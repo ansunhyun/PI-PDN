@@ -1,0 +1,222 @@
+{
+  "preprocessingMode": "anf_cmp",
+  "aedtVersion": "2024.2",
+  "preprocessing": {
+    "version": "2024.2",
+    "referencePolicy": "dcir_reference_v1",
+    "outputName": "49XF3P_1.0_241010",
+    "inputs": {
+      "anf": "../input/original_design/49XF3P_1.0_241010.anf",
+      "cmp": "../input/original_design/49XF3P_1.0_241010.cmp",
+      "stackup": "../input/original_design/49XF3P_1.0_241010.stk",
+      "bom": "../input/original_design/analysis_bom.csv"
+    },
+    "sws": "siwave/DCIR_Fast.sws",
+    "dcShort": {
+      "excludeNet": [],
+      "shortedComp": [],
+      "shortKey": "SIGN",
+      "excludePrefixes": [],
+      "deleteCompTypes": [],
+      "preserveCompTypes": []
+    },
+    "BOM": {
+      "designatorColumns": [
+        "Designator"
+      ],
+      "expandedDesignatorPolicy": "parent_numeric_suffix"
+    }
+  },
+  "nets": {
+    "reference": "GND"
+  },
+  "pcbCapture": {
+    "channels": [
+      "*"
+    ],
+    "overview": {
+      "enabled": true
+    },
+    "highlight": {
+      "mode": "context"
+    }
+  },
+  "BOM": {
+    "schemaVersion": 1,
+    "path": "../input/original_design/analysis_bom.csv",
+    "colKey": [
+      "Designator",
+      "Part Number"
+    ],
+    "compProp": {
+      "hdmiFourChannelArray5R1": {
+        "Part Number": {
+          "regex": "^EBC62798406$"
+        },
+        "siTdr": {
+          "arrayPinMap": [
+            [
+              "1",
+              "8"
+            ],
+            [
+              "2",
+              "7"
+            ],
+            [
+              "3",
+              "6"
+            ],
+            [
+              "4",
+              "5"
+            ]
+          ],
+          "resistanceOhm": 5.1
+        }
+      },
+      "dpAcCouplingCapacitor": {
+        "Part Number": {
+          "regex": "^0CK104BF56A$"
+        }
+      },
+      "usbSeriesResistor2R2": {
+        "Part Number": {
+          "regex": "^0RJ0221C678$"
+        }
+      }
+    }
+  },
+  "seriesTreatment": {
+    "default": "unresolved",
+    "byGroup": {
+      "hdmiFourChannelArray5R1": "actual",
+      "dpAcCouplingCapacitor": "actual",
+      "usbSeriesResistor2R2": "actual"
+    }
+  },
+  "ports": {
+    "mode": "metadata-snp",
+    "referenceNet": "GND",
+    "referenceLayer": "COND_2",
+    "singleEndedImpedanceOhm": 50
+  },
+  "analysisTemplates": {
+    "schemaVersion": 1,
+    "defaults": {
+      "syzTemplateId": "SYZ_DEFAULT",
+      "tdrTemplateId": "TDR_DEFAULT"
+    },
+    "syzTemplates": {
+      "SYZ_DEFAULT": {
+        "frequencySweep": {
+          "name": "Customer_TDR_Sweep",
+          "discrete_sweep": true,
+          "ranges": [
+            [
+              "linear count",
+              "0Hz",
+              "0Hz",
+              1
+            ],
+            [
+              "log scale",
+              "1Hz",
+              "10MHz",
+              10
+            ],
+            [
+              "linear count",
+              "10MHz",
+              "5GHz",
+              500
+            ],
+            [
+              "linear count",
+              "5GHz",
+              "10GHz",
+              501
+            ]
+          ]
+        }
+      }
+    },
+    "tdrTemplates": {
+      "TDR_DEFAULT": {
+        "circuitTopology": "manual-snp-multi-diff",
+        "mode": "differential",
+        "targetImpedanceOhm": 100,
+        "riseTimePs": 50,
+        "layout": {
+          "manualSnpMultiDiff": {
+            "nearX": -0.09,
+            "farX": 0.125,
+            "yStart": 0.085,
+            "yStep": -0.026,
+            "pageOffset": 0.01016,
+            "pairDy": 0.003,
+            "tdrPageDy": 0.0,
+            "farResistorDx": 0.018
+          }
+        },
+        "transient": {
+          "stepPs": 100,
+          "stopPs": 10000,
+          "useTsConvolution": false
+        },
+        "timeRangePolicy": {
+          "mode": "route_length",
+          "routeLengthSource": "resolved_channel_path",
+          "differentialLengthPolicy": "max_positive_negative",
+          "channelAggregationPolicy": "max_selected_channel",
+          "propagation": {
+            "velocity": {
+              "value": 0.149896229,
+              "unit": "mm/ps"
+            }
+          },
+          "roundTripFactor": 2,
+          "observationWindow": {
+            "scope": "report_view_only",
+            "reflectionRoundTripCount": 2,
+            "riseTimeGuardMultiplier": 10,
+            "riseTime": {
+              "value": 50,
+              "unit": "ps"
+            },
+            "quantization": {
+              "mode": "ceil",
+              "step": {
+                "value": 0.5,
+                "unit": "ns"
+              }
+            },
+            "reportGroupAggregationPolicy": "max_channel_view",
+            "commonGroupedReportPolicy": "per_report_group_view"
+          },
+          "manualOverrideAllowed": true
+        },
+        "view": {
+          "yAxisOhm": {
+            "min": 70,
+            "max": 130
+          }
+        },
+        "resultProcessing": {
+          "endpointAnnotations": {
+            "enabled": true,
+            "mode": "boundary_labels",
+            "layout": {
+              "placement": "plot_inside",
+              "fontSizePt": 32,
+              "wrapWidthChars": 24
+            }
+          }
+        },
+        "termination": {
+          "differentialBridgeOhm": 100
+        }
+      }
+    }
+  }
+}

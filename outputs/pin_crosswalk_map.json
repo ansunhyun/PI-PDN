@@ -1,0 +1,5055 @@
+{
+  "Schema_Version": 1,
+  "Records": [
+    {
+      "Designator": "IC100",
+      "UI_Pin": "A10",
+      "EDB_Pin": "A10",
+      "UI_Net": "TX_P_1_IM100",
+      "EDB_Net": "TX_P_1_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "A12",
+      "EDB_Pin": "A12",
+      "UI_Net": "TX_N_3_IM100",
+      "EDB_Net": "TX_N_3_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "A14",
+      "EDB_Pin": "A14",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "A16",
+      "EDB_Pin": "A16",
+      "UI_Net": "TX_P_6_IM100",
+      "EDB_Net": "TX_P_6_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "A18",
+      "EDB_Pin": "A18",
+      "UI_Net": "TX_N_8_IM100",
+      "EDB_Net": "TX_N_8_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "A2",
+      "EDB_Pin": "A2",
+      "UI_Net": "EPHY_TD_N_IM100",
+      "EDB_Net": "EPHY_TD_N_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "A20",
+      "EDB_Pin": "A20",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "A22",
+      "EDB_Pin": "A22",
+      "UI_Net": "TX_P_11_IM100",
+      "EDB_Net": "TX_P_11_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "A24",
+      "EDB_Pin": "A24",
+      "UI_Net": "TX_N_13_IM100",
+      "EDB_Net": "TX_N_13_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "A26",
+      "EDB_Pin": "A26",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "A28",
+      "EDB_Pin": "B28",
+      "UI_Net": "SIGN003116",
+      "EDB_Net": "SIGN003116",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "A30",
+      "EDB_Pin": "R31",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "A4",
+      "EDB_Pin": "A4",
+      "UI_Net": "POWER_ON/OFF_REOTP",
+      "EDB_Net": "POWER_ON_OFF_REOTP",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "A6",
+      "EDB_Pin": "A6",
+      "UI_Net": "HTPDAn",
+      "EDB_Net": "HTPDAn",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "A8",
+      "EDB_Pin": "A8",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AA1",
+      "EDB_Pin": "AA1",
+      "UI_Net": "HDMI2.1_3_CK_-_IM90",
+      "EDB_Net": "HDMI2.1_3_CK_-_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AA10",
+      "EDB_Pin": "AA10",
+      "UI_Net": "+CPU_1V0",
+      "EDB_Net": "+CPU_1V0",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AA13",
+      "EDB_Pin": "AA13",
+      "UI_Net": "+D1V0",
+      "EDB_Net": "+D1V0",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AA14",
+      "EDB_Pin": "AA14",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AA15",
+      "EDB_Pin": "AA15",
+      "UI_Net": "+CPU_1V0",
+      "EDB_Net": "+CPU_1V0",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AA17",
+      "EDB_Pin": "AA17",
+      "UI_Net": "+CPU_1V0",
+      "EDB_Net": "+CPU_1V0",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AA18",
+      "EDB_Pin": "P31",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AA20",
+      "EDB_Pin": "AA20",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AA29",
+      "EDB_Pin": "AA29",
+      "UI_Net": "EMMC_DATA[2]",
+      "EDB_Net": "EMMC_DATA[2]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AA3",
+      "EDB_Pin": "AA3",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AA30",
+      "EDB_Pin": "AA30",
+      "UI_Net": "EMMC_DATA[7]",
+      "EDB_Net": "EMMC_DATA[7]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AA4",
+      "EDB_Pin": "AA4",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AA5",
+      "EDB_Pin": "AA5",
+      "UI_Net": "SIGN001618",
+      "EDB_Net": "SIGN001618",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AA6",
+      "EDB_Pin": "AA6",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AA7",
+      "EDB_Pin": "AA7",
+      "UI_Net": "FE_DEMOD1_TS_VAL",
+      "EDB_Net": "FE_DEMOD1_TS_VAL",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AA8",
+      "EDB_Pin": "AA8",
+      "UI_Net": "FE_DEMOD1_TS_SYNC",
+      "EDB_Net": "FE_DEMOD1_TS_SYNC",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AA9",
+      "EDB_Pin": "AA9",
+      "UI_Net": "FE_DEMOD1_TS_DATA[7]",
+      "EDB_Net": "FE_DEMOD1_TS_DATA[7]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AB1",
+      "EDB_Pin": "AB1",
+      "UI_Net": "HDMI2.1_3_CK_+_IM90",
+      "EDB_Net": "HDMI2.1_3_CK_+_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AB12",
+      "EDB_Pin": "AB12",
+      "UI_Net": "+D1V0",
+      "EDB_Net": "+D1V0",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AB14",
+      "EDB_Pin": "AB14",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AB15",
+      "EDB_Pin": "AB15",
+      "UI_Net": "+CPU_1V0",
+      "EDB_Net": "+CPU_1V0",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AB17",
+      "EDB_Pin": "AB17",
+      "UI_Net": "+CPU_1V0",
+      "EDB_Net": "+CPU_1V0",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AB18",
+      "EDB_Pin": "AB18",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AB2",
+      "EDB_Pin": "AB2",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AB23",
+      "EDB_Pin": "AB23",
+      "UI_Net": "TPO_DATA[7]",
+      "EDB_Net": "TPO_DATA[7]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AB24",
+      "EDB_Pin": "AB24",
+      "UI_Net": "TPO_DATA[6]",
+      "EDB_Net": "TPO_DATA[6]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AB25",
+      "EDB_Pin": "AB25",
+      "UI_Net": "TPO_CLK",
+      "EDB_Net": "TPO_CLK",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AB26",
+      "EDB_Pin": "AB26",
+      "UI_Net": "TPO_DATA[4]",
+      "EDB_Net": "TPO_DATA[4]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AB27",
+      "EDB_Pin": "AB27",
+      "UI_Net": "TPO_VAL",
+      "EDB_Net": "TPO_VAL",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AB28",
+      "EDB_Pin": "AB28",
+      "UI_Net": "TPO_DATA[5]",
+      "EDB_Net": "TPO_DATA[5]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AB29",
+      "EDB_Pin": "AB29",
+      "UI_Net": "EMMC_DATA[0]",
+      "EDB_Net": "EMMC_DATA[0]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AB3",
+      "EDB_Pin": "AB3",
+      "UI_Net": "HDMI2.1_3_D0_-_IM90",
+      "EDB_Net": "HDMI2.1_3_D0_-_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AB30",
+      "EDB_Pin": "AB30",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AB31",
+      "EDB_Pin": "AB31",
+      "UI_Net": "EMMC_DATA[1]",
+      "EDB_Net": "EMMC_DATA[1]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AB4",
+      "EDB_Pin": "AB4",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AC13",
+      "EDB_Pin": "AC13",
+      "UI_Net": "+D1V0",
+      "EDB_Net": "+D1V0",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AC15",
+      "EDB_Pin": "AC15",
+      "UI_Net": "+CPU_1V0",
+      "EDB_Net": "+CPU_1V0",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AC17",
+      "EDB_Pin": "AC17",
+      "UI_Net": "+CPU_1V0",
+      "EDB_Net": "+CPU_1V0",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AC18",
+      "EDB_Pin": "AC18",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AC23",
+      "EDB_Pin": "AC23",
+      "UI_Net": "TPO_DATA[3]",
+      "EDB_Net": "TPO_DATA[3]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AC25",
+      "EDB_Pin": "AC25",
+      "UI_Net": "TPO_DATA[2]",
+      "EDB_Net": "TPO_DATA[2]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AC27",
+      "EDB_Pin": "AC27",
+      "UI_Net": "TPO_DATA[1]",
+      "EDB_Net": "TPO_DATA[1]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AC29",
+      "EDB_Pin": "AC29",
+      "UI_Net": "EMMC_DATA[3]",
+      "EDB_Net": "EMMC_DATA[3]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AC3",
+      "EDB_Pin": "AC3",
+      "UI_Net": "HDMI2.1_3_D0_+_IM90",
+      "EDB_Net": "HDMI2.1_3_D0_+_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AC30",
+      "EDB_Pin": "AC30",
+      "UI_Net": "EMMC_DATA[4]",
+      "EDB_Net": "EMMC_DATA[4]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AC4",
+      "EDB_Pin": "AC4",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AC5",
+      "EDB_Pin": "AC5",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AC6",
+      "EDB_Pin": "AC6",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AC7",
+      "EDB_Pin": "AC7",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AC9",
+      "EDB_Pin": "AC9",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AD14",
+      "EDB_Pin": "AD14",
+      "UI_Net": "+D1V0",
+      "EDB_Net": "+D1V0",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AD16",
+      "EDB_Pin": "AD16",
+      "UI_Net": "+CPU_1V0",
+      "EDB_Net": "+CPU_1V0",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AD17",
+      "EDB_Pin": "AD17",
+      "UI_Net": "+CPU_1V0",
+      "EDB_Net": "+CPU_1V0",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AD18",
+      "EDB_Pin": "AD18",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AD29",
+      "EDB_Pin": "AD29",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AD3",
+      "EDB_Pin": "AD3",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AD30",
+      "EDB_Pin": "AD30",
+      "UI_Net": "EMMC_STRB",
+      "EDB_Net": "EMMC_STRB",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AD31",
+      "EDB_Pin": "AD31",
+      "UI_Net": "EMMC_DATA[5]",
+      "EDB_Net": "EMMC_DATA[5]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AD4",
+      "EDB_Pin": "AD4",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AE12",
+      "EDB_Pin": "N31",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AE15",
+      "EDB_Pin": "AE15",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AE23",
+      "EDB_Pin": "AE23",
+      "UI_Net": "TPO_DATA[0]",
+      "EDB_Net": "TPO_DATA[0]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AE25",
+      "EDB_Pin": "AE25",
+      "UI_Net": "TPO_SOP",
+      "EDB_Net": "TPO_SOP",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AE26",
+      "EDB_Pin": "AE26",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AE27",
+      "EDB_Pin": "AE27",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AE28",
+      "EDB_Pin": "AE28",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AE29",
+      "EDB_Pin": "AE29",
+      "UI_Net": "EMMC_CMD",
+      "EDB_Net": "EMMC_CMD",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AE3",
+      "EDB_Pin": "AE3",
+      "UI_Net": "HDMI2.1_3_D1_-_IM90",
+      "EDB_Net": "HDMI2.1_3_D1_-_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AE30",
+      "EDB_Pin": "AE30",
+      "UI_Net": "EMMC_RST",
+      "EDB_Net": "EMMC_RST",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AE4",
+      "EDB_Pin": "AE4",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AE5",
+      "EDB_Pin": "AE5",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AE7",
+      "EDB_Pin": "AE7",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AE9",
+      "EDB_Pin": "AE9",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AF1",
+      "EDB_Pin": "AF1",
+      "UI_Net": "HDMI2.1_3_D2_-_IM90",
+      "EDB_Net": "HDMI2.1_3_D2_-_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AF11",
+      "EDB_Pin": "AJ11",
+      "UI_Net": "+CPU_1V0",
+      "EDB_Net": "+CPU_1V0",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AF13",
+      "EDB_Pin": "AF13",
+      "UI_Net": "+D1V0",
+      "EDB_Net": "+D1V0",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AF14",
+      "EDB_Pin": "AF14",
+      "UI_Net": "+D1V0",
+      "EDB_Net": "+D1V0",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AF2",
+      "EDB_Pin": "AF2",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AF29",
+      "EDB_Pin": "AF29",
+      "UI_Net": "CAM_CD2_N_SC_CMD_VCC",
+      "EDB_Net": "CAM_CD2_N_SC_CMD_VCC",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AF3",
+      "EDB_Pin": "AF3",
+      "UI_Net": "HDMI2.1_3_D1_+_IM90",
+      "EDB_Net": "HDMI2.1_3_D1_+_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AF30",
+      "EDB_Pin": "AF30",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AF31",
+      "EDB_Pin": "AF31",
+      "UI_Net": "EMMC_CLK",
+      "EDB_Net": "EMMC_CLK",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AF4",
+      "EDB_Pin": "AF4",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AF5",
+      "EDB_Pin": "AF5",
+      "UI_Net": "FE_DEMOD1_TS_DATA[5]",
+      "EDB_Net": "FE_DEMOD1_TS_DATA[5]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AF6",
+      "EDB_Pin": "AF6",
+      "UI_Net": "FE_DEMOD1_TS_DATA[6]",
+      "EDB_Net": "FE_DEMOD1_TS_DATA[6]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AF7",
+      "EDB_Pin": "AF7",
+      "UI_Net": "FE_DEMOD1_TS_DATA[4]",
+      "EDB_Net": "FE_DEMOD1_TS_DATA[4]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AF8",
+      "EDB_Pin": "AF8",
+      "UI_Net": "FE_DEMOD1_TS_DATA[3]",
+      "EDB_Net": "FE_DEMOD1_TS_DATA[3]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AF9",
+      "EDB_Pin": "AF9",
+      "UI_Net": "FE_DEMOD1_TS_DATA[2]",
+      "EDB_Net": "FE_DEMOD1_TS_DATA[2]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AG1",
+      "EDB_Pin": "AG1",
+      "UI_Net": "HDMI2.1_3_D2_+_IM90",
+      "EDB_Net": "HDMI2.1_3_D2_+_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AG23",
+      "EDB_Pin": "AG23",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AG24",
+      "EDB_Pin": "AG24",
+      "UI_Net": "TPI_DATA[7]",
+      "EDB_Net": "TPI_DATA[7]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AG25",
+      "EDB_Pin": "AG25",
+      "UI_Net": "TPI_DATA[6]",
+      "EDB_Net": "TPI_DATA[6]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AG26",
+      "EDB_Pin": "AG26",
+      "UI_Net": "TPI_DATA[5]",
+      "EDB_Net": "TPI_DATA[5]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AG27",
+      "EDB_Pin": "AG27",
+      "UI_Net": "TPI_DATA[4]",
+      "EDB_Net": "TPI_DATA[4]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AG28",
+      "EDB_Pin": "AG28",
+      "UI_Net": "TPI_DATA[3]",
+      "EDB_Net": "TPI_DATA[3]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AG29",
+      "EDB_Pin": "AG29",
+      "UI_Net": "EB_DATA[1]",
+      "EDB_Net": "EB_DATA[1]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AG3",
+      "EDB_Pin": "AG3",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AG30",
+      "EDB_Pin": "AG30",
+      "UI_Net": "EB_DATA[2]",
+      "EDB_Net": "EB_DATA[2]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AH1",
+      "EDB_Pin": "AH1",
+      "UI_Net": "HDMI2.1_2_CK_-_IM90",
+      "EDB_Net": "HDMI2.1_2_CK_-_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AH2",
+      "EDB_Pin": "AH2",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AH29",
+      "EDB_Pin": "AH29",
+      "UI_Net": "EB_ADDR[1]",
+      "EDB_Net": "EB_ADDR[1]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AH3",
+      "EDB_Pin": "AH3",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AH30",
+      "EDB_Pin": "AH30",
+      "UI_Net": "EB_ADDR[0]",
+      "EDB_Net": "EB_ADDR[0]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AH31",
+      "EDB_Pin": "AH31",
+      "UI_Net": "EB_DATA[0]",
+      "EDB_Net": "EB_DATA[0]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AH4",
+      "EDB_Pin": "AH4",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AH5",
+      "EDB_Pin": "AH5",
+      "UI_Net": "FE_DEMOD1_TS_DATA[1]",
+      "EDB_Net": "FE_DEMOD1_TS_DATA[1]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AH6",
+      "EDB_Pin": "AH6",
+      "UI_Net": "FE_DEMOD1_TS_DATA[0]",
+      "EDB_Net": "FE_DEMOD1_TS_DATA[0]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AH7",
+      "EDB_Pin": "AH7",
+      "UI_Net": "I2C_SDA_2",
+      "EDB_Net": "I2C_SDA_2",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AH8",
+      "EDB_Pin": "AH8",
+      "UI_Net": "I2C_SCL_2",
+      "EDB_Net": "I2C_SCL_2",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AH9",
+      "EDB_Pin": "AH9",
+      "UI_Net": "",
+      "EDB_Net": "ZUKEN_DUMMY",
+      "Net_Match": false,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AJ1",
+      "EDB_Pin": "AJ1",
+      "UI_Net": "HDMI2.1_2_CK_+_IM90",
+      "EDB_Net": "HDMI2.1_2_CK_+_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AJ11",
+      "EDB_Pin": "AT31",
+      "UI_Net": "+CPU_1V0",
+      "EDB_Net": "EB_ADDR[9]",
+      "Net_Match": false,
+      "Method": "coord_only",
+      "Confidence": 0.55
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AJ15",
+      "EDB_Pin": "AJ15",
+      "UI_Net": "COMBO_RESET",
+      "EDB_Net": "COMBO_RESET",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AJ16",
+      "EDB_Pin": "AJ16",
+      "UI_Net": "+D1V8",
+      "EDB_Net": "+D1V8",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AJ18",
+      "EDB_Pin": "AJ18",
+      "UI_Net": "IR_BLASTER_DET",
+      "EDB_Net": "IR_BLASTER_DET",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AJ2",
+      "EDB_Pin": "AJ2",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AJ20",
+      "EDB_Pin": "AJ20",
+      "UI_Net": "PANEL_CTL",
+      "EDB_Net": "PANEL_CTL",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AJ22",
+      "EDB_Pin": "AJ22",
+      "UI_Net": "POR_PERIOD",
+      "EDB_Net": "POR_PERIOD",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AJ23",
+      "EDB_Pin": "AJ23",
+      "UI_Net": "KEY2",
+      "EDB_Net": "KEY2",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AJ25",
+      "EDB_Pin": "AJ25",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AJ27",
+      "EDB_Pin": "AJ27",
+      "UI_Net": "DISCHARGE_CTR",
+      "EDB_Net": "DISCHARGE_CTR",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AJ29",
+      "EDB_Pin": "AJ29",
+      "UI_Net": "CAM_REG_N",
+      "EDB_Net": "CAM_REG_N",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AJ3",
+      "EDB_Pin": "AJ3",
+      "UI_Net": "HDMI2.1_2_D0_-_IM90",
+      "EDB_Net": "HDMI2.1_2_D0_-_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AJ30",
+      "EDB_Pin": "AJ30",
+      "UI_Net": "EB_ADDR[2]",
+      "EDB_Net": "EB_ADDR[2]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AK11",
+      "EDB_Pin": "AK11",
+      "UI_Net": "LED",
+      "EDB_Net": "LED",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AK16",
+      "EDB_Pin": "AK16",
+      "UI_Net": "LED_D_FB_PWM",
+      "EDB_Net": "LED_D_FB_PWM",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AK18",
+      "EDB_Pin": "AK18",
+      "UI_Net": "EEPROM_WP",
+      "EDB_Net": "EEPROM_WP",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AK23",
+      "EDB_Pin": "AK23",
+      "UI_Net": "SIGN001668",
+      "EDB_Net": "SIGN001668",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AK25",
+      "EDB_Pin": "AK25",
+      "UI_Net": "POWER_ON/OFF2_4",
+      "EDB_Net": "POWER_ON_OFF2_4",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AK27",
+      "EDB_Pin": "AK27",
+      "UI_Net": "MODE_SELECT_PWM1",
+      "EDB_Net": "MODE_SELECT_PWM1",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AK29",
+      "EDB_Pin": "AK29",
+      "UI_Net": "CAM_WAIT_N",
+      "EDB_Net": "CAM_WAIT_N",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AK3",
+      "EDB_Pin": "AK3",
+      "UI_Net": "HDMI2.1_2_D0_+_IM90",
+      "EDB_Net": "HDMI2.1_2_D0_+_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AK30",
+      "EDB_Pin": "AK30",
+      "UI_Net": "EB_ADDR[4]",
+      "EDB_Net": "EB_ADDR[4]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AK31",
+      "EDB_Pin": "AK31",
+      "UI_Net": "EB_ADDR[3]",
+      "EDB_Net": "EB_ADDR[3]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AK4",
+      "EDB_Pin": "AK4",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AK5",
+      "EDB_Pin": "AK5",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AK6",
+      "EDB_Pin": "AK6",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AK7",
+      "EDB_Pin": "AK7",
+      "UI_Net": "HDMI_DET3",
+      "EDB_Net": "HDMI_DET3",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AK8",
+      "EDB_Pin": "AK8",
+      "UI_Net": "HDMI_DET4",
+      "EDB_Net": "HDMI_DET4",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AK9",
+      "EDB_Pin": "AK9",
+      "UI_Net": "CVBS_DET",
+      "EDB_Net": "CVBS_DET",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AL11",
+      "EDB_Pin": "AL11",
+      "UI_Net": "AMP_MUTE",
+      "EDB_Net": "AMP_MUTE",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AL13",
+      "EDB_Pin": "AL13",
+      "UI_Net": "BT_WAKEUP_HOST",
+      "EDB_Net": "BT_WAKEUP_HOST",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AL15",
+      "EDB_Pin": "AL15",
+      "UI_Net": "WIFI_EN",
+      "EDB_Net": "WIFI_EN",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AL16",
+      "EDB_Pin": "AL16",
+      "UI_Net": "WOV_RLON",
+      "EDB_Net": "WOV_RLON",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AL18",
+      "EDB_Pin": "AL18",
+      "UI_Net": "I2C_SCL_5",
+      "EDB_Net": "I2C_SCL_5",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AL20",
+      "EDB_Pin": "AL20",
+      "UI_Net": "UEI_IR_TX",
+      "EDB_Net": "UEI_IR_TX",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AL22",
+      "EDB_Pin": "AL22",
+      "UI_Net": "HDMI_DET2",
+      "EDB_Net": "HDMI_DET2",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AL23",
+      "EDB_Pin": "AL23",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AL25",
+      "EDB_Pin": "AL25",
+      "UI_Net": "POWER_ON/OFF2_3",
+      "EDB_Net": "POWER_ON_OFF2_3",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AL27",
+      "EDB_Pin": "AL27",
+      "UI_Net": "INV_CTL",
+      "EDB_Net": "INV_CTL",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AL29",
+      "EDB_Pin": "AL29",
+      "UI_Net": "PCM_RESET",
+      "EDB_Net": "PCM_RESET",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AL3",
+      "EDB_Pin": "AL3",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AL30",
+      "EDB_Pin": "AL30",
+      "UI_Net": "EB_ADDR[5]",
+      "EDB_Net": "EB_ADDR[5]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AL4",
+      "EDB_Pin": "AL4",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AM11",
+      "EDB_Pin": "AM11",
+      "UI_Net": "I2C_SDA_0",
+      "EDB_Net": "I2C_SDA_0",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AM13",
+      "EDB_Pin": "AM13",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AM16",
+      "EDB_Pin": "AM16",
+      "UI_Net": "IR",
+      "EDB_Net": "IR",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AM18",
+      "EDB_Pin": "AM18",
+      "UI_Net": "I2C_SDA_5",
+      "EDB_Net": "I2C_SDA_5",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AM20",
+      "EDB_Pin": "AM20",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AM23",
+      "EDB_Pin": "AM23",
+      "UI_Net": "SIGN001575",
+      "EDB_Net": "SIGN001575",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AM25",
+      "EDB_Pin": "AM25",
+      "UI_Net": "POWER_ON/OFF1",
+      "EDB_Net": "POWER_ON_OFF1",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AM27",
+      "EDB_Pin": "AM27",
+      "UI_Net": "LED_RGB",
+      "EDB_Net": "LED_RGB",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AM29",
+      "EDB_Pin": "AM29",
+      "UI_Net": "EB_ADDR[12]",
+      "EDB_Net": "EB_ADDR[12]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AM3",
+      "EDB_Pin": "AM3",
+      "UI_Net": "HDMI2.1_2_D1_-_IM90",
+      "EDB_Net": "HDMI2.1_2_D1_-_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AM30",
+      "EDB_Pin": "AM30",
+      "UI_Net": "EB_ADDR[7]",
+      "EDB_Net": "EB_ADDR[7]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AM31",
+      "EDB_Pin": "AM31",
+      "UI_Net": "EB_ADDR[6]",
+      "EDB_Net": "EB_ADDR[6]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AM4",
+      "EDB_Pin": "AM4",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AM5",
+      "EDB_Pin": "AM5",
+      "UI_Net": "",
+      "EDB_Net": "ZUKEN_DUMMY",
+      "Net_Match": false,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AM6",
+      "EDB_Pin": "AM6",
+      "UI_Net": "HDMI2.1_3_HPD",
+      "EDB_Net": "HDMI2.1_3_HPD",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AM7",
+      "EDB_Pin": "AM7",
+      "UI_Net": "HDMI2.1_3_5V_DET",
+      "EDB_Net": "HDMI2.1_3_5V_DET",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AM8",
+      "EDB_Pin": "AM8",
+      "UI_Net": "DDC_SDA_3",
+      "EDB_Net": "DDC_SDA_3",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AM9",
+      "EDB_Pin": "AM9",
+      "UI_Net": "DDC_SCL_3",
+      "EDB_Net": "DDC_SCL_3",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AN1",
+      "EDB_Pin": "AN1",
+      "UI_Net": "HDMI2.1_2_D2_-_IM90",
+      "EDB_Net": "HDMI2.1_2_D2_-_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AN11",
+      "EDB_Pin": "AN11",
+      "UI_Net": "I2C_SCL_0",
+      "EDB_Net": "I2C_SCL_0",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AN13",
+      "EDB_Pin": "AN13",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AN15",
+      "EDB_Pin": "AN15",
+      "UI_Net": "WOL/WIFI_POWER_ON",
+      "EDB_Net": "WOL_WIFI_POWER_ON",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AN16",
+      "EDB_Pin": "AN16",
+      "UI_Net": "MIC_DATA_SOC",
+      "EDB_Net": "MIC_DATA_SOC",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AN18",
+      "EDB_Pin": "AN18",
+      "UI_Net": "HP_MUTE",
+      "EDB_Net": "HP_MUTE",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AN2",
+      "EDB_Pin": "AN2",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AN20",
+      "EDB_Pin": "AN20",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AN22",
+      "EDB_Pin": "AN22",
+      "UI_Net": "HDMI_DET1",
+      "EDB_Net": "HDMI_DET1",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AN23",
+      "EDB_Pin": "AN23",
+      "UI_Net": "SOC_TX",
+      "EDB_Net": "SOC_TX",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AN25",
+      "EDB_Pin": "AN25",
+      "UI_Net": "LSDAC",
+      "EDB_Net": "LSDAC",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AN27",
+      "EDB_Pin": "AN27",
+      "UI_Net": "RL_ON_SOC",
+      "EDB_Net": "RL_ON_SOC",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AN29",
+      "EDB_Pin": "AN29",
+      "UI_Net": "EB_WE_N",
+      "EDB_Net": "EB_WE_N",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AN3",
+      "EDB_Pin": "AN3",
+      "UI_Net": "HDMI2.1_2_D1_+_IM90",
+      "EDB_Net": "HDMI2.1_2_D1_+_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AN30",
+      "EDB_Pin": "AN30",
+      "UI_Net": "CAM_IREQ_N",
+      "EDB_Net": "CAM_IREQ_N",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AP1",
+      "EDB_Pin": "AP1",
+      "UI_Net": "HDMI2.1_2_D2_+_IM90",
+      "EDB_Net": "HDMI2.1_2_D2_+_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AP11",
+      "EDB_Pin": "AP11",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AP13",
+      "EDB_Pin": "AP13",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AP14",
+      "EDB_Pin": "AP14",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AP15",
+      "EDB_Pin": "AP15",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AP16",
+      "EDB_Pin": "AP16",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AP17",
+      "EDB_Pin": "AP17",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AP18",
+      "EDB_Pin": "AP18",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AP20",
+      "EDB_Pin": "AP20",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AP21",
+      "EDB_Pin": "AP21",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AP22",
+      "EDB_Pin": "AP22",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AP23",
+      "EDB_Pin": "AP23",
+      "UI_Net": "SOC_RX",
+      "EDB_Net": "SOC_RX",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AP25",
+      "EDB_Pin": "AP25",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AP27",
+      "EDB_Pin": "AP27",
+      "UI_Net": "POWER_DET",
+      "EDB_Net": "POWER_DET",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AP29",
+      "EDB_Pin": "AP29",
+      "UI_Net": "EB_ADDR[8]",
+      "EDB_Net": "EB_ADDR[8]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AP3",
+      "EDB_Pin": "AP3",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AP30",
+      "EDB_Pin": "AP30",
+      "UI_Net": "EB_ADDR[13]",
+      "EDB_Net": "EB_ADDR[13]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AP31",
+      "EDB_Pin": "AP31",
+      "UI_Net": "EB_ADDR[14]",
+      "EDB_Net": "EB_ADDR[14]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AP4",
+      "EDB_Pin": "AP4",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AP5",
+      "EDB_Pin": "AP5",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AP6",
+      "EDB_Pin": "AP6",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AP7",
+      "EDB_Pin": "AP7",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AP8",
+      "EDB_Pin": "AP8",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AP9",
+      "EDB_Pin": "AP9",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AR10",
+      "EDB_Pin": "AR10",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AR11",
+      "EDB_Pin": "AR11",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AR12",
+      "EDB_Pin": "AR12",
+      "UI_Net": "HDMI2.0_4_D0_-_IM90",
+      "EDB_Net": "HDMI2.0_4_D0_-_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AR13",
+      "EDB_Pin": "AR13",
+      "UI_Net": "HDMI2.0_4_D0_+_IM90",
+      "EDB_Net": "HDMI2.0_4_D0_+_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AR14",
+      "EDB_Pin": "AR14",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AR15",
+      "EDB_Pin": "AR15",
+      "UI_Net": "HDMI2.0_4_D1_-_IM90",
+      "EDB_Net": "HDMI2.0_4_D1_-_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AR16",
+      "EDB_Pin": "AR16",
+      "UI_Net": "HDMI2.0_4_D1_+_IM90",
+      "EDB_Net": "HDMI2.0_4_D1_+_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AR17",
+      "EDB_Pin": "AR17",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AR18",
+      "EDB_Pin": "AR18",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AR19",
+      "EDB_Pin": "AR19",
+      "UI_Net": "HDMI2.0_1_HPD",
+      "EDB_Net": "HDMI2.0_1_HPD",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AR2",
+      "EDB_Pin": "AR2",
+      "UI_Net": "USB2.0_1_DM_IM90",
+      "EDB_Net": "USB2.0_1_DM_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AR20",
+      "EDB_Pin": "AR20",
+      "UI_Net": "DDC_SDA_1",
+      "EDB_Net": "DDC_SDA_1",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AR21",
+      "EDB_Pin": "AR21",
+      "UI_Net": "HDMI2.1_2_5V_DET",
+      "EDB_Net": "HDMI2.1_2_5V_DET",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AR22",
+      "EDB_Pin": "AR22",
+      "UI_Net": "DDC_SCL_2",
+      "EDB_Net": "DDC_SCL_2",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AR23",
+      "EDB_Pin": "M31",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AR24",
+      "EDB_Pin": "Y31",
+      "UI_Net": "SIGN003119",
+      "EDB_Net": "PCM_5V_SC_PWR_SEL",
+      "Net_Match": false,
+      "Method": "coord_only",
+      "Confidence": 0.55
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AR25",
+      "EDB_Pin": "AR25",
+      "UI_Net": "EB_DATA[3]",
+      "EDB_Net": "EB_DATA[3]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AR26",
+      "EDB_Pin": "AR26",
+      "UI_Net": "EB_DATA[5]",
+      "EDB_Net": "EB_DATA[5]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AR27",
+      "EDB_Pin": "AR27",
+      "UI_Net": "/PCM_CE1",
+      "EDB_Net": "_PCM_CE1",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AR28",
+      "EDB_Pin": "AR28",
+      "UI_Net": "EB_OE_N",
+      "EDB_Net": "EB_OE_N",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AR30",
+      "EDB_Pin": "AR30",
+      "UI_Net": "EB_ADDR[11]",
+      "EDB_Net": "EB_ADDR[11]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AR4",
+      "EDB_Pin": "AR4",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AR5",
+      "EDB_Pin": "AR5",
+      "UI_Net": "HDMI2.0_1_D0_-_IM90",
+      "EDB_Net": "HDMI2.0_1_D0_-_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AR6",
+      "EDB_Pin": "AR6",
+      "UI_Net": "HDMI2.0_1_D0_+_IM90",
+      "EDB_Net": "HDMI2.0_1_D0_+_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AR7",
+      "EDB_Pin": "AR7",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AR8",
+      "EDB_Pin": "AR8",
+      "UI_Net": "HDMI2.0_1_D1_-_IM90",
+      "EDB_Net": "HDMI2.0_1_D1_-_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AR9",
+      "EDB_Pin": "AR9",
+      "UI_Net": "HDMI2.0_1_D1_+_IM90",
+      "EDB_Net": "HDMI2.0_1_D1_+_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AT1",
+      "EDB_Pin": "AT1",
+      "UI_Net": "USB2.0_1_DP_IM90",
+      "EDB_Net": "USB2.0_1_DP_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AT11",
+      "EDB_Pin": "AT11",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AT12",
+      "EDB_Pin": "AT12",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AT16",
+      "EDB_Pin": "AT16",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AT18",
+      "EDB_Pin": "AT18",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AT19",
+      "EDB_Pin": "AT19",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AT20",
+      "EDB_Pin": "AT20",
+      "UI_Net": "HDMI2.0_1_5V_DET",
+      "EDB_Net": "HDMI2.0_1_5V_DET",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AT21",
+      "EDB_Pin": "AT21",
+      "UI_Net": "HDMI2.1_2_HPD",
+      "EDB_Net": "HDMI2.1_2_HPD",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AT22",
+      "EDB_Pin": "AT22",
+      "UI_Net": "DDC_SDA_2",
+      "EDB_Net": "DDC_SDA_2",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AT23",
+      "EDB_Pin": "AT23",
+      "UI_Net": "HW_CEC",
+      "EDB_Net": "HW_CEC",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AT24",
+      "EDB_Pin": "U31",
+      "UI_Net": "SIGN003119",
+      "EDB_Net": "SIGN00441",
+      "Net_Match": false,
+      "Method": "coord_only",
+      "Confidence": 0.55
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AT25",
+      "EDB_Pin": "AT25",
+      "UI_Net": "CAM_CD1_N",
+      "EDB_Net": "CAM_CD1_N",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AT26",
+      "EDB_Pin": "AT26",
+      "UI_Net": "EB_DATA[4]",
+      "EDB_Net": "EB_DATA[4]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AT27",
+      "EDB_Pin": "AT27",
+      "UI_Net": "EB_DATA[7]",
+      "EDB_Net": "EB_DATA[7]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AT28",
+      "EDB_Pin": "AT28",
+      "UI_Net": "EB_ADDR[10]",
+      "EDB_Net": "EB_ADDR[10]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AT29",
+      "EDB_Pin": "AT29",
+      "UI_Net": "EB_BE_N1",
+      "EDB_Net": "EB_BE_N1",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AT3",
+      "EDB_Pin": "AT3",
+      "UI_Net": "EARC_P_SOC_IM100",
+      "EDB_Net": "EARC_P_SOC_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AT31",
+      "EDB_Pin": "L31",
+      "UI_Net": "EB_ADDR[9]",
+      "EDB_Net": "GND",
+      "Net_Match": false,
+      "Method": "coord_only",
+      "Confidence": 0.55
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AT4",
+      "EDB_Pin": "AT4",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AT5",
+      "EDB_Pin": "AT5",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AT9",
+      "EDB_Pin": "AT9",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AU10",
+      "EDB_Pin": "AU10",
+      "UI_Net": "HDMI2.0_1_D2_+_IM90",
+      "EDB_Net": "HDMI2.0_1_D2_+_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AU11",
+      "EDB_Pin": "AU11",
+      "UI_Net": "HDMI2.0_4_CK_-_IM90",
+      "EDB_Net": "HDMI2.0_4_CK_-_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AU12",
+      "EDB_Pin": "AU12",
+      "UI_Net": "HDMI2.0_4_CK_+_IM90",
+      "EDB_Net": "HDMI2.0_4_CK_+_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AU16",
+      "EDB_Pin": "AU16",
+      "UI_Net": "HDMI2.0_4_D2_-_IM90",
+      "EDB_Net": "HDMI2.0_4_D2_-_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AU17",
+      "EDB_Pin": "AU17",
+      "UI_Net": "HDMI2.0_4_D2_+_IM90",
+      "EDB_Net": "HDMI2.0_4_D2_+_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AU18",
+      "EDB_Pin": "AU18",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AU19",
+      "EDB_Pin": "AU19",
+      "UI_Net": "SIGN006323",
+      "EDB_Net": "SIGN006323",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AU2",
+      "EDB_Pin": "AU2",
+      "UI_Net": "EARC_N_SOC_IM100",
+      "EDB_Net": "EARC_N_SOC_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AU21",
+      "EDB_Pin": "AU21",
+      "UI_Net": "DDC_SCL_1",
+      "EDB_Net": "DDC_SCL_1",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AU23",
+      "EDB_Pin": "K31",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AU25",
+      "EDB_Pin": "AU25",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AU27",
+      "EDB_Pin": "AU27",
+      "UI_Net": "EB_DATA[6]",
+      "EDB_Net": "EB_DATA[6]",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AU30",
+      "EDB_Pin": "AU30",
+      "UI_Net": "EB_BE_N0",
+      "EDB_Net": "EB_BE_N0",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AU4",
+      "EDB_Pin": "AU4",
+      "UI_Net": "HDMI2.0_1_CK_-_IM90",
+      "EDB_Net": "HDMI2.0_1_CK_-_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AU5",
+      "EDB_Pin": "AU5",
+      "UI_Net": "HDMI2.0_1_CK_+_IM90",
+      "EDB_Net": "HDMI2.0_1_CK_+_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "AU9",
+      "EDB_Pin": "AU9",
+      "UI_Net": "HDMI2.0_1_D2_-_IM90",
+      "EDB_Net": "HDMI2.0_1_D2_-_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "B1",
+      "EDB_Pin": "B1",
+      "UI_Net": "EPHY_TD_P_IM100",
+      "EDB_Net": "EPHY_TD_P_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "B10",
+      "EDB_Pin": "B10",
+      "UI_Net": "TX_N_1_IM100",
+      "EDB_Net": "TX_N_1_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "B11",
+      "EDB_Pin": "B11",
+      "UI_Net": "TX_N_2_IM100",
+      "EDB_Net": "TX_N_2_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "B12",
+      "EDB_Pin": "B12",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "B13",
+      "EDB_Pin": "B13",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "B14",
+      "EDB_Pin": "B14",
+      "UI_Net": "TX_P_4_IM100",
+      "EDB_Net": "TX_P_4_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "B15",
+      "EDB_Pin": "B15",
+      "UI_Net": "TX_P_5_IM100",
+      "EDB_Net": "TX_P_5_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "B16",
+      "EDB_Pin": "B16",
+      "UI_Net": "TX_N_6_IM100",
+      "EDB_Net": "TX_N_6_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "B17",
+      "EDB_Pin": "B17",
+      "UI_Net": "TX_N_7_IM100",
+      "EDB_Net": "TX_N_7_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "B18",
+      "EDB_Pin": "B18",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "B19",
+      "EDB_Pin": "B19",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "B20",
+      "EDB_Pin": "B20",
+      "UI_Net": "TX_P_9_IM100",
+      "EDB_Net": "TX_P_9_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "B21",
+      "EDB_Pin": "B21",
+      "UI_Net": "TX_P_10_IM100",
+      "EDB_Net": "TX_P_10_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "B22",
+      "EDB_Pin": "B22",
+      "UI_Net": "TX_N_11_IM100",
+      "EDB_Net": "TX_N_11_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "B23",
+      "EDB_Pin": "B23",
+      "UI_Net": "TX_N_12_IM100",
+      "EDB_Net": "TX_N_12_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "B24",
+      "EDB_Pin": "B24",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "B25",
+      "EDB_Pin": "B25",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "B26",
+      "EDB_Pin": "B26",
+      "UI_Net": "TX_P_14_IM100",
+      "EDB_Net": "TX_P_14_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "B27",
+      "EDB_Pin": "B27",
+      "UI_Net": "TX_P_15_IM100",
+      "EDB_Net": "TX_P_15_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "B28",
+      "EDB_Pin": "J31",
+      "UI_Net": "SIGN003116",
+      "EDB_Net": "GND",
+      "Net_Match": false,
+      "Method": "coord_only",
+      "Confidence": 0.55
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "B29",
+      "EDB_Pin": "H31",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "B3",
+      "EDB_Pin": "B3",
+      "UI_Net": "/PQ_BYPASS_DISABLE",
+      "EDB_Net": "_PQ_BYPASS_DISABLE",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "B31",
+      "EDB_Pin": "R30",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "B4",
+      "EDB_Pin": "B4",
+      "UI_Net": "SIGN001633",
+      "EDB_Net": "SIGN001633",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "B5",
+      "EDB_Pin": "B5",
+      "UI_Net": "I2S_AMP",
+      "EDB_Net": "I2S_AMP",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "B6",
+      "EDB_Pin": "B6",
+      "UI_Net": "I2C_SDA_3",
+      "EDB_Net": "I2C_SDA_3",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "B7",
+      "EDB_Pin": "B7",
+      "UI_Net": "EPI_FCIC_CS",
+      "EDB_Net": "EPI_FCIC_CS",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "B8",
+      "EDB_Pin": "B8",
+      "UI_Net": "EPI_FCIC_MOSI",
+      "EDB_Net": "EPI_FCIC_MOSI",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "B9",
+      "EDB_Pin": "B9",
+      "UI_Net": "TX_P_0_IM100",
+      "EDB_Net": "TX_P_0_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "C10",
+      "EDB_Pin": "C10",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "C11",
+      "EDB_Pin": "C11",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "C12",
+      "EDB_Pin": "C12",
+      "UI_Net": "TX_P_2_IM100",
+      "EDB_Net": "TX_P_2_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "C13",
+      "EDB_Pin": "C13",
+      "UI_Net": "TX_P_3_IM100",
+      "EDB_Net": "TX_P_3_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "C14",
+      "EDB_Pin": "C14",
+      "UI_Net": "TX_N_4_IM100",
+      "EDB_Net": "TX_N_4_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "C15",
+      "EDB_Pin": "C15",
+      "UI_Net": "TX_N_5_IM100",
+      "EDB_Net": "TX_N_5_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "C16",
+      "EDB_Pin": "C16",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "C17",
+      "EDB_Pin": "C17",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "C18",
+      "EDB_Pin": "C18",
+      "UI_Net": "TX_P_7_IM100",
+      "EDB_Net": "TX_P_7_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "C19",
+      "EDB_Pin": "C19",
+      "UI_Net": "TX_P_8_IM100",
+      "EDB_Net": "TX_P_8_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "C2",
+      "EDB_Pin": "C2",
+      "UI_Net": "EPHY_RD_N_IM100",
+      "EDB_Net": "EPHY_RD_N_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "C20",
+      "EDB_Pin": "C20",
+      "UI_Net": "TX_N_9_IM100",
+      "EDB_Net": "TX_N_9_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "C21",
+      "EDB_Pin": "C21",
+      "UI_Net": "TX_N_10_IM100",
+      "EDB_Net": "TX_N_10_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "C22",
+      "EDB_Pin": "C22",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "C23",
+      "EDB_Pin": "C23",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "C24",
+      "EDB_Pin": "C24",
+      "UI_Net": "TX_P_12_IM100",
+      "EDB_Net": "TX_P_12_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "C25",
+      "EDB_Pin": "C25",
+      "UI_Net": "TX_P_13_IM100",
+      "EDB_Net": "TX_P_13_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "C26",
+      "EDB_Pin": "C26",
+      "UI_Net": "TX_N_14_IM100",
+      "EDB_Net": "TX_N_14_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "C27",
+      "EDB_Pin": "C27",
+      "UI_Net": "TX_N_15_IM100",
+      "EDB_Net": "TX_N_15_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "C30",
+      "EDB_Pin": "C30",
+      "UI_Net": "+VREF_SOC",
+      "EDB_Net": "+VREF_SOC",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "C4",
+      "EDB_Pin": "C4",
+      "UI_Net": "SIGN001630",
+      "EDB_Net": "SIGN001630",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "C5",
+      "EDB_Pin": "C5",
+      "UI_Net": "SIGN001666",
+      "EDB_Net": "SIGN001666",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "C6",
+      "EDB_Pin": "C6",
+      "UI_Net": "I2C_SCL_3",
+      "EDB_Net": "I2C_SCL_3",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "C7",
+      "EDB_Pin": "C7",
+      "UI_Net": "EPI_FCIC_MISO",
+      "EDB_Net": "EPI_FCIC_MISO",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "C8",
+      "EDB_Pin": "C8",
+      "UI_Net": "EPI_FCIC_CLK",
+      "EDB_Net": "EPI_FCIC_CLK",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "C9",
+      "EDB_Pin": "C9",
+      "UI_Net": "TX_N_0_IM100",
+      "EDB_Net": "TX_N_0_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "D2",
+      "EDB_Pin": "D2",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "D22",
+      "EDB_Pin": "D22",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "D25",
+      "EDB_Pin": "D25",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "D26",
+      "EDB_Pin": "D26",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "D27",
+      "EDB_Pin": "D27",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "D3",
+      "EDB_Pin": "D3",
+      "UI_Net": "EPHY_RD_P_IM100",
+      "EDB_Net": "EPHY_RD_P_IM100",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "D30",
+      "EDB_Pin": "F31",
+      "UI_Net": "+1.2V_DDR",
+      "EDB_Net": "+1.2V_DDR",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "D31",
+      "EDB_Pin": "F27",
+      "UI_Net": "+1.2V_DDR",
+      "EDB_Net": "SIGN004218",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "E1",
+      "EDB_Pin": "E1",
+      "UI_Net": "WIFI_USB2.0_DM_IM90",
+      "EDB_Net": "WIFI_USB2.0_DM_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "E10",
+      "EDB_Pin": "E10",
+      "UI_Net": "EPI_EO",
+      "EDB_Net": "EPI_EO",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "E2",
+      "EDB_Pin": "E2",
+      "UI_Net": "USB2.0_2_DP_IM90",
+      "EDB_Net": "USB2.0_2_DP_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "E29",
+      "EDB_Pin": "G31",
+      "UI_Net": "+1.2V_DDR",
+      "EDB_Net": "+2.5V_DDR4_VPP",
+      "Net_Match": false,
+      "Method": "coord_only",
+      "Confidence": 0.55
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "E3",
+      "EDB_Pin": "E3",
+      "UI_Net": "USB2.0_2_DM_IM90",
+      "EDB_Net": "USB2.0_2_DM_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "E30",
+      "EDB_Pin": "W30",
+      "UI_Net": "+1.2V_DDR",
+      "EDB_Net": "USB_CTL2",
+      "Net_Match": false,
+      "Method": "coord_only",
+      "Confidence": 0.55
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "E31",
+      "EDB_Pin": "U30",
+      "UI_Net": "+1.2V_DDR",
+      "EDB_Net": "SIGN00440",
+      "Net_Match": false,
+      "Method": "coord_only",
+      "Confidence": 0.55
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "E4",
+      "EDB_Pin": "E4",
+      "UI_Net": "EPI_GCLK",
+      "EDB_Net": "EPI_GCLK",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "E5",
+      "EDB_Pin": "E5",
+      "UI_Net": "EPI_MCLK",
+      "EDB_Net": "EPI_MCLK",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "E6",
+      "EDB_Pin": "E6",
+      "UI_Net": "TCON_OD_CTL",
+      "EDB_Net": "TCON_OD_CTL",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "E7",
+      "EDB_Pin": "E7",
+      "UI_Net": "LNB_PWR_SEL",
+      "EDB_Net": "LNB_PWR_SEL",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "E8",
+      "EDB_Pin": "E8",
+      "UI_Net": "UART1_RTS",
+      "EDB_Net": "UART1_RTS",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "E9",
+      "EDB_Pin": "E9",
+      "UI_Net": "UART1_CTS",
+      "EDB_Net": "UART1_CTS",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "F18",
+      "EDB_Pin": "F18",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "F2",
+      "EDB_Pin": "F2",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "F20",
+      "EDB_Pin": "F20",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "F27",
+      "EDB_Pin": "T30",
+      "UI_Net": "SIGN004218",
+      "EDB_Net": "SIGN004224",
+      "Net_Match": false,
+      "Method": "coord_only",
+      "Confidence": 0.55
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "F28",
+      "EDB_Pin": "P30",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "F29",
+      "EDB_Pin": "N30",
+      "UI_Net": "+1.2V_DDR",
+      "EDB_Net": "GND",
+      "Net_Match": false,
+      "Method": "coord_only",
+      "Confidence": 0.55
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "F3",
+      "EDB_Pin": "F3",
+      "UI_Net": "WIFI_USB2.0_DP_IM90",
+      "EDB_Net": "WIFI_USB2.0_DP_IM90",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "F30",
+      "EDB_Pin": "M30",
+      "UI_Net": "+1.2V_DDR",
+      "EDB_Net": "GND",
+      "Net_Match": false,
+      "Method": "coord_only",
+      "Confidence": 0.55
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "F31",
+      "EDB_Pin": "L30",
+      "UI_Net": "+1.2V_DDR",
+      "EDB_Net": "GND",
+      "Net_Match": false,
+      "Method": "coord_only",
+      "Confidence": 0.55
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "F5",
+      "EDB_Pin": "F5",
+      "UI_Net": "PWM_DIM1",
+      "EDB_Net": "PWM_DIM1",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "F7",
+      "EDB_Pin": "F7",
+      "UI_Net": "PWM_DIM2",
+      "EDB_Net": "PWM_DIM2",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "F9",
+      "EDB_Pin": "F9",
+      "UI_Net": "EPI_VST",
+      "EDB_Net": "EPI_VST",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "G1",
+      "EDB_Pin": "G1",
+      "UI_Net": "",
+      "EDB_Net": "ZUKEN_DUMMY",
+      "Net_Match": false,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "G2",
+      "EDB_Pin": "G2",
+      "UI_Net": "SIGN006400",
+      "EDB_Net": "SIGN006400",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "G29",
+      "EDB_Pin": "K30",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "G3",
+      "EDB_Pin": "G3",
+      "UI_Net": "SIGN006412",
+      "EDB_Net": "SIGN006412",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "G30",
+      "EDB_Pin": "J30",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "G31",
+      "EDB_Pin": "Y29",
+      "UI_Net": "+2.5V_DDR4_VPP",
+      "EDB_Net": "EMMC_DATA[6]",
+      "Net_Match": false,
+      "Method": "coord_only",
+      "Confidence": 0.55
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "G4",
+      "EDB_Pin": "G4",
+      "UI_Net": "LOCK_IN",
+      "EDB_Net": "LOCK_IN",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "G5",
+      "EDB_Pin": "G5",
+      "UI_Net": "GP14",
+      "EDB_Net": "GP14",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "G6",
+      "EDB_Pin": "G6",
+      "UI_Net": "UART1_TX",
+      "EDB_Net": "UART1_TX",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "G7",
+      "EDB_Pin": "G7",
+      "UI_Net": "UART1_RX",
+      "EDB_Net": "UART1_RX",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "G8",
+      "EDB_Pin": "G8",
+      "UI_Net": "L/DIM_M0_VS/OLED_QSM_EN",
+      "EDB_Net": "L_DIM_M0_VS_OLED_QSM_EN",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "G9",
+      "EDB_Pin": "G9",
+      "UI_Net": "L/DIM_M0_MOSI_1/OLED_DPC_CTL",
+      "EDB_Net": "L_DIM_M0_MOSI_1_OLED_DPC_CTL",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "H18",
+      "EDB_Pin": "H18",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "H2",
+      "EDB_Pin": "H2",
+      "UI_Net": "",
+      "EDB_Net": "ZUKEN_DUMMY",
+      "Net_Match": false,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "H27",
+      "EDB_Pin": "H27",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "H29",
+      "EDB_Pin": "T29",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "H3",
+      "EDB_Pin": "H3",
+      "UI_Net": "",
+      "EDB_Net": "ZUKEN_DUMMY",
+      "Net_Match": false,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "H30",
+      "EDB_Pin": "R29",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "H31",
+      "EDB_Pin": "P29",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "J1",
+      "EDB_Pin": "J1",
+      "UI_Net": "SIGN00615",
+      "EDB_Net": "SIGN00615",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "J2",
+      "EDB_Pin": "J2",
+      "UI_Net": "AUDA_OUTL",
+      "EDB_Net": "AUDA_OUTL",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "J26",
+      "EDB_Pin": "J26",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "J28",
+      "EDB_Pin": "J28",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "J29",
+      "EDB_Pin": "J29",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "J3",
+      "EDB_Pin": "J3",
+      "UI_Net": "AUDA_OUTR",
+      "EDB_Net": "AUDA_OUTR",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "J30",
+      "EDB_Pin": "N29",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "J31",
+      "EDB_Pin": "M29",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "J4",
+      "EDB_Pin": "J4",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "J5",
+      "EDB_Pin": "J5",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "J6",
+      "EDB_Pin": "J6",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "J7",
+      "EDB_Pin": "J7",
+      "UI_Net": "L/DIM_M0_SCLK/OLED_TCON_FW",
+      "EDB_Net": "L_DIM_M0_SCLK_OLED_TCON_FW",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "J9",
+      "EDB_Pin": "J9",
+      "UI_Net": "SIGN006504",
+      "EDB_Net": "SIGN006504",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "K11",
+      "EDB_Pin": "L29",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "K12",
+      "EDB_Pin": "P14",
+      "UI_Net": "+D1V0",
+      "EDB_Net": "+D1V0",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "K13",
+      "EDB_Pin": "K13",
+      "UI_Net": "+D1V0",
+      "EDB_Net": "+D1V0",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "K14",
+      "EDB_Pin": "K14",
+      "UI_Net": "+D1V0",
+      "EDB_Net": "+D1V0",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "K16",
+      "EDB_Pin": "K16",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "K2",
+      "EDB_Pin": "K2",
+      "UI_Net": "SIGN006396",
+      "EDB_Net": "SIGN006396",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "K25",
+      "EDB_Pin": "K25",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "K27",
+      "EDB_Pin": "K27",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "K29",
+      "EDB_Pin": "K29",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "K3",
+      "EDB_Pin": "K3",
+      "UI_Net": "SIGN006399",
+      "EDB_Net": "SIGN006399",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "K30",
+      "EDB_Pin": "V28",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "K31",
+      "EDB_Pin": "U28",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "L1",
+      "EDB_Pin": "L1",
+      "UI_Net": "IF_S_IN",
+      "EDB_Net": "IF_S_IN",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "L2",
+      "EDB_Pin": "L2",
+      "UI_Net": "IF_S_IP",
+      "EDB_Net": "IF_S_IP",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "L24",
+      "EDB_Pin": "L24",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "L26",
+      "EDB_Pin": "L26",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "L28",
+      "EDB_Pin": "L28",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "L29",
+      "EDB_Pin": "R28",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "L3",
+      "EDB_Pin": "L3",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "L30",
+      "EDB_Pin": "N28",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "L31",
+      "EDB_Pin": "U27",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "L5",
+      "EDB_Pin": "L5",
+      "UI_Net": "SIGN006505",
+      "EDB_Net": "SIGN006505",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "L7",
+      "EDB_Pin": "L7",
+      "UI_Net": "SIGN006508",
+      "EDB_Net": "SIGN006508",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "L9",
+      "EDB_Pin": "L9",
+      "UI_Net": "VID_CPU_PWM",
+      "EDB_Net": "VID_CPU_PWM",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "M11",
+      "EDB_Pin": "P27",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "M12",
+      "EDB_Pin": "M14",
+      "UI_Net": "+D1V0",
+      "EDB_Net": "+D1V0",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "M13",
+      "EDB_Pin": "M13",
+      "UI_Net": "+D1V0",
+      "EDB_Net": "+D1V0",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "M14",
+      "EDB_Pin": "W13",
+      "UI_Net": "+D1V0",
+      "EDB_Net": "+D1V0",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "M16",
+      "EDB_Pin": "M16",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "M2",
+      "EDB_Pin": "M2",
+      "UI_Net": "IF_S_QN",
+      "EDB_Net": "IF_S_QN",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "M23",
+      "EDB_Pin": "M23",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "M27",
+      "EDB_Pin": "M27",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "M29",
+      "EDB_Pin": "N27",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "M3",
+      "EDB_Pin": "M3",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "M30",
+      "EDB_Pin": "V26",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "M31",
+      "EDB_Pin": "V25",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "M4",
+      "EDB_Pin": "M4",
+      "UI_Net": "VID_CORE",
+      "EDB_Net": "VID_CORE",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "M5",
+      "EDB_Pin": "M5",
+      "UI_Net": "VID_CORE2_PWM",
+      "EDB_Net": "VID_CORE2_PWM",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "M6",
+      "EDB_Pin": "M6",
+      "UI_Net": "USB_CTL1",
+      "EDB_Net": "USB_CTL1",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "M8",
+      "EDB_Pin": "M8",
+      "UI_Net": "SPDIF_OUT",
+      "EDB_Net": "SPDIF_OUT",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "M9",
+      "EDB_Pin": "M9",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "N1",
+      "EDB_Pin": "N1",
+      "UI_Net": "IF_P",
+      "EDB_Net": "IF_P",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "N2",
+      "EDB_Pin": "N2",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "N22",
+      "EDB_Pin": "N22",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "N27",
+      "EDB_Pin": "R22",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "N28",
+      "EDB_Pin": "P16",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "N29",
+      "EDB_Pin": "V9",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "N3",
+      "EDB_Pin": "N3",
+      "UI_Net": "IF_S_QP",
+      "EDB_Net": "IF_S_QP",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "N30",
+      "EDB_Pin": "V7",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "N31",
+      "EDB_Pin": "T6",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "P11",
+      "EDB_Pin": "V5",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "P12",
+      "EDB_Pin": "P13",
+      "UI_Net": "+D1V0",
+      "EDB_Net": "+D1V0",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "P13",
+      "EDB_Pin": "Y12",
+      "UI_Net": "+D1V0",
+      "EDB_Net": "+D1V0",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "P14",
+      "EDB_Pin": "V12",
+      "UI_Net": "+D1V0",
+      "EDB_Net": "+D1V0",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "P16",
+      "EDB_Pin": "T5",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "P2",
+      "EDB_Pin": "P2",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "P27",
+      "EDB_Pin": "T4",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "P29",
+      "EDB_Pin": "W3",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "P3",
+      "EDB_Pin": "P3",
+      "UI_Net": "IF_N",
+      "EDB_Net": "IF_N",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "P30",
+      "EDB_Pin": "V3",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "P31",
+      "EDB_Pin": "U3",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "P4",
+      "EDB_Pin": "P4",
+      "UI_Net": "/USB_OCD1",
+      "EDB_Net": "_USB_OCD1",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "P5",
+      "EDB_Pin": "P5",
+      "UI_Net": "AMP_RESET_N",
+      "EDB_Net": "AMP_RESET_N",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "P6",
+      "EDB_Pin": "P6",
+      "UI_Net": "EYE_SCL",
+      "EDB_Net": "EYE_SCL",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "P7",
+      "EDB_Pin": "P7",
+      "UI_Net": "EYE_SDA",
+      "EDB_Net": "EYE_SDA",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "P8",
+      "EDB_Pin": "P8",
+      "UI_Net": "FE_DEMOD2_TS_SYNC",
+      "EDB_Net": "FE_DEMOD2_TS_SYNC",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "P9",
+      "EDB_Pin": "P9",
+      "UI_Net": "FE_DEMOD2_TS_CLK",
+      "EDB_Net": "FE_DEMOD2_TS_CLK",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "R1",
+      "EDB_Pin": "R1",
+      "UI_Net": "IF_S_AGC",
+      "EDB_Net": "IF_S_AGC",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "R2",
+      "EDB_Pin": "R2",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "R22",
+      "EDB_Pin": "T3",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "R28",
+      "EDB_Pin": "V2",
+      "UI_Net": "GND",
+      "EDB_Net": "GND",
+      "Net_Match": true,
+      "Method": "coord_net",
+      "Confidence": 0.8
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "R29",
+      "EDB_Pin": "W29",
+      "UI_Net": "GND",
+      "EDB_Net": "_USB_OCD2",
+      "Net_Match": false,
+      "Method": "coord_only",
+      "Confidence": 0.55
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "R3",
+      "EDB_Pin": "R3",
+      "UI_Net": "IF_AGC",
+      "EDB_Net": "IF_AGC",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "R30",
+      "EDB_Pin": "U29",
+      "UI_Net": "GND",
+      "EDB_Net": "SIGN00439",
+      "Net_Match": false,
+      "Method": "coord_only",
+      "Confidence": 0.55
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "R31",
+      "EDB_Pin": "Y28",
+      "UI_Net": "GND",
+      "EDB_Net": "TPI_CLK",
+      "Net_Match": false,
+      "Method": "coord_only",
+      "Confidence": 0.55
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "T2",
+      "EDB_Pin": "T2",
+      "UI_Net": "SIF",
+      "EDB_Net": "SIF",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "T29",
+      "EDB_Pin": "Y27",
+      "UI_Net": "GND",
+      "EDB_Net": "TPI_VAL",
+      "Net_Match": false,
+      "Method": "coord_only",
+      "Confidence": 0.55
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "T3",
+      "EDB_Pin": "Y26",
+      "UI_Net": "GND",
+      "EDB_Net": "TPI_SOP",
+      "Net_Match": false,
+      "Method": "coord_only",
+      "Confidence": 0.55
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "T30",
+      "EDB_Pin": "Y25",
+      "UI_Net": "SIGN004224",
+      "EDB_Net": "TPI_DATA[0]",
+      "Net_Match": false,
+      "Method": "coord_only",
+      "Confidence": 0.55
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "T4",
+      "EDB_Pin": "Y24",
+      "UI_Net": "GND",
+      "EDB_Net": "TPI_DATA[2]",
+      "Net_Match": false,
+      "Method": "coord_only",
+      "Confidence": 0.55
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "T5",
+      "EDB_Pin": "Y23",
+      "UI_Net": "GND",
+      "EDB_Net": "SIGN001560",
+      "Net_Match": false,
+      "Method": "coord_only",
+      "Confidence": 0.55
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "T6",
+      "EDB_Pin": "W9",
+      "UI_Net": "GND",
+      "EDB_Net": "I2C_SDA_1",
+      "Net_Match": false,
+      "Method": "coord_only",
+      "Confidence": 0.55
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "T7",
+      "EDB_Pin": "T7",
+      "UI_Net": "FE_DEMOD2_TS_DATA",
+      "EDB_Net": "FE_DEMOD2_TS_DATA",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "T9",
+      "EDB_Pin": "T9",
+      "UI_Net": "FE_DEMOD2_TS_VAL",
+      "EDB_Net": "FE_DEMOD2_TS_VAL",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "U1",
+      "EDB_Pin": "U1",
+      "UI_Net": "XIN_MAIN",
+      "EDB_Net": "XIN_MAIN",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "U2",
+      "EDB_Pin": "U2",
+      "UI_Net": "XOUT_MAIN",
+      "EDB_Net": "XOUT_MAIN",
+      "Net_Match": true,
+      "Method": "pin_exact",
+      "Confidence": 0.99
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "U27",
+      "EDB_Pin": "W8",
+      "UI_Net": "GND",
+      "EDB_Net": "I2C_SCL_1",
+      "Net_Match": false,
+      "Method": "coord_only",
+      "Confidence": 0.55
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "U28",
+      "EDB_Pin": "W7",
+      "UI_Net": "GND",
+      "EDB_Net": "_TU_RESET2",
+      "Net_Match": false,
+      "Method": "coord_only",
+      "Confidence": 0.55
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "U29",
+      "EDB_Pin": "W6",
+      "UI_Net": "SIGN00439",
+      "EDB_Net": "HP_DET",
+      "Net_Match": false,
+      "Method": "coord_only",
+      "Confidence": 0.55
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "U3",
+      "EDB_Pin": "W5",
+      "UI_Net": "GND",
+      "EDB_Net": "SIGN001565",
+      "Net_Match": false,
+      "Method": "coord_only",
+      "Confidence": 0.55
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "U30",
+      "EDB_Pin": "W4",
+      "UI_Net": "SIGN00440",
+      "EDB_Net": "_TU_RESET1",
+      "Net_Match": false,
+      "Method": "coord_only",
+      "Confidence": 0.55
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "U31",
+      "EDB_Pin": "Y3",
+      "UI_Net": "SIGN00441",
+      "EDB_Net": "DDC_SDA_4",
+      "Net_Match": false,
+      "Method": "coord_only",
+      "Confidence": 0.55
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "V11",
+      "EDB_Pin": "Y2",
+      "UI_Net": "GND",
+      "EDB_Net": "DDC_SCL_4",
+      "Net_Match": false,
+      "Method": "coord_only",
+      "Confidence": 0.55
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "V12",
+      "EDB_Pin": "W2",
+      "UI_Net": "+D1V0",
+      "EDB_Net": "HDMI2.0_4_HPD",
+      "Net_Match": false,
+      "Method": "coord_only",
+      "Confidence": 0.55
+    },
+    {
+      "Designator": "IC100",
+      "UI_Pin": "V2",
+      "EDB_Pin": "W1",
+      "UI_Net": "GND",
+      "EDB_Net": "HDMI2.0_4_5V_DET",
+      "Net_Match": false,
+      "Method": "coord_only",
+      "Confidence": 0.55
+    }
+  ]
+}

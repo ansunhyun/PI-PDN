@@ -1,0 +1,186 @@
+[
+    {
+        "Schema_Version": 3,
+        "Case_Index": 1,
+        "IC_Designator": "IC100",
+        "Spec_Pin": "K12",
+        "IC_Pin": "K13",
+        "Target_Net": "+D1V0",
+        "PCB_Target_Net": "+D1V0",
+        "Spec_Target_Net": "+D1V0",
+        "Full_Net_Chain": [
+            "+D1V0",
+            "SIGN023247"
+        ],
+        "Source_Component": "IC2301",
+        "Source_Pin": "6",
+        "Net_Chain": [
+            "+D1V0",
+            "SIGN023247"
+        ],
+        "Voltage_V": 1.0,
+        "Current_A": 1.0,
+        "Min_Spec_V": 0.0,
+        "Max_Spec_V": 1.2,
+        "Project_Path": "C:\\Users\\HP\\Documents\\PI-PDN_auto_sim_V1\\outputs\\EAX02034601_ready_for_solve.siw",
+        "Project_File": "EAX02034601_ready_for_solve.siw",
+        "Edb_Path": "C:\\Users\\HP\\Documents\\PI-PDN_auto_sim_V1\\outputs\\EAX02034601_ref_20260821_163150.aedb",
+        "Edb_Folder": "EAX02034601_ref_20260821_163150.aedb",
+        "Artifact_Ownership": {
+            "Project_File": "Pre",
+            "Edb_Folder": "Post"
+        },
+        "V_Port_Name": "V_IC100_D1V0",
+        "I_Port_Name": "I_IC100_D1V0",
+        "GND_Net": "GND",
+        "Solver_Backend": "aedt_cutout",
+        "Mapping_Mode": "designator_pin_ui_api_exact",
+        "Mapping_Trace": {
+            "status": "direct",
+            "reason": "designator_pin_ui_api_exact",
+            "dsg_source": "siw_coord_net",
+            "dsg_d2": ""
+        },
+        "Mapping_Status": "PASS",
+        "Mapping_Confidence": "HIGH",
+        "Mapping_Note": "designator_pin_ui_api_exact"
+    },
+    {
+        "Schema_Version": 3,
+        "Case_Index": 2,
+        "IC_Designator": "IC100",
+        "Spec_Pin": "Y15",
+        "IC_Pin": "AA15",
+        "Target_Net": "+CPU_1V0",
+        "PCB_Target_Net": "+CPU_1V0",
+        "Spec_Target_Net": "+CPU_1V0",
+        "Full_Net_Chain": [
+            "+CPU_1V0",
+            "SW_+0.9V_CPU"
+        ],
+        "Source_Component": "IC2100",
+        "Source_Pin": "2",
+        "Net_Chain": [
+            "+CPU_1V0",
+            "SW_+0.9V_CPU"
+        ],
+        "Voltage_V": 1.0,
+        "Current_A": 1.0,
+        "Min_Spec_V": 0.0,
+        "Max_Spec_V": 1.2,
+        "Project_Path": "C:\\Users\\HP\\Documents\\PI-PDN_auto_sim_V1\\outputs\\EAX02034601_ready_for_solve.siw",
+        "Project_File": "EAX02034601_ready_for_solve.siw",
+        "Edb_Path": "C:\\Users\\HP\\Documents\\PI-PDN_auto_sim_V1\\outputs\\EAX02034601_ref_20260821_163150.aedb",
+        "Edb_Folder": "EAX02034601_ref_20260821_163150.aedb",
+        "Artifact_Ownership": {
+            "Project_File": "Pre",
+            "Edb_Folder": "Post"
+        },
+        "V_Port_Name": "V_IC100_CPU_1V0",
+        "I_Port_Name": "I_IC100_CPU_1V0",
+        "GND_Net": "GND",
+        "Solver_Backend": "aedt_cutout",
+        "Mapping_Mode": "designator_pin_ui_api_exact",
+        "Mapping_Trace": {
+            "status": "direct",
+            "reason": "designator_pin_ui_api_exact",
+            "dsg_source": "siw_coord_net",
+            "dsg_d2": ""
+        },
+        "Mapping_Status": "PASS",
+        "Mapping_Confidence": "HIGH",
+        "Mapping_Note": "designator_pin_ui_api_exact"
+    },
+    {
+        "Schema_Version": 3,
+        "Case_Index": 3,
+        "IC_Designator": "IC100",
+        "Spec_Pin": "D30",
+        "IC_Pin": "F31",
+        "Target_Net": "+1.2V_DDR",
+        "PCB_Target_Net": "+1.2V_DDR",
+        "Spec_Target_Net": "+1.2V_DDR",
+        "Full_Net_Chain": [
+            "+1.2V_DDR",
+            "SW_+1.2V_DDR"
+        ],
+        "Source_Component": "IC1500",
+        "Source_Pin": "2",
+        "Net_Chain": [
+            "+1.2V_DDR",
+            "SW_+1.2V_DDR"
+        ],
+        "Voltage_V": 1.2,
+        "Current_A": 1.0,
+        "Min_Spec_V": 0.0,
+        "Max_Spec_V": 1.44,
+        "Project_Path": "C:\\Users\\HP\\Documents\\PI-PDN_auto_sim_V1\\outputs\\EAX02034601_ready_for_solve.siw",
+        "Project_File": "EAX02034601_ready_for_solve.siw",
+        "Edb_Path": "C:\\Users\\HP\\Documents\\PI-PDN_auto_sim_V1\\outputs\\EAX02034601_ref_20260821_163150.aedb",
+        "Edb_Folder": "EAX02034601_ref_20260821_163150.aedb",
+        "Artifact_Ownership": {
+            "Project_File": "Pre",
+            "Edb_Folder": "Post"
+        },
+        "V_Port_Name": "V_IC100_12V_DDR",
+        "I_Port_Name": "I_IC100_12V_DDR",
+        "GND_Net": "GND",
+        "Solver_Backend": "aedt_cutout",
+        "Mapping_Mode": "designator_pin_ui_api_exact",
+        "Mapping_Trace": {
+            "status": "direct",
+            "reason": "designator_pin_ui_api_exact",
+            "dsg_source": "siw_coord_net",
+            "dsg_d2": ""
+        },
+        "Mapping_Status": "PASS",
+        "Mapping_Confidence": "HIGH",
+        "Mapping_Note": "designator_pin_ui_api_exact"
+    },
+    {
+        "Schema_Version": 3,
+        "Case_Index": 4,
+        "IC_Designator": "IC100",
+        "Spec_Pin": "A28",
+        "IC_Pin": "B28",
+        "Target_Net": "PIF1V5",
+        "PCB_Target_Net": "SIGN003116",
+        "Spec_Target_Net": "PIF1V5",
+        "Full_Net_Chain": [
+            "SIGN003116",
+            "+VTERM"
+        ],
+        "Source_Component": "IC8100",
+        "Source_Pin": "1",
+        "Net_Chain": [
+            "SIGN003116",
+            "+VTERM"
+        ],
+        "Voltage_V": 1.0,
+        "Current_A": 1.0,
+        "Min_Spec_V": 0.0,
+        "Max_Spec_V": 1.2,
+        "Project_Path": "C:\\Users\\HP\\Documents\\PI-PDN_auto_sim_V1\\outputs\\EAX02034601_ready_for_solve.siw",
+        "Project_File": "EAX02034601_ready_for_solve.siw",
+        "Edb_Path": "C:\\Users\\HP\\Documents\\PI-PDN_auto_sim_V1\\outputs\\EAX02034601_ref_20260821_163150.aedb",
+        "Edb_Folder": "EAX02034601_ref_20260821_163150.aedb",
+        "Artifact_Ownership": {
+            "Project_File": "Pre",
+            "Edb_Folder": "Post"
+        },
+        "V_Port_Name": "V_IC100_PIF1V5",
+        "I_Port_Name": "I_IC100_PIF1V5",
+        "GND_Net": "GND",
+        "Solver_Backend": "aedt_cutout",
+        "Mapping_Mode": "designator_pin_ui_api_exact",
+        "Mapping_Trace": {
+            "status": "direct",
+            "reason": "designator_pin_ui_api_exact",
+            "dsg_source": "siw_coord_net",
+            "dsg_d2": ""
+        },
+        "Mapping_Status": "PASS",
+        "Mapping_Confidence": "HIGH",
+        "Mapping_Note": "designator_pin_ui_api_exact"
+    }
+]

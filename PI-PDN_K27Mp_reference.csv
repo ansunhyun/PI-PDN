@@ -1,0 +1,6 @@
+﻿,Designator,Net_name,Pin_number,Frequency_start(MHz),Frequency_end(MHz),Spec(ohm)
+1,IC100, +D1V0,K12 ,0.1,1000,<10
+2,IC100, +CPU_1V0,Y15 ,0.1,1000,<10
+3,IC100, +1.2V_DDR,D30,0.1,1000,<10
+4,IC100, +1.8V,V31 ,0.1,1000,<10
+5,IC100, PIF1V5,A28,0.1,1000,<10

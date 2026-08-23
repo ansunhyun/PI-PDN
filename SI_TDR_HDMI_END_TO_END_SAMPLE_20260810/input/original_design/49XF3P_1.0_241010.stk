@@ -1,0 +1,72 @@
+$begin 'StackupLayers'
+	Units('mm')
+	$begin 'Layers'
+		Layer(LayerID=1, LayerName='SR_T', LayerType=0, IsNegative=true, Material='LG_SMPL_SR', Elevation=1.526, Thickness=0.02, TopRoughness=0, BottomRoughness=0, SideRoughness=0, IsTopRoughnessHuray=false, IsBottomRoughnessHuray=false, IsSideRoughnessHuray=false, TopRoughnessHurayModel='', BottomRoughnessHurayModel='', SideRoughnessHurayModel='', DefinedDielectricFill='', TraceCrossSectionShape=0, TraceCrossSectionEtchStyle=0, TraceCrossSectionTopEdgeRatio=1, TraceCrossSectionBottomEdgeRatio=1, IsUserDefinedAbsValForTCS=false, AbsValueOfTopWidthForTCS=0, AbsValueOfBotWidthForTCS=0, IsThicknessInvolvedForTCS=true, IsFlipOrientationForTCS=0, Color(192, 192, 192))
+		Layer(LayerID=2, LayerName='Layer1', LayerType=2, IsNegative=true, Material='copper', Elevation=1.483, Thickness=0.043, TopRoughness=0, BottomRoughness=0, SideRoughness=0, IsTopRoughnessHuray=false, IsBottomRoughnessHuray=false, IsSideRoughnessHuray=false, TopRoughnessHurayModel='', BottomRoughnessHurayModel='', SideRoughnessHurayModel='', DefinedDielectricFill='LG_SMPL_SR', TraceCrossSectionShape=0, TraceCrossSectionEtchStyle=0, TraceCrossSectionTopEdgeRatio=1, TraceCrossSectionBottomEdgeRatio=1, IsUserDefinedAbsValForTCS=false, AbsValueOfTopWidthForTCS=0, AbsValueOfBotWidthForTCS=0, IsThicknessInvolvedForTCS=true, IsFlipOrientationForTCS=0, Color(192, 192, 192))
+		Layer(LayerID=3, LayerName='PP1', LayerType=0, IsNegative=true, Material='LG_SMPL_2116', Elevation=1.373, Thickness=0.11, TopRoughness=0, BottomRoughness=0, SideRoughness=0, IsTopRoughnessHuray=false, IsBottomRoughnessHuray=false, IsSideRoughnessHuray=false, TopRoughnessHurayModel='', BottomRoughnessHurayModel='', SideRoughnessHurayModel='', DefinedDielectricFill='', TraceCrossSectionShape=0, TraceCrossSectionEtchStyle=0, TraceCrossSectionTopEdgeRatio=1, TraceCrossSectionBottomEdgeRatio=1, IsUserDefinedAbsValForTCS=false, AbsValueOfTopWidthForTCS=0, AbsValueOfBotWidthForTCS=0, IsThicknessInvolvedForTCS=true, IsFlipOrientationForTCS=0, Color(192, 192, 192))
+		Layer(LayerID=4, LayerName='Layer2', LayerType=2, IsNegative=true, Material='copper', Elevation=1.338, Thickness=0.035, TopRoughness=0, BottomRoughness=0, SideRoughness=0, IsTopRoughnessHuray=false, IsBottomRoughnessHuray=false, IsSideRoughnessHuray=false, TopRoughnessHurayModel='', BottomRoughnessHurayModel='', SideRoughnessHurayModel='', DefinedDielectricFill='LG_SMPL_2116', TraceCrossSectionShape=0, TraceCrossSectionEtchStyle=0, TraceCrossSectionTopEdgeRatio=1, TraceCrossSectionBottomEdgeRatio=1, IsUserDefinedAbsValForTCS=false, AbsValueOfTopWidthForTCS=0, AbsValueOfBotWidthForTCS=0, IsThicknessInvolvedForTCS=true, IsFlipOrientationForTCS=0, Color(192, 192, 192))
+		Layer(LayerID=5, LayerName='CORE2', LayerType=0, IsNegative=true, Material='LG_SMPL_1.2(1/1)', Elevation=0.208, Thickness=1.13, TopRoughness=0, BottomRoughness=0, SideRoughness=0, IsTopRoughnessHuray=false, IsBottomRoughnessHuray=false, IsSideRoughnessHuray=false, TopRoughnessHurayModel='', BottomRoughnessHurayModel='', SideRoughnessHurayModel='', DefinedDielectricFill='', TraceCrossSectionShape=0, TraceCrossSectionEtchStyle=0, TraceCrossSectionTopEdgeRatio=1, TraceCrossSectionBottomEdgeRatio=1, IsUserDefinedAbsValForTCS=false, AbsValueOfTopWidthForTCS=0, AbsValueOfBotWidthForTCS=0, IsThicknessInvolvedForTCS=true, IsFlipOrientationForTCS=0, Color(192, 192, 192))
+		Layer(LayerID=6, LayerName='Layer3', LayerType=2, IsNegative=true, Material='copper', Elevation=0.173, Thickness=0.035, TopRoughness=0, BottomRoughness=0, SideRoughness=0, IsTopRoughnessHuray=false, IsBottomRoughnessHuray=false, IsSideRoughnessHuray=false, TopRoughnessHurayModel='', BottomRoughnessHurayModel='', SideRoughnessHurayModel='', DefinedDielectricFill='', TraceCrossSectionShape=0, TraceCrossSectionEtchStyle=0, TraceCrossSectionTopEdgeRatio=1, TraceCrossSectionBottomEdgeRatio=1, IsUserDefinedAbsValForTCS=false, AbsValueOfTopWidthForTCS=0, AbsValueOfBotWidthForTCS=0, IsThicknessInvolvedForTCS=true, IsFlipOrientationForTCS=0, Color(192, 192, 192))
+		Layer(LayerID=7, LayerName='PP3', LayerType=0, IsNegative=true, Material='LG_SMPL_2116', Elevation=0.063, Thickness=0.11, TopRoughness=0, BottomRoughness=0, SideRoughness=0, IsTopRoughnessHuray=false, IsBottomRoughnessHuray=false, IsSideRoughnessHuray=false, TopRoughnessHurayModel='', BottomRoughnessHurayModel='', SideRoughnessHurayModel='', DefinedDielectricFill='', TraceCrossSectionShape=0, TraceCrossSectionEtchStyle=0, TraceCrossSectionTopEdgeRatio=1, TraceCrossSectionBottomEdgeRatio=1, IsUserDefinedAbsValForTCS=false, AbsValueOfTopWidthForTCS=0, AbsValueOfBotWidthForTCS=0, IsThicknessInvolvedForTCS=true, IsFlipOrientationForTCS=0, Color(192, 192, 192))
+		Layer(LayerID=8, LayerName='Layer4', LayerType=2, IsNegative=true, Material='copper', Elevation=0.02, Thickness=0.043, TopRoughness=0, BottomRoughness=0, SideRoughness=0, IsTopRoughnessHuray=false, IsBottomRoughnessHuray=false, IsSideRoughnessHuray=false, TopRoughnessHurayModel='', BottomRoughnessHurayModel='', SideRoughnessHurayModel='', DefinedDielectricFill='', TraceCrossSectionShape=0, TraceCrossSectionEtchStyle=0, TraceCrossSectionTopEdgeRatio=1, TraceCrossSectionBottomEdgeRatio=1, IsUserDefinedAbsValForTCS=false, AbsValueOfTopWidthForTCS=0, AbsValueOfBotWidthForTCS=0, IsThicknessInvolvedForTCS=true, IsFlipOrientationForTCS=0, Color(192, 192, 192))
+		Layer(LayerID=9, LayerName='SR_B', LayerType=0, IsNegative=true, Material='LG_SMPL_SR', Elevation=0, Thickness=0.02, TopRoughness=0, BottomRoughness=0, SideRoughness=0, IsTopRoughnessHuray=false, IsBottomRoughnessHuray=false, IsSideRoughnessHuray=false, TopRoughnessHurayModel='', BottomRoughnessHurayModel='', SideRoughnessHurayModel='', DefinedDielectricFill='', TraceCrossSectionShape=0, TraceCrossSectionEtchStyle=0, TraceCrossSectionTopEdgeRatio=1, TraceCrossSectionBottomEdgeRatio=1, IsUserDefinedAbsValForTCS=false, AbsValueOfTopWidthForTCS=0, AbsValueOfBotWidthForTCS=0, IsThicknessInvolvedForTCS=true, IsFlipOrientationForTCS=0, Color(192, 192, 192))
+	$end 'Layers'
+	$begin 'Materials'
+		$begin 'Insulator'
+			Name='LG_SMPL_SR'
+			Permittivity=4.31
+			LossTangent=0.033
+			DerivedFrom='vacuum'
+			AnsoftID=0
+			$begin 'Djordjevic-Sarkar'
+				MeasurementFreq=1000000000
+				SigmaDC=1e-12
+				EpsDC=0
+			$end 'Djordjevic-Sarkar'
+		$end 'Insulator'
+		$begin 'Insulator'
+			Name='LG_SMPL_2116'
+			Permittivity=3.96
+			LossTangent=0.0189
+			DerivedFrom='vacuum'
+			AnsoftID=0
+			$begin 'Djordjevic-Sarkar'
+				MeasurementFreq=1000000000
+				SigmaDC=1e-12
+				EpsDC=0
+			$end 'Djordjevic-Sarkar'
+		$end 'Insulator'
+		$begin 'Insulator'
+			Name='LG_SMPL_1.2(1/1)'
+			Permittivity=4.26
+			LossTangent=0.0176
+			DerivedFrom='vacuum'
+			AnsoftID=0
+			$begin 'Djordjevic-Sarkar'
+				MeasurementFreq=1000000000
+				SigmaDC=1e-12
+				EpsDC=0
+			$end 'Djordjevic-Sarkar'
+		$end 'Insulator'
+	$end 'Materials'
+	$begin 'HurayModels'
+		$begin 'HurayModel'
+			ModelName='Low Loss'
+			MetalSphereRadius=0.0005
+			UnitCellArea=1e-06
+			SpheresPerUnitCell=0.3183098861837906
+		$end 'HurayModel'
+		$begin 'HurayModel'
+			ModelName='Medium Loss'
+			MetalSphereRadius=0.0005
+			UnitCellArea=1e-06
+			SpheresPerUnitCell=0.954929658551372
+		$end 'HurayModel'
+		$begin 'HurayModel'
+			ModelName='High Loss'
+			MetalSphereRadius=0.0005
+			UnitCellArea=1e-06
+			SpheresPerUnitCell=1.909859317102744
+		$end 'HurayModel'
+	$end 'HurayModels'
+$end 'StackupLayers'

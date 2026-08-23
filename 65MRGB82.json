@@ -1,0 +1,29 @@
+{
+  "Request": {
+    "Model": "65MRGB82",
+    "Year": "2026",
+    "CAE_type": "PI-PDN",
+    "Requester": "현안선",
+    "CAE_eng": "김성수85",
+    "Start_date": "2026-07-14",
+    "Target_date": "2026-07-15",
+    "Event": "DV"
+  },
+  "CAE": {
+    "SOC": {
+      "Name": "K27Mp",
+      "Inner_cap": "InnerCap_K27Mp.csv",
+      "Spec": "PI-PDN_K27Mp_reference.csv"
+    },
+    "PCB": {
+      "cadFile": "EAX02034601-HD-BD.zip",
+      "PN": "EAX02034601",
+      "Rev": "EAX02034601",
+      "Stackup": "Standard 2L 1.6T.stk",
+      "BOM": "65MRGB82_EAX02034601/K27MP_65MRGB82_withCI_BOM_260423.csv",
+      "Pmap": "Pmap_K27Mp_65MRGB82_260721.pmap",
+      "PinGroup": ""
+    },
+    "Purpose": "PDN autotest"
+  }
+}

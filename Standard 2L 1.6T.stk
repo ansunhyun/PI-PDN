@@ -1,0 +1,30 @@
+$begin 'StackupLayers'
+	Units('mm')
+	$begin 'Layers'
+		Layer(LayerID=1, LayerName='COND_1', LayerType=2, IsNegative=true, Material='copper', Elevation=1.645, Thickness=0.045, TopRoughness=0, BottomRoughness=0, IsTopRoughnessHuray=false, IsBottomRoughnessHuray=false, TopRoughnessHurayModel='', BottomRoughnessHurayModel='', DefinedDielectricFill='', TraceCrossSectionShape=0, TraceCrossSectionEtchStyle=0, TraceCrossSectionTopEdgeRatio=1, TraceCrossSectionBottomEdgeRatio=1, IsUserDefinedAbsValForTCS=false, AbsValueOfTopWidthForTCS=0, AbsValueOfBotWidthForTCS=0, IsThicknessInvolvedForTCS=true, Color(196, 171, 30))
+		Layer(LayerID=2, LayerName='DIEL_1', LayerType=0, IsNegative=true, Material='FR4_epoxy', Elevation=0.045, Thickness=1.6, TopRoughness=0, BottomRoughness=0, IsTopRoughnessHuray=false, IsBottomRoughnessHuray=false, TopRoughnessHurayModel='', BottomRoughnessHurayModel='', DefinedDielectricFill='', TraceCrossSectionShape=0, TraceCrossSectionEtchStyle=0, TraceCrossSectionTopEdgeRatio=1, TraceCrossSectionBottomEdgeRatio=1, IsUserDefinedAbsValForTCS=false, AbsValueOfTopWidthForTCS=0, AbsValueOfBotWidthForTCS=0, IsThicknessInvolvedForTCS=true, Color(192, 192, 192))
+		Layer(LayerID=3, LayerName='COND_2', LayerType=2, IsNegative=true, Material='copper', Elevation=0, Thickness=0.045, TopRoughness=0, BottomRoughness=0, IsTopRoughnessHuray=false, IsBottomRoughnessHuray=false, TopRoughnessHurayModel='', BottomRoughnessHurayModel='', DefinedDielectricFill='', TraceCrossSectionShape=0, TraceCrossSectionEtchStyle=0, TraceCrossSectionTopEdgeRatio=1, TraceCrossSectionBottomEdgeRatio=1, IsUserDefinedAbsValForTCS=false, AbsValueOfTopWidthForTCS=0, AbsValueOfBotWidthForTCS=0, IsThicknessInvolvedForTCS=true, Color(152, 143, 192))
+	$end 'Layers'
+	$begin 'Materials'
+	$end 'Materials'
+	$begin 'HurayModels'
+		$begin 'HurayModel'
+			ModelName='Low Loss'
+			MetalSphereRadius=0.0005
+			UnitCellArea=1e-06
+			SpheresPerUnitCell=0.3183098861837906
+		$end 'HurayModel'
+		$begin 'HurayModel'
+			ModelName='Medium Loss'
+			MetalSphereRadius=0.0005
+			UnitCellArea=1e-06
+			SpheresPerUnitCell=0.954929658551372
+		$end 'HurayModel'
+		$begin 'HurayModel'
+			ModelName='High Loss'
+			MetalSphereRadius=0.0005
+			UnitCellArea=1e-06
+			SpheresPerUnitCell=1.909859317102744
+		$end 'HurayModel'
+	$end 'HurayModels'
+$end 'StackupLayers'

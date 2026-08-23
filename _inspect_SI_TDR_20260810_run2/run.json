@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "name": "M16P3_HDMI1_E2E",
+  "inputFormat": "detailed",
+  "csv": "config/channel.csv",
+  "baseConfig": "config/si-tdr-m16p3-multi-interface.json",
+  "aedtVersion": "2024.2",
+  "referenceLayer": "COND_2",
+  "portImpedanceOhm": 50,
+  "outputSubdir": "run/generated_config"
+}

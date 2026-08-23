@@ -1,0 +1,106 @@
+
+
+<2025> ANSYS, Inc. Unauthorized use, distribution, or duplication is prohibited
+| Launched Ansys AutoPDN v1.4 on 2026.08.21, 16:31:50
+2026/08/21 16:31:50		 Step 0. Initialize
+2026/08/21 16:31:50			> Execution stage : pre
+2026/08/21 16:31:50			> [PREFLIGHT] No existing SIwave background process found.
+2026/08/21 16:31:50		 Step 1. Get Configurations for PDN
+2026/08/21 16:31:50			> [PREFLIGHT] Python: 3.11.9 (C:\Program Files\Python311\python.exe)
+2026/08/21 16:31:50			> [PREFLIGHT] Admin privileges: True
+2026/08/21 16:31:50			> [PREFLIGHT] AEDT target version: 2025.2 | expected env: ANSYSEM_ROOT252
+2026/08/21 16:31:50			> [PREFLIGHT] Detected ANSYSEM_ROOT vars: ['ANSYSEM_ROOT242', 'ANSYSEM_ROOT252']
+2026/08/21 16:31:50			> [PREFLIGHT] ANSYSEM_ROOT252=C:\Program Files\ANSYS Inc\v252\AnsysEM
+2026/08/21 16:31:50			> [PREFLIGHT] SIwave executable found: C:\Program Files\ANSYS Inc\v252\AnsysEM\siwave_ng.exe
+2026/08/21 16:31:50			> [PREFLIGHT] pyaedt version: 0.17.2
+2026/08/21 16:31:50			> [PREFLIGHT] pyedb version: 0.50.1
+2026/08/21 16:31:50		 Step 2. Get Settings for PDN
+2026/08/21 16:31:50				>> Pass - Spec : C:\Users\HP\Documents\PI-PDN_auto_sim_V1\PI-PDN_K27Mp_reference.csv
+2026/08/21 16:31:50				>> Pass - cadFile : C:\Users\HP\Documents\PI-PDN_auto_sim_V1\EAX02034601-HD-BD.zip
+2026/08/21 16:31:50				>> Pass - Stackup : C:\Users\HP\Documents\PI-PDN_auto_sim_V1\Standard 2L 1.6T.stk
+2026/08/21 16:31:50				>> Pass - BOM : C:\Users\HP\Documents\PI-PDN_auto_sim_V1\K27MP_65MRGB82_withCI_BOM_260423.csv
+2026/08/21 16:31:50				>> Pass - Inner_cap : C:\Users\HP\Documents\PI-PDN_auto_sim_V1\InnerCap_K27Mp.csv
+2026/08/21 16:31:50		 Step 3. Get ECAD Data
+2026/08/21 16:31:50			> [PRE] Effective stackup selected: C:\Users\HP\Documents\PI-PDN_auto_sim_V1\Standard 2L 1.6T.stk
+2026/08/21 16:31:50	 [TEMP] Preconverted artifacts detected. Zuken conversion will be skipped.
+2026/08/21 16:31:50			> [PRE] Reuse existing ANF/CMP: EAX02034601.anf, EAX02034601.cmp
+2026/08/21 16:32:01				>> SIwave 2025.2 launched successfully.
+2026/08/21 16:32:46		 [PRE] Bootstrap SIW/EDB created via create_project: C:\Users\HP\Documents\PI-PDN_auto_sim_V1\outputs\EAX02034601_stackup_bootstrap.siw, C:\Users\HP\Documents\PI-PDN_auto_sim_V1\outputs\EAX02034601_stackup_bootstrap.aedb
+2026/08/21 16:32:46			> [SPEC] CMP source selected for pin mapping: C:\Users\HP\Documents\PI-PDN_auto_sim_V1\EAX02034601.cmp
+2026/08/21 16:32:46			> [SPEC] NDF source selected for pin/net crosswalk: C:\Users\HP\Documents\PI-PDN_auto_sim_V1\EAX02034601.ndf
+2026/08/21 16:32:46		 Step 4. CAD Modification using EDB database
+2026/08/21 16:32:52				>> EDB initialized with CAD file: C:\Users\HP\Documents\PI-PDN_auto_sim_V1\outputs\EAX02034601_stackup_bootstrap.aedb
+2026/08/21 16:32:52			> [STACKUP][Step4] COND_1 thickness=4.4999999999999996e-05
+2026/08/21 16:32:52			> [STACKUP][Step4] COND_2 thickness=4.4999999999999996e-05
+2026/08/21 16:32:53				>> Detected File Type: BOM
+2026/08/21 16:32:53	 [WARNING] Maker PN column not found. Falling back to Part Number for S-Parameter mapping.
+2026/08/21 16:32:59			> [SPEC] Parsed rows: 5
+2026/08/21 16:32:59			> [SPEC] SIW source selected for UI/API crosswalk: C:\Users\HP\Documents\PI-PDN_auto_sim_V1\outputs\EAX02034601_stackup_bootstrap.siw
+2026/08/21 16:32:59			> [SPEC] Pin override table loaded: C:\Users\HP\Documents\PI-PDN_auto_sim_V1\pin_override.csv (rows=1)
+2026/08/21 16:33:02			> Successfully parsed 19 Inner Caps from InnerCap_K27Mp.csv
+2026/08/21 16:33:09		 [SPEC] Pin matching policy: strict_refdes_pin=True
+2026/08/21 16:34:27	 [SPEC][PINMAP][D+P] IC100: K12 -> K13 (mode=designator_pin_ui_api_exact, net=+D1V0, source=siw_coord_net)
+2026/08/21 16:34:27	 [SPEC][PINMAP] IC100: K12 -> K13 (mode=designator_pin_ui_api_exact, net=+D1V0)
+2026/08/21 16:34:28	 [SPEC][PINMAP][D+P] IC100: Y15 -> AA15 (mode=designator_pin_ui_api_exact, net=+CPU_1V0, source=siw_coord_net)
+2026/08/21 16:34:28	 [SPEC][PINMAP] IC100: Y15 -> AA15 (mode=designator_pin_ui_api_exact, net=+CPU_1V0)
+2026/08/21 16:34:28	 [SPEC][PINMAP][D+P] IC100: D30 -> F31 (mode=designator_pin_ui_api_exact, net=+1.2V_DDR, source=siw_coord_net)
+2026/08/21 16:34:28	 [SPEC][PINMAP] IC100: D30 -> F31 (mode=designator_pin_ui_api_exact, net=+1.2V_DDR)
+2026/08/21 16:34:28	 [SPEC][OVERRIDE][WARNING] Override target not found: IC100:V31 -> V31
+2026/08/21 16:34:43	 [SPEC][PINMAP][3SRC][STRICT-SKIP] IC100:V31 spec-api candidate exists but api-ui relation is missing. tri_status=ok_spec_api_only
+2026/08/21 16:34:43	 [SPEC][SKIP][STRICT] Pin exact match not found: designator=IC100, pin=V31, lookup_pin=V31, nets=['+1.8V']. Net/coord fallback disabled by policy.
+2026/08/21 16:34:44	 [SPEC][PINMAP][D+P] IC100: A28 -> B28 (mode=designator_pin_ui_api_exact, net=SIGN003116, source=siw_coord_net)
+2026/08/21 16:34:44	 [SPEC][PINMAP] IC100: A28 -> B28 (mode=designator_pin_ui_api_exact, net=SIGN003116)
+2026/08/21 16:34:52		 [SPEC] Case build summary: total_rows=5, cases=4, fallback_resolved=0, skip_missing_comp=0, skip_missing_pin=1
+2026/08/21 16:34:52		 [SPEC] Pin resolution modes: {'designator_pin_ui_api_exact': 4, 'net_fix_unresolved': 1}
+2026/08/21 16:34:52		 [SPEC] Pin mapping quality: {'PASS': 4, 'SKIP': 1}
+2026/08/21 16:34:52			> [SPEC] Exported pin crosswalk CSV: C:\Users\HP\Documents\PI-PDN_auto_sim_V1\outputs\pin_crosswalk_map.csv
+2026/08/21 16:34:52			> [SPEC] Exported pin crosswalk JSON: C:\Users\HP\Documents\PI-PDN_auto_sim_V1\outputs\pin_crosswalk_map.json
+2026/08/21 16:34:52			> [SPEC] Exported EDB truth-table CSV: C:\Users\HP\Documents\PI-PDN_auto_sim_V1\outputs\edb_truth_table.csv
+2026/08/21 16:34:52			> [SPEC] Exported EDB truth-table JSON: C:\Users\HP\Documents\PI-PDN_auto_sim_V1\outputs\edb_truth_table.json
+2026/08/21 16:34:52			> [SPEC] Exported UI<->API crosswalk CSV: C:\Users\HP\Documents\PI-PDN_auto_sim_V1\outputs\ui_api_crosswalk_map.csv
+2026/08/21 16:34:52			> [SPEC] Exported UI<->API crosswalk JSON: C:\Users\HP\Documents\PI-PDN_auto_sim_V1\outputs\ui_api_crosswalk_map.json
+2026/08/21 16:34:52			> [SPEC] Exported Spec->EDB pin map: C:\Users\HP\Documents\PI-PDN_auto_sim_V1\outputs\spec_to_edb_pin_map.json
+2026/08/21 16:34:55		 [PRE] Legacy pre short-circuit is disabled. Continue to Step5 for setting-phase validation logs.
+2026/08/21 16:34:55		 Step 5. CAD Modification
+2026/08/21 16:34:58		 [BACKEND] Solver backend resolved: aedt_cutout (policy=auto, layer_count=2)
+2026/08/21 16:34:59				>> EDB initialized with CAD file: C:\Users\HP\Documents\PI-PDN_auto_sim_V1\outputs\EAX02034601_stackup_bootstrap_pre_20260821_163150.aedb
+2026/08/21 16:34:59			> [STACKUP][Step5] COND_1 thickness=4.4999999999999996e-05
+2026/08/21 16:34:59			> [STACKUP][Step5] COND_2 thickness=4.4999999999999996e-05
+2026/08/21 16:34:59			> [PDN][Short] Applied=35, Disabled=0, Skipped=0, AliasGroups=4
+2026/08/21 16:34:59			> [SParam] EDB component API capabilities: ['assign_s_param_model', 'use_s_parameter_model']
+2026/08/21 16:35:01			> [SParam] Exported assignment report: C:\Users\HP\Documents\PI-PDN_auto_sim_V1\outputs\sparam_assignment_result.json
+2026/08/21 16:35:01		 [SParam] Diagnostics: s2p_dir_exists=True, total_processed=401, assigned=289, reasons={'No Maker PN found': 81, 'Assigned': 289, 'No .s2p file': 31}
+2026/08/21 16:35:01			> [VRM_SETUP] Cleared previous setup artifacts by prefixes: ['PORT_', 'Rvrm_']
+2026/08/21 16:35:01			> [VRM_SETUP][PORT_META] PORT_IC100_D1V0: boundary=PortBoundary, is_circuit_port=False
+2026/08/21 16:35:02			> [VRM_SETUP][OK] IC100:+D1V0 => Port=IC100_D1V0, VRM=Rvrm_D1V0, R/L/C=0.005/1e-09/0.0
+2026/08/21 16:35:02			> [VRM_SETUP][PORT_META] PORT_IC100_CPU_1V0: boundary=PortBoundary, is_circuit_port=False
+2026/08/21 16:35:02			> [VRM_SETUP][OK] IC100:+CPU_1V0 => Port=IC100_CPU_1V0, VRM=Rvrm_CPU_1V0, R/L/C=0.005/1e-09/0.0
+2026/08/21 16:35:02			> [VRM_SETUP][PORT_META] PORT_IC100_1_2V_DDR: boundary=PortBoundary, is_circuit_port=False
+2026/08/21 16:35:03			> [VRM_SETUP][OK] IC100:+1.2V_DDR => Port=IC100_1_2V_DDR, VRM=Rvrm_1_2V_DDR, R/L/C=0.005/1e-09/0.0
+2026/08/21 16:35:03			> [VRM_SETUP][PORT_META] PORT_IC100_PIF1V5: boundary=PortBoundary, is_circuit_port=False
+2026/08/21 16:35:03			> [VRM_SETUP][INFO] No inductor on chain. Using preferred fallback anchor pin on net SIGN003116.
+2026/08/21 16:35:04			> [VRM_SETUP][OK] IC100:SIGN003116 => Port=IC100_PIF1V5, VRM=Rvrm_PIF1V5, R/L/C=0.005/1e-09/0.0
+2026/08/21 16:35:04			> [VRM_SETUP] Exported setup report: C:\Users\HP\Documents\PI-PDN_auto_sim_V1\outputs\vrm_port_setup_result.json
+2026/08/21 16:35:04		 [VRM_SETUP] Summary: total=4, done=4, skipped=0
+2026/08/21 16:35:04		 [PRE][CHECK] Port/VRM detail report: C:\Users\HP\Documents\PI-PDN_auto_sim_V1\outputs\vrm_port_setup_result.json
+2026/08/21 16:35:04		 [NET] Analysis nets: requested=9, available=9, missing=0, signal_demote=2
+2026/08/21 16:35:04			> [NET] Plane-area audit (non-path area): {'+1.2V_DDR': 0.00010048507033755433, '+CPU_1V0': 0.00018281383311529072, '+D1V0': 0.0002631575594162383, '+VTERM': 5.170651856553218e-05, 'GND': 0.0844375801288244, 'SIGN003116': 6.3095118927188555e-06, 'SIGN023247': 1.888453688917226e-05, 'SW_+0.9V_CPU': 1.4632086422354961e-05, 'SW_+1.2V_DDR': 9.413775811450566e-06}
+2026/08/21 16:35:04		 [PRE] Skip SIwave setup import for AEDT cutout backend (avoid SIwave-only setup artifacts).
+2026/08/21 16:35:17				>> SIwave 2025.2 launched successfully.
+2026/08/21 16:35:28		 [PRE] SIW snapshot generated from EDB: C:\Users\HP\Documents\PI-PDN_auto_sim_V1\outputs\EAX02034601_ready_for_solve.siw
+2026/08/21 16:35:50		 [AEDT][FULL] Exported pre-solve AEDT: C:\Users\HP\Documents\PI-PDN_auto_sim_V1\outputs\EAX02034601_full_presolve.aedt
+2026/08/21 16:36:07		 [AEDT][IMG] Offline board previews exported: C:\Users\HP\Documents\PI-PDN_auto_sim_V1\outputs\top.png, C:\Users\HP\Documents\PI-PDN_auto_sim_V1\outputs\btm.png
+2026/08/21 16:36:07		 [BACKEND] Solver backend resolved: aedt_cutout (policy=auto, layer_count=2)
+2026/08/21 16:36:07		 [PRE] Exported preprocessing result to: C:\Users\HP\Documents\PI-PDN_auto_sim_V1\outputs\preprocessing_result.json
+2026/08/21 16:36:07		 [PRE][CHECK] Pin mapping report: C:\Users\HP\Documents\PI-PDN_auto_sim_V1\outputs\spec_to_edb_pin_map.json
+2026/08/21 16:36:07		 [PRE][CHECK] EDB truth table: C:\Users\HP\Documents\PI-PDN_auto_sim_V1\outputs\edb_truth_table.csv
+2026/08/21 16:36:07		 [PRE][CHECK] Final setting EDB: C:\Users\HP\Documents\PI-PDN_auto_sim_V1\outputs\EAX02034601_ref_20260821_163150.aedb
+2026/08/21 16:36:07		 [PRE][CHECK] Final setting SIW: C:\Users\HP\Documents\PI-PDN_auto_sim_V1\outputs\EAX02034601_ready_for_solve.siw
+2026/08/21 16:36:07		 [PRE] Stage pre completed at Setting phase (Port/VRM + setup). Solve and report stages are skipped by design.
+2026/08/21 16:36:07		 Step 6. Generate Files and Run PDN Setup skipped (stage=pre, settings-only).
+2026/08/21 16:36:07		 Step 6. Post-processing skipped (stage=pre)
+####################################################################################################
+|
+| Terminate Ansys AutoPDN v1.4 on 2026.08.21, 16:36:07
+|
+####################################################################################################

@@ -1,0 +1,8 @@
+ExecSyzSim
+SaveArchive
+SaveEdb
+SaveSiw
+SetNumCpus 16
+UseHpcLicenses workgroup
+SolverMemLimit 80
+WaitForLicense

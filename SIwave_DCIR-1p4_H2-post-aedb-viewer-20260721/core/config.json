@@ -1,0 +1,66 @@
+{
+  "DCIR": {
+    "version": "2025.2",
+    "plot": {
+      "bgColor": "whitesmoke",
+      "bgOpacity": 0.2,
+      "nanColor": "darkgray"
+    },    
+    "isZuken":true,
+    "DF_path": "C:\\Program Files\\Zuken\\CR-8000\\Design Force\\bin",
+    "exportANF": true,
+    "exportCMP": true,
+    "exportODB": true,
+    "exportEDB": false,
+    "sws": "DCIR_Fast.sws",
+    "dump_stage_outputs": true,
+    "exportIPC": false,
+    "dcShort": {
+      "excludeNet": ["DUMMY", "ZUKEN_DUMMY", "OUTLINES"],
+      "shortedComp": ["SHORT_1005", "SHORT_1005_BOT", "SHORT_3030", "SHORT_NARROW_1MM", "SHORT_ZEROFUSE_M10MM", "SHORT_ZEROFUSE_M10MM_0.12"],
+      "shortKey": "SIGN",
+      "excludePrefixes": ["AR", "JK", "P", "IC", "X", "D"], 
+      "deleteCompTypes": ["IC", "IO", "Other"],
+      "powerNetKeywords": ["+", "-", "V", "PWR"]
+    },
+    "BOM": {
+      "colKey": ["Description", "Designator"],
+      "compProp": {
+        "bulkInd": {
+          "Description": "Wire Wound"
+        },
+        "beadInd": {
+          "Description": "Bead"
+        },
+		"LDO": {
+          "Description": "LDO"
+        },
+		"DCDC": {
+          "Description": "DC Converter"
+        },
+        "analogSwitch": {
+			"Description": "Analog Switch",
+			"connectType" : ["IN", "OUT", "VIN", "VOUT"],
+			"connectPin" : [[1, 5], [1, 6]]
+		},
+        "FET": {
+          "Description": "FET",
+          "startWith" : "Q",
+          "connectPin" : [1, 3]
+        },
+        "TR": {
+          "Description": "TR",
+          "startWith" : "Q",
+          "connectPin" : [1, 3]
+        }
+      }
+    },
+    "setup": {
+      "Vsource_Res": 1e-6,
+      "Isource_Res": 50000000
+    },
+    "doValchk": false,
+    "HPC": "Auto"
+  }
+}
+
