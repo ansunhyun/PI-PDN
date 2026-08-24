@@ -1,8 +1,0 @@
---------------------- Fri Aug 21 16:32:30 2026 ---------------------
-
-Creating SIwave session log C:\Users\HP\Documents\PI-PDN_auto_sim_V1\outputs\EAX02034601_stackup_bootstrap.log
-Ansys(R) SIwave 2025 R2.4 (Build 2025-11-06 17:01:32)
-OS: Windows 11 Professional for Workstations  (Build 26100)
-
-Saved C:\Users\HP\Documents\PI-PDN_auto_sim_V1\outputs\EAX02034601_stackup_bootstrap.siw
-Warning:  Thermal properties are incomplete for material "pec", augmenting with properties from system material "copper"

@@ -50,3 +50,26 @@ next-env.d.ts
 
 # worktree
 .claude/worktrees
+
+# python cache and virtual env
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+env/
+
+# local logs and temp
+*.log
+*.tmp
+
+# simulation/build outputs
+outputs/
+*.aedt
+*.aedtresults/
+*.aedb/
+*.siw
+*.asol
