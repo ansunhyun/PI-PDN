@@ -46,6 +46,7 @@ from core.services import (
     prepare_step6_runtime,
     run_step6_solver,
     write_step6_preprocessing_result,
+    run_step8_post_processing,
 )
 
 MODE = 0  # Generic Mode
@@ -4496,33 +4497,18 @@ finally:
 # endregion
 
 # region 8. Post-Processing
-if STAGE == "pre":
-    logger.log(f"Step {step}. Post-processing skipped (stage=pre)", level=LogLevel.INFO)
-elif SOLVER_BACKEND_USED == "aedt_cutout":
-    try:
-        logger.log(
-            f"Step {step}. Post-processing : Export AEDT cutout summary artifacts",
-            level=LogLevel.INFO,
-        )
-        export_aedt_cutout_post_reports(OUTPUT_DIR, logger)
-    except Exception:
-        logger.fatal(f"An error occurred while exporting AEDT post artifacts : {traceback.format_exc()}")
-        raise SystemExit(1)
-elif SOLVER_BACKEND_USED == "siwave":
-    try:
-        logger.log(f"Step {step}. Post-processing : Extracting PDN results", level=LogLevel.INFO)
-        full_state = run_standalone_post(
-            conf_manager,
-            INPUT_JSON,
-            OUTPUT_DIR,
-            analysis_start=START_TIME,
-            analysis_end=END_TIME,
-        )
-    except Exception:
-        logger.fatal(f"An error occurred while performing PDN results extracting : {traceback.format_exc()}")
-        raise SystemExit(1)
-else:
-    logger.fatal(f"Unsupported solver backend at post stage: {SOLVER_BACKEND_USED}")
-    raise SystemExit(1)
+run_step8_post_processing(
+    stage=STAGE,
+    step=step,
+    solver_backend_used=SOLVER_BACKEND_USED,
+    output_dir=OUTPUT_DIR,
+    logger=logger,
+    conf_manager=conf_manager,
+    input_json=INPUT_JSON,
+    start_time=START_TIME,
+    end_time=END_TIME,
+    export_aedt_cutout_post_reports_fn=export_aedt_cutout_post_reports,
+    run_standalone_post_fn=run_standalone_post,
+)
 # endregion
 

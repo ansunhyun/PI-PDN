@@ -17,6 +17,7 @@ from .step5_service import emit_step5_pre_stage_records
 from .step6_service import prepare_step6_runtime
 from .step6_service import run_step6_solver
 from .step6_service import write_step6_preprocessing_result
+from .step8_service import run_step8_post_processing
 
 __all__ = [
     "load_and_validate_settings",
@@ -36,4 +37,5 @@ __all__ = [
     "prepare_step6_runtime",
     "run_step6_solver",
     "write_step6_preprocessing_result",
+    "run_step8_post_processing",
 ]

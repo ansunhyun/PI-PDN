@@ -68,8 +68,20 @@ def run_step6_solver(
 ):
     preprocessing_data = []
     app_ref = app
+    if not pdn_cases_info:
+        logger.log(
+            "[STEP6] No PDN cases were generated from spec mapping. Skip solver run and emit empty preprocessing result.",
+            level=LogLevel.WARNING,
+        )
+        return {"preprocessing_data": preprocessing_data, "app": app_ref}
 
     if solver_backend == "siwave":
+        if not ref_siwave_file_path:
+            ref_siwave_file_path = (output_dir / f"{model_name}_PDN_FULL.siw").resolve()
+            logger.log(
+                f"[STEP6][WARNING] Reference SIW path was empty. Fallback path is used: {ref_siwave_file_path}",
+                level=LogLevel.WARNING,
+            )
         siw_execute_file = resolve_siwave_executable_fn(aedt_version)
         case_data_app = edb_setup_app if edb_setup_app else app_ref
         if not case_data_app:
@@ -127,6 +139,9 @@ def run_step6_solver(
 
 
 def write_step6_preprocessing_result(*, output_dir: Path, preprocessing_data, logger):
-    with open(output_dir / "preprocessing_result.json", "w", encoding="utf-8") as f:
+    temp_output = output_dir / "preprocessing_result.json.tmp"
+    final_output = output_dir / "preprocessing_result.json"
+    with open(temp_output, "w", encoding="utf-8") as f:
         json.dump(preprocessing_data, f, indent=4, ensure_ascii=False)
-    logger.log(f"Exported preprocessing result to: {output_dir / 'preprocessing_result.json'}", level=LogLevel.DETAIL1)
+    temp_output.replace(final_output)
+    logger.log(f"Exported preprocessing result to: {final_output}", level=LogLevel.DETAIL1)
