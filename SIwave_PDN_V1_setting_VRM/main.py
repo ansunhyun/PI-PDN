@@ -7,7 +7,6 @@ import traceback
 import time
 import os
 import argparse
-import zipfile
 import subprocess
 import shutil
 import atexit
@@ -24,11 +23,30 @@ from pathlib import Path
 
 from core.SettingsManager import SettingsManager, MAX_RETRIES, RETRY_DELAY
 from core.logger import Logger, LogLevel
-from core.database import PDNSessionException, ErrorCode, InValChk, Database, PDNCase, extract_voltage, sanitize_str
+from core.database import PDNSessionException, ErrorCode, Database, PDNCase, extract_voltage, sanitize_str
 from core.post_processing import PostProcessing
 from core.post_stage import PostStageError, append_post_detail, prepare_post_settings, reconstruct_post_state
 from core import pdn_setup_utils
 from core import vrm_setup
+from core.services import (
+    load_and_validate_settings,
+    prepare_ecad_data,
+    initialize_step4_context,
+    prepare_step4_case_state,
+    process_step4_cases,
+    finalize_step4_outputs,
+    add_pin_mapping_record as step4_add_pin_mapping_record,
+    append_case_from_target_net as step4_append_case_from_target_net,
+    trace_ic_local_power_pin as step4_trace_ic_local_power_pin,
+    initialize_step5_runtime,
+    configure_step5_settings,
+    export_step5_design_artifacts,
+    export_step5_preview_images,
+    emit_step5_pre_stage_records,
+    prepare_step6_runtime,
+    run_step6_solver,
+    write_step6_preprocessing_result,
+)
 
 MODE = 0  # Generic Mode
 
@@ -3990,36 +4008,12 @@ if STAGE == "post":
 
 try:
     logger.log(f"Step {step}. Get Settings for PDN", level=LogLevel.INFO)
-    settings_manager = SettingsManager(INPUT_JSON, configuration=conf_manager, logger=logger)
-    settings_manager.data.setdefault('CAE', {})
-    settings_manager.data['CAE'].setdefault('PCB', {})
-    settings_manager.data['CAE'].setdefault('SOC', {})
-
-    original_spec_name = settings_manager.data.get('CAE', {}).get('SOC', {}).get('Spec', '')
-    if original_spec_name:
-        primary_spec_path = INPUT_DIR / original_spec_name
-        if not primary_spec_path.exists():
-            parts = original_spec_name.rsplit('_', 1) 
-            base_name = parts[0] if len(parts) == 2 else original_spec_name.rsplit('.', 1)[0]
-            fallback_spec_name = f"{base_name}_reference.csv"
-            settings_manager.data['CAE']['SOC']['Spec'] = fallback_spec_name
-
-    original_bom_name = settings_manager.data.get('CAE', {}).get('PCB', {}).get('BOM', '')
-    if original_bom_name:
-        primary_bom_path = INPUT_DIR / original_bom_name
-        if not primary_bom_path.exists() and primary_bom_path.suffix.lower() == '.csv':
-            for ext in ['.xlsx', '.xls']:
-                fallback_bom_path = primary_bom_path.with_suffix(ext)
-                if fallback_bom_path.exists():
-                    settings_manager.data['CAE']['PCB']['BOM'] = original_bom_name.rsplit('.', 1)[0] + ext
-                    break
-
-    input_valchk = InValChk(settings_manager.data, INPUT_DIR, logger)
-    default, optional = input_valchk.is_valid()
-    
-    # [수정] Pmap 비의존 PDN 입력만 유지
-    settings_manager.data['CAE']['PCB'].update({'cadFile': default['cadFile'], 'Stackup': default['Stackup'], 'BOM': default['BOM']})
-    settings_manager.data['CAE']['SOC'].update({'Spec': default['Spec'], 'Inner_cap': optional['Inner_cap']})
+    settings_manager, input_valchk = load_and_validate_settings(
+        input_json=INPUT_JSON,
+        conf_manager=conf_manager,
+        input_dir=INPUT_DIR,
+        logger=logger,
+    )
     step += 1
 except Exception: 
     logger.fatal(f"An error occurred while loading settings: {traceback.format_exc()}")
@@ -4027,270 +4021,115 @@ except Exception:
 # endregion 
 
 # region 3. Get ECAD Data
-try:
-    logger.log(f"Step {step}. Get ECAD Data", level=LogLevel.INFO)
-    INPUT_CAD_FILE = INPUT_DIR / settings_manager.data['CAE']['PCB']['cadFile']
-    EDB_FILE_PATH = None
-    CMP_FILE_PATH = None
-    STACKUP_INPUT_FILE = input_valchk._default_inputFiles.get('Stackup') if input_valchk else None
-    STACKUP_EFFECTIVE_FILE = resolve_stackup_for_project(input_valchk, INPUT_DIR, WORKING_DIR, logger)
-    STACKUP_APPLIED_AT_PROJECT_CREATION = False
-    
-    if INPUT_CAD_FILE.suffix == '.zip':
-        with zipfile.ZipFile(INPUT_CAD_FILE, 'r') as zip_ref: zip_ref.extractall(INPUT_CAD_FILE.parent)
-        if conf_manager.data['PDN']['isZuken']:
-            temp_preconv = resolve_temp_preconverted_files(INPUT_CAD_FILE, logger)
-            if temp_preconv:
-                DSGN_FILE = temp_preconv.get("DSGN_FILE")
-                EDB_FILE_PATH = temp_preconv.get("EDB_FILE_PATH")
-                if EDB_FILE_PATH and Path(EDB_FILE_PATH).exists():
-                    valid_preconv, preconv_thickness = is_edb_stackup_valid_for_solve(
-                        Path(EDB_FILE_PATH),
-                        AEDT_VERSION,
-                        logger,
-                    )
-                    logger.log(f"[STACKUP][CHECK] Preconverted EDB thickness map: {preconv_thickness}", level=LogLevel.DETAIL1)
-                    if not valid_preconv:
-                        logger.log(
-                            "[STACKUP][CHECK] Preconverted EDB stackup is invalid. Force rebuild via create_project(ANF/CMP/STK).",
-                            level=LogLevel.WARNING,
-                        )
-                        EDB_FILE_PATH = None
-                        temp_preconv = None
-            else:
-                DSGN_FILE = None
-
-            ZUKEN_BIN_DIR = Path(conf_manager.data['PDN']['DF_path'])
-            pcb_files = list(INPUT_CAD_FILE.parent.glob('*.pcb'))
-            if len(pcb_files) == 1: PCB_FILE = pcb_files[0]
-            else: raise PDNSessionException(ErrorCode.INVALID_PCB_FILE_NUM, pcb_files)
-
-            if not temp_preconv:
-                CR5_EXEC = ZUKEN_BIN_DIR / 'DFevolv.cr5.exe'
-                dsgn_candidate = PCB_FILE.with_suffix('.dsgn')
-                if dsgn_candidate.exists():
-                    DSGN_FILE = dsgn_candidate
-                    logger.log(f"[PRE] Reuse existing DSGN for rebuild path: {DSGN_FILE}", level=LogLevel.DETAIL1)
-                else:
-                    result = run_external_tool([str(CR5_EXEC), str(PCB_FILE.parent)], "DFevolv.cr5.exe")
-                    if result.returncode: raise PDNSessionException(ErrorCode.CONVERT_PCB_TO_DSGN_FAIL, result.returncode)
-                    DSGN_FILE = dsgn_candidate
-
-            if EDB_FILE_PATH is None:
-                base_name_for_project = INPUT_CAD_FILE.stem.split('-')[0]
-                use_create_project_flow = bool(DSGN_FILE and STACKUP_EFFECTIVE_FILE and Path(STACKUP_EFFECTIVE_FILE).exists())
-                if use_create_project_flow:
-                    anf_file, cmp_file = resolve_or_create_anf_cmp(Path(DSGN_FILE), ZUKEN_BIN_DIR, logger)
-                    _, EDB_FILE_PATH = build_edb_via_create_project(
-                        aedt_version=AEDT_VERSION,
-                        anf_file=Path(anf_file),
-                        cmp_file=Path(cmp_file),
-                        stackup_file=Path(STACKUP_EFFECTIVE_FILE),
-                        output_dir=OUTPUT_DIR,
-                        base_name=base_name_for_project,
-                        logger=logger,
-                    )
-                    STACKUP_APPLIED_AT_PROJECT_CREATION = True
-                else:
-                    DSGN2EDB_EXEC = ZUKEN_BIN_DIR / 'DFaedbout.exe'
-                    EDB_FILE_PATH = DSGN_FILE.with_suffix('.aedb')
-                    result = run_external_tool([str(DSGN2EDB_EXEC), '-r', str(DSGN_FILE), '-o', str(EDB_FILE_PATH)], "DFaedbout.exe")
-                    if result.returncode:
-                        raise PDNSessionException(ErrorCode.CONVERT_DSGN_TO_EDB_FAIL, result.returncode)
-        else:
-            EDB_FILE_PATH = INPUT_CAD_FILE.with_suffix('.aedb')
-    else:
-        raise PDNSessionException(ErrorCode.INVALID_CAD_FILE, INPUT_CAD_FILE)
-
-    base_name = INPUT_CAD_FILE.stem.split('-')[0]
-    CMP_FILE_PATH = discover_cmp_file(INPUT_DIR, base_name)
-    NDF_FILE_PATH = discover_ndf_file(INPUT_DIR, base_name)
-    if CMP_FILE_PATH:
-        logger.log(f"[SPEC] CMP source selected for pin mapping: {CMP_FILE_PATH}", level=LogLevel.DETAIL1)
-    else:
-        logger.log("[SPEC][WARNING] CMP file not found. Spec->EDB pin coordinate fallback is disabled.", level=LogLevel.WARNING)
-    if NDF_FILE_PATH:
-        logger.log(f"[SPEC] NDF source selected for pin/net crosswalk: {NDF_FILE_PATH}", level=LogLevel.DETAIL1)
-    else:
-        logger.log("[SPEC][WARNING] NDF file not found. Spec pin/net crosswalk fallback is disabled.", level=LogLevel.WARNING)
-    
-    # [수정] SIwave_FILE_PATH를 outputs 폴더 하위로 지정하여 pre/full 모두 동일한 경로를 바라보도록 설정
-    SIwave_FILE_PATH = OUTPUT_DIR / f'{base_name}_ready_for_solve.siw'
-
-except Exception:
-    logger.fatal(f"An error occurred while getting CAD database: {traceback.format_exc()}")
-    raise PDNSessionException(ErrorCode.CAD_IMPORT_FAIL)
-finally:
-    step += 1
+ecad_data = prepare_ecad_data(
+    step=step,
+    logger=logger,
+    input_dir=INPUT_DIR,
+    output_dir=OUTPUT_DIR,
+    working_dir=WORKING_DIR,
+    settings_manager=settings_manager,
+    input_valchk=input_valchk,
+    conf_manager=conf_manager,
+    aedt_version=AEDT_VERSION,
+    resolve_stackup_for_project=resolve_stackup_for_project,
+    resolve_temp_preconverted_files=resolve_temp_preconverted_files,
+    is_edb_stackup_valid_for_solve=is_edb_stackup_valid_for_solve,
+    run_external_tool=run_external_tool,
+    resolve_or_create_anf_cmp=resolve_or_create_anf_cmp,
+    build_edb_via_create_project=build_edb_via_create_project,
+    discover_cmp_file=discover_cmp_file,
+    discover_ndf_file=discover_ndf_file,
+)
+step = ecad_data["step"]
+INPUT_CAD_FILE = ecad_data["INPUT_CAD_FILE"]
+EDB_FILE_PATH = ecad_data["EDB_FILE_PATH"]
+CMP_FILE_PATH = ecad_data["CMP_FILE_PATH"]
+NDF_FILE_PATH = ecad_data["NDF_FILE_PATH"]
+STACKUP_INPUT_FILE = ecad_data["STACKUP_INPUT_FILE"]
+STACKUP_EFFECTIVE_FILE = ecad_data["STACKUP_EFFECTIVE_FILE"]
+STACKUP_APPLIED_AT_PROJECT_CREATION = ecad_data["STACKUP_APPLIED_AT_PROJECT_CREATION"]
+SIwave_FILE_PATH = ecad_data["SIwave_FILE_PATH"]
+base_name = ecad_data["base_name"]
 # endregion
 
 # region 4. Modify CAD Data using EDB database
 logger.log(f"Step {step}. CAD Modification using EDB database", level=LogLevel.INFO)
 app = None
 try:
-    app = SIwave(version=AEDT_VERSION, logger=logger)
-    app.set_cad_file(EDB_FILE_PATH)
-    log_signal_layer_thicknesses(app, logger, tag="[STACKUP][Step4]")
-    try: STACKUP_LAYER_COUNT = len(app.edb.stackup.signal_layers.keys())
-    except Exception: STACKUP_LAYER_COUNT = None
+    step4_ctx = initialize_step4_context(
+        aedt_version=AEDT_VERSION,
+        logger=logger,
+        edb_file_path=EDB_FILE_PATH,
+        conf_manager=conf_manager,
+        input_valchk=input_valchk,
+        settings_manager=settings_manager,
+        cmp_file_path=CMP_FILE_PATH,
+        ndf_file_path=NDF_FILE_PATH,
+        output_dir=OUTPUT_DIR,
+        input_dir=INPUT_DIR,
+        base_name=base_name,
+        parse_cmp_pin_records=parse_cmp_pin_records,
+        parse_ndf_pin_records=parse_ndf_pin_records,
+        discover_siw_for_ui_crosswalk=discover_siw_for_ui_crosswalk,
+        parse_siw_pin_records=parse_siw_pin_records,
+        load_pin_overrides=_load_pin_overrides,
+        log_signal_layer_thicknesses=log_signal_layer_thicknesses,
+        siwave_cls=SIwave,
+    )
 
-    power_net_areas = {
-        net_name: sum(p.area() for p in net_inst.primitives if p.type != 'Path')
-        for net_name, net_inst in app.edb._nets.power.items()
-        if conf_manager.data['PDN']['dcShort']['shortKey'] not in net_name and '+' not in net_name
-    }
-    if power_net_areas: GND_NET = max(power_net_areas, key=power_net_areas.get)
-    else: raise PDNSessionException(ErrorCode.GND_NET_DETECT_FAIL)
-
-    BOM_FILE = input_valchk._default_inputFiles['BOM']
-    settings_manager.parse_bom_and_partlist(BOM_FILE)
-    bom_info = settings_manager.get_bom() 
-
-    delComp, missing_in_bom = {}, []
-    exclude_prefixes = tuple(conf_manager.data['PDN']['dcShort'].get('excludePrefixes', ['AR', 'JK', 'P', 'IC', 'X', 'D']))
-    delete_types = conf_manager.data['PDN']['dcShort'].get('deleteCompTypes', ['IC', 'IO', 'Other'])
-
-    for comp_name, comp_inst in app.edb._components.components.items():
-        if str(comp_name).upper().startswith('C'): continue
-        if comp_name in bom_info['Designators']: continue
-        elif not comp_name.startswith(exclude_prefixes) and comp_inst.component_def in conf_manager.data['PDN']['dcShort']['shortedComp']: continue
-        else:
-            if comp_inst.type in delete_types:
-                delComp[comp_name] = comp_inst
-                missing_in_bom.append(comp_name) 
-            else: comp_inst.enabled = False
-
-    SHORT_CORRECTION, DEL_COMP = {}, set()
-    for comp_name, comp_inst in app.edb._components.components.items():
-        if comp_name.startswith(exclude_prefixes) or comp_inst.component_def not in conf_manager.data['PDN']['dcShort']['shortedComp']: continue
-        target_nets = app.edb.nets.nets_by_components[comp_name]
-        if len(target_nets) != 2: continue
-        net1, net2 = target_nets
-        short_key = conf_manager.data['PDN']['dcShort']['shortKey']
-        primary, secondary = (net2, net1) if short_key in net1 or (short_key not in net2 and len(net1) > len(net2)) else (net1, net2)
-        SHORT_CORRECTION.setdefault(primary, []).append(secondary)
-        DEL_COMP.add(comp_name)
-
-    SPEC_FILE = input_valchk._default_inputFiles['Spec']
-    settings_manager.parse_spec(SPEC_FILE)
-    spec_info = settings_manager.get_spec()
-    logger.log(f"[SPEC] Parsed rows: {len(spec_info)}", level=LogLevel.DETAIL1)
-    target_designators = {str(row.get("Designator", "")).strip() for row in spec_info if row.get("Designator")}
-    cmp_pin_records = parse_cmp_pin_records(CMP_FILE_PATH, target_designators=target_designators)
-    ndf_pin_records = parse_ndf_pin_records(NDF_FILE_PATH, target_designators=target_designators)
-    siw_crosswalk_source = discover_siw_for_ui_crosswalk(OUTPUT_DIR, INPUT_DIR, base_name)
-    siw_pin_records = parse_siw_pin_records(siw_crosswalk_source, target_designators=target_designators)
-    if siw_crosswalk_source:
-        logger.log(f"[SPEC] SIW source selected for UI/API crosswalk: {siw_crosswalk_source}", level=LogLevel.DETAIL1)
-    else:
-        logger.log("[SPEC][WARNING] SIW source not found. SIW-assisted UI/API crosswalk is disabled.", level=LogLevel.WARNING)
-    pin_crosswalk_cache = {}
-    edb_truth_cache = {}
-    ui_api_crosswalk_cache = {}
-    pin_override_map, pin_override_path = _load_pin_overrides(INPUT_DIR)
-    if pin_override_path:
-        logger.log(
-            f"[SPEC] Pin override table loaded: {pin_override_path} (rows={len(pin_override_map)})",
-            level=LogLevel.DETAIL1,
-        )
-    else:
-        logger.log("[SPEC] Pin override table not found. Continue without manual overrides.", level=LogLevel.DETAIL2)
-    
-    pdn_cases_info = []
-    inner_cap_audit = []
-    inner_cap_net_lookup = {}
-    designator_list = {case['Designator'] for case in spec_info}
+    app = step4_ctx["app"]
+    STACKUP_LAYER_COUNT = step4_ctx["STACKUP_LAYER_COUNT"]
+    GND_NET = step4_ctx["GND_NET"]
+    BOM_FILE = step4_ctx["BOM_FILE"]
+    bom_info = step4_ctx["bom_info"]
+    delComp = step4_ctx["delComp"]
+    missing_in_bom = step4_ctx["missing_in_bom"]
+    exclude_prefixes = step4_ctx["exclude_prefixes"]
+    delete_types = step4_ctx["delete_types"]
+    SHORT_CORRECTION = step4_ctx["SHORT_CORRECTION"]
+    DEL_COMP = step4_ctx["DEL_COMP"]
+    SPEC_FILE = step4_ctx["SPEC_FILE"]
+    spec_info = step4_ctx["spec_info"]
+    cmp_pin_records = step4_ctx["cmp_pin_records"]
+    ndf_pin_records = step4_ctx["ndf_pin_records"]
+    siw_crosswalk_source = step4_ctx["siw_crosswalk_source"]
+    siw_pin_records = step4_ctx["siw_pin_records"]
+    pin_crosswalk_cache = step4_ctx["pin_crosswalk_cache"]
+    edb_truth_cache = step4_ctx["edb_truth_cache"]
+    ui_api_crosswalk_cache = step4_ctx["ui_api_crosswalk_cache"]
+    pin_override_map = step4_ctx["pin_override_map"]
+    pin_override_path = step4_ctx["pin_override_path"]
     
     time.sleep(3.0)
-
-    def normalize_name(name): return re.sub(r'[^A-Za-z0-9]', '', str(name)).upper()
-    def normalize_pin_name(pin_name): return re.sub(r'[^A-Za-z0-9]', '', str(pin_name or "")).upper()
-
-    DEFAULT_NET_ALIASES = {"+1.8V": ["EMMC1V8", "VCC_1V8", "+1V8"], "PIF1V5": ["+VTERM", "VCC_1V5", "SIGN003116"]}
-
-    def build_net_alias_map(short_correction):
-        alias = {}
-        for primary, secondaries in (short_correction or {}).items():
-            all_nets = [str(primary)] + [str(s) for s in secondaries]
-            for n in all_nets: alias.setdefault(n, set()).update(x for x in all_nets if x != n)
-        for spec_net, edb_nets in DEFAULT_NET_ALIASES.items():
-            alias.setdefault(spec_net, set()).update(edb_nets)
-            for edb_net in edb_nets: alias.setdefault(edb_net, set()).add(spec_net)
-        return alias
-
-    net_alias_map = build_net_alias_map(SHORT_CORRECTION)
-    normalized_edb_component_names = {normalize_name(c_name): c_name for c_name in app.edb._components.components.keys()}
-
-    def get_component_by_normalized(norm_name):
-        comp_name = normalized_edb_component_names.get(norm_name)
-        return app.edb._components.components.get(comp_name) if comp_name else None
-
-    INNER_CAP_FILE = settings_manager.data.get('CAE', {}).get('SOC', {}).get('Inner_cap')
-    if INNER_CAP_FILE:
-        inner_cap_path = INPUT_DIR / INNER_CAP_FILE
-        if settings_manager.parse_inner_cap(inner_cap_path):
-            inner_caps = settings_manager.get_inner_cap()
-            for icap_item in inner_caps:
-                lk = (normalize_name(icap_item.get('Designator', '')), normalize_pin_name(icap_item.get('Pin_Number', '')))
-                if lk not in inner_cap_net_lookup:
-                    inner_cap_net_lookup[lk] = {"PCB_Net": (icap_item.get('PCB_Net') or "").strip(), "SoC_Net": (icap_item.get('SoC_Net') or "").strip()}
-            
-            cap_name_counter = {}
-            for idx, icap in enumerate(inner_caps):
-                ic_refdes = icap['Designator']
-                pin_no = icap['Pin_Number']
-                cap_val = icap['Cap_Value']
-                base_cap_name = f"C_{sanitize_name_token(ic_refdes)}_{sanitize_name_token(pin_no)}"
-                seq = cap_name_counter.get(base_cap_name, 0) + 1
-                cap_name_counter[base_cap_name] = seq
-                cap_name = base_cap_name if seq == 1 else f"{base_cap_name}_Q{seq}"
-                
-                audit_item = {
-                    "index": idx + 1, "component_name": cap_name, "designator": ic_refdes,
-                    "pin_number": pin_no, "cap_value": cap_val, "status": "pending", "message": "",
-                }
-                
-                norm_ic_name = normalize_name(ic_refdes)
-                ic_inst = get_component_by_normalized(norm_ic_name)
-                if not ic_inst: continue
-                
-                pin_inst = ic_inst.pins.get(pin_no)
-                if not pin_inst: continue
-                    
-                pin_loc = pin_inst.position
-                
-                try:
-                    gnd_pin_inst = find_nearest_gnd_pin(app.edb, pin_loc, GND_NET)
-                    if not gnd_pin_inst: continue
-
-                    created = app.create_rlc_component(
-                        pins=[pin_inst, gnd_pin_inst], comp_name=cap_name,
-                        part_name=icap.get('Part_Number', 'INNER_CAP'), r_value=1e9,
-                    )
-                    if created:
-                        new_comp = app.edb._components.components.get(cap_name)
-                        if new_comp:
-                            new_comp.type = "Capacitor"
-                            new_comp.value = cap_val
-                            audit_item["status"] = "created"
-                    inner_cap_audit.append(audit_item)
-                except Exception as e:
-                    logger.log(f"[ERROR] Inner Cap {cap_name} 생성 중 오류 발생: {e}", level=LogLevel.ERROR)
-
-    spec_skip_missing_comp = 0
-    spec_skip_missing_pin = 0
-    spec_fallback_resolved = 0
-    strict_refdes_pin = bool(
-        conf_manager.data.get("PDN", {}).get("pinMapping", {}).get("strictRefdesPin", True)
+    step4_case_state = prepare_step4_case_state(
+        app=app,
+        settings_manager=settings_manager,
+        input_dir=INPUT_DIR,
+        gnd_net=GND_NET,
+        short_correction=SHORT_CORRECTION,
+        spec_info=spec_info,
+        conf_manager=conf_manager,
+        sanitize_name_token=sanitize_name_token,
+        find_nearest_gnd_pin=find_nearest_gnd_pin,
+        logger=logger,
     )
-    pin_resolution_stats = defaultdict(int)
-    pin_mapping_quality_stats = defaultdict(int)
-    pin_mapping_records = []
-    used_component_pins = defaultdict(set)
-    logger.log(
-        f"[SPEC] Pin matching policy: strict_refdes_pin={strict_refdes_pin}",
-        level=LogLevel.INFO,
-    )
+    pdn_cases_info = step4_case_state["pdn_cases_info"]
+    inner_cap_audit = step4_case_state["inner_cap_audit"]
+    inner_cap_net_lookup = step4_case_state["inner_cap_net_lookup"]
+    designator_list = step4_case_state["designator_list"]
+    normalize_name = step4_case_state["normalize_name"]
+    normalize_pin_name = step4_case_state["normalize_pin_name"]
+    net_alias_map = step4_case_state["net_alias_map"]
+    normalized_edb_component_names = step4_case_state["normalized_edb_component_names"]
+    get_component_by_normalized = step4_case_state["get_component_by_normalized"]
+    spec_skip_missing_comp = step4_case_state["spec_skip_missing_comp"]
+    spec_skip_missing_pin = step4_case_state["spec_skip_missing_pin"]
+    spec_fallback_resolved = step4_case_state["spec_fallback_resolved"]
+    strict_refdes_pin = step4_case_state["strict_refdes_pin"]
+    pin_resolution_stats = step4_case_state["pin_resolution_stats"]
+    pin_mapping_quality_stats = step4_case_state["pin_mapping_quality_stats"]
+    pin_mapping_records = step4_case_state["pin_mapping_records"]
+    used_component_pins = step4_case_state["used_component_pins"]
 
     def add_pin_mapping_record(
         case_row,
@@ -4302,37 +4141,19 @@ try:
         resolved_net,
         trace_meta=None,
     ):
-        spec_net_preferred = ""
-        try:
-            spec_net_preferred = str((spec_nets_row or [""])[0] or "").strip()
-        except Exception:
-            spec_net_preferred = ""
-        trace_meta = trace_meta or {}
-        mapping_status, mapping_confidence, mapping_note = evaluate_pin_mapping_quality(mode, trace_meta)
-        pin_mapping_quality_stats[mapping_status] += 1
-        pin_resolution_stats[mode] += 1
-        pin_mapping_records.append(
-            {
-                "Spec_Designator": case_row.get("Designator"),
-                "Resolved_Designator": resolved_comp,
-                "Spec_Pin": spec_pin,
-                "Resolved_Pin": resolved_pin,
-                "Resolve_Mode": mode,
-                "Spec_Nets": spec_nets_row,
-                # Report-level naming policy: prefer Spec net label for readability.
-                "Resolved_Net": spec_net_preferred or resolved_net,
-                # Keep actual PCB-resolved net for traceability/debug.
-                "Resolved_Net_PCB": resolved_net,
-                "Trace_Start_Net": trace_meta.get("start_net", ""),
-                "Trace_Reached_Net": trace_meta.get("reached_net", ""),
-                "Trace_Hops": trace_meta.get("hops", ""),
-                "Trace_Status": trace_meta.get("status", ""),
-                "Trace_Reason": trace_meta.get("reason", ""),
-                "Trace_Candidate_Pins": trace_meta.get("candidate_pins", []),
-                "Mapping_Status": mapping_status,
-                "Mapping_Confidence": mapping_confidence,
-                "Mapping_Note": mapping_note,
-            }
+        return step4_add_pin_mapping_record(
+            case_row=case_row,
+            resolved_comp=resolved_comp,
+            spec_pin=spec_pin,
+            resolved_pin=resolved_pin,
+            mode=mode,
+            spec_nets_row=spec_nets_row,
+            resolved_net=resolved_net,
+            trace_meta=trace_meta,
+            evaluate_pin_mapping_quality=evaluate_pin_mapping_quality,
+            pin_mapping_quality_stats=pin_mapping_quality_stats,
+            pin_resolution_stats=pin_resolution_stats,
+            pin_mapping_records=pin_mapping_records,
         )
 
     def append_case_from_target_net(
@@ -4345,718 +4166,121 @@ try:
         mapping_mode="",
         trace_meta=None,
     ):
-        try:
-            net_obj = app.edb.nets.nets.get(target_net)
-        except Exception:
-            net_obj = None
-        if net_obj is None:
-            return False
-        trace_meta = trace_meta or {}
-        mapping_status, mapping_confidence, mapping_note = evaluate_pin_mapping_quality(mapping_mode, trace_meta)
-
-        db.other_nets[target_net] = []
-        result, net_chain = find_power_source(app.edb, net_obj, designator_list, bom_info, GND_NET, target_ic=resolved_comp)
-        if isinstance(result, ErrorCode):
-            net_chain = []
-
-        source_pin_name = None
-        if not isinstance(result, ErrorCode) and result and getattr(result, "pins", None):
-            source_pin_name = next(
-                (
-                    p_name
-                    for s_net in reversed(net_chain + [target_net])
-                    for p_name, p in result.pins.items()
-                    if p.net_name == s_net
-                ),
-                None,
-            )
-
-        full_chain = []
-        for n in (net_chain + [target_net]):
-            if n not in full_chain:
-                full_chain.append(n)
-
-        vmag_default = extract_voltage(target_net) or 1.0
-        vmag = parse_numeric(case_row.get('Voltage_(V)'), vmag_default)
-        imag = parse_numeric(case_row.get('Current_(A)'), 1.0)
-        min_spec = parse_numeric(case_row.get('Min_Spec_(V)'), 0.0)
-        max_spec = parse_numeric(case_row.get('Max_Spec_(V)'), max(vmag * 1.2, vmag + 0.1))
-        spec_net_preferred = spec_nets_row[0] if spec_nets_row else target_net
-
-        pdn_cases_info.append({
-            'IC': resolved_comp,
-            'Spec_Pin': spec_pin,
-            'IC_pin': resolved_pin,
-            'Net': target_net,
-            'Spec_Net': spec_net_preferred,
-            'Display_Net': spec_net_preferred or target_net,
-            'Source_name': result.name if not isinstance(result, ErrorCode) else "",
-            'Source_pin': source_pin_name,
-            'Source_net_chain': net_chain,
-            'Full_Net_Chain': full_chain,
-            'Vmag': vmag,
-            'Imag': imag,
-            'MinSpec': min_spec,
-            'MaxSpec': max_spec,
-            'Mapping_Mode': mapping_mode,
-            'Mapping_Trace': trace_meta,
-            'Mapping_Status': mapping_status,
-            'Mapping_Confidence': mapping_confidence,
-            'Mapping_Note': mapping_note,
-        })
-        return True
+        return step4_append_case_from_target_net(
+            app=app,
+            case_row=case_row,
+            resolved_comp=resolved_comp,
+            spec_pin=spec_pin,
+            resolved_pin=resolved_pin,
+            target_net=target_net,
+            spec_nets_row=spec_nets_row,
+            mapping_mode=mapping_mode,
+            trace_meta=trace_meta,
+            evaluate_pin_mapping_quality=evaluate_pin_mapping_quality,
+            db=db,
+            find_power_source=find_power_source,
+            designator_list=designator_list,
+            bom_info=bom_info,
+            gnd_net=GND_NET,
+            parse_numeric=parse_numeric,
+            extract_voltage=extract_voltage,
+            error_code_cls=ErrorCode,
+            pdn_cases_info=pdn_cases_info,
+        )
 
     def trace_ic_local_power_pin(comp_inst_local, start_net, gnd_net, spec_nets=None, max_hops=10):
-        """
-        Trace from start_net through component connectivity and return first IC-local
-        non-GND, non-signal, non-dummy pin reached.
-        Also return diagnostic list of all IC-local pin hits encountered on traced nets.
-        """
-        start_net = str(start_net or "").strip()
-        if not start_net or comp_inst_local is None:
-            return "", "", -1, "invalid_input", {"visited_nets": [], "ic_hits": []}
-
-        from collections import deque
-        q = deque([(start_net, 0)])
-        visited = {start_net}
-        visited_order = [start_net]
-        gnd_u = str(gnd_net or "").strip().upper()
-        spec_nets_local = [str(n).strip() for n in (spec_nets or []) if str(n).strip()]
-        ic_hits_all = []
-        ic_hits_seen = set()
-
-        while q:
-            cur_net, hops = q.popleft()
-            cur_u = str(cur_net or "").upper()
-            cur_signal = _is_signal_like_net(cur_net)
-            cur_forbidden = _is_forbidden_trace_net(cur_net)
-            if cur_u == gnd_u or cur_signal or cur_forbidden:
-                pass
-            else:
-                ic_hits = []
-                for pn, p in comp_inst_local.pins.items():
-                    pnet = str(getattr(p, "net_name", "") or "").strip()
-                    if not pnet:
-                        continue
-                    if pnet == cur_net:
-                        is_gnd = str(pnet).upper() == gnd_u
-                        is_signal = _is_signal_like_net(pnet)
-                        is_forbidden = _is_forbidden_trace_net(pnet)
-                        is_power = _is_power_like_net(pnet)
-                        hit_key = (str(pn), str(pnet), hops)
-                        if hit_key not in ic_hits_seen:
-                            ic_hits_all.append(
-                                {
-                                    "pin": str(pn),
-                                    "net": str(pnet),
-                                    "hop": hops,
-                                    "is_gnd": bool(is_gnd),
-                                    "is_power_like": bool(is_power),
-                                    "is_signal_like": bool(is_signal),
-                                    "is_forbidden": bool(is_forbidden),
-                                }
-                            )
-                            ic_hits_seen.add(hit_key)
-                        if is_gnd or is_signal or is_forbidden or (not is_power):
-                            continue
-                        if spec_nets_local and not any(_net_matches_spec(sn, pnet, net_alias_map) for sn in spec_nets_local):
-                            continue
-                        ic_hits.append((pn, pnet))
-                if ic_hits:
-                    ic_hits.sort(key=lambda x: str(x[0]))
-                    return ic_hits[0][0], ic_hits[0][1], hops, "ok", {
-                        "visited_nets": visited_order,
-                        "ic_hits": ic_hits_all,
-                    }
-
-            if hops >= max_hops:
-                continue
-
-            for _, comp in app.edb._components.components.items():
-                pins = list(comp.pins.values())
-                if not pins:
-                    continue
-                # graph 폭발 방지
-                if len(pins) > 24 and comp is not comp_inst_local:
-                    continue
-                if not any(str(getattr(p, "net_name", "") or "") == cur_net for p in pins):
-                    continue
-                for p in pins:
-                    nxt = str(getattr(p, "net_name", "") or "").strip()
-                    if not nxt or nxt in visited or nxt == cur_net:
-                        continue
-                    if str(nxt).upper() == gnd_u:
-                        continue
-                    if _is_signal_like_net(nxt) or _is_forbidden_trace_net(nxt):
-                        continue
-                    visited.add(nxt)
-                    visited_order.append(nxt)
-                    q.append((nxt, hops + 1))
-
-        return "", "", -1, "no_ic_local_power_pin", {
-            "visited_nets": visited_order,
-            "ic_hits": ic_hits_all,
-        }
-
-    for case in spec_info:
-        comp_name = case['Designator']
-        norm_comp_name = normalize_name(comp_name)
-        comp_inst = get_component_by_normalized(norm_comp_name)
-        target_pin_name = str(case.get('Pin_number', '')).strip()
-        spec_nets = _spec_net_candidates(case)
-        if comp_inst is None:
-            fallback_candidates = []
-            for cand_name, cand_comp in app.edb._components.components.items():
-                cand_pin = cand_comp.pins.get(target_pin_name)
-                if not cand_pin:
-                    continue
-                if not spec_nets:
-                    fallback_candidates.append((cand_name, cand_comp))
-                    continue
-                for spec_net in spec_nets:
-                    if _net_matches_spec(spec_net, cand_pin.net_name, net_alias_map):
-                        fallback_candidates.append((cand_name, cand_comp))
-                        break
-            if fallback_candidates:
-                chosen_name, chosen_comp = fallback_candidates[0]
-                comp_name = chosen_name
-                comp_inst = chosen_comp
-                spec_fallback_resolved += 1
-                logger.log(
-                    f"[SPEC][FALLBACK] Designator remapped: {case.get('Designator')} -> {comp_name}, pin={target_pin_name}, nets={spec_nets}",
-                    level=LogLevel.WARNING,
-                )
-            else:
-                spec_skip_missing_comp += 1
-                logger.log(
-                    f"[SPEC][SKIP] Component not found: designator={case.get('Designator')}, pin={target_pin_name}, nets={spec_nets}",
-                    level=LogLevel.WARNING,
-                )
-                continue
-
-        cmp_pin_info = (cmp_pin_records.get(comp_name, {}) or {}).get(target_pin_name)
-        if comp_name not in pin_crosswalk_cache:
-            pin_crosswalk_cache[comp_name] = build_component_pin_crosswalk(
-                comp_inst=comp_inst,
-                cmp_component_record=(cmp_pin_records.get(comp_name, {}) or {}),
-                ndf_component_record=(ndf_pin_records.get(comp_name, {}) or {}),
-                net_alias_map=net_alias_map,
-            )
-        if comp_name not in edb_truth_cache:
-            edb_truth_cache[comp_name] = build_component_edb_truth_table(comp_inst)
-        if comp_name not in ui_api_crosswalk_cache:
-            ui_api_crosswalk_cache[comp_name] = build_component_ui_api_crosswalk(
-                comp_inst=comp_inst,
-                components_api=getattr(app.edb, "components", None),
-                siw_component_record=(siw_pin_records.get(comp_name, {}) or {}),
-                ndf_component_record=(ndf_pin_records.get(comp_name, {}) or {}),
-                net_alias_map=net_alias_map,
-            )
-        crosswalk_pin_info = (pin_crosswalk_cache.get(comp_name, {}) or {}).get(target_pin_name)
-        truth_component_rows = edb_truth_cache.get(comp_name, [])
-        ui_api_component_map = ui_api_crosswalk_cache.get(comp_name, {})
-        siw_pin_info = (siw_pin_records.get(comp_name, {}) or {}).get(target_pin_name)
-        lookup_pin_name = target_pin_name
-        strict_norm_reason = None
-        if strict_refdes_pin:
-            lookup_pin_name, strict_norm_reason = normalize_spec_pin_for_strict_mode(
-                spec_pin=target_pin_name,
-                spec_nets=spec_nets,
-                crosswalk_pin_record=crosswalk_pin_info,
-                net_alias_map=net_alias_map,
-            )
-            if strict_norm_reason:
-                logger.log(
-                    f"[SPEC][STRICT][NORMALIZE] {comp_name}:{target_pin_name} -> {lookup_pin_name} "
-                    f"(method={strict_norm_reason.get('method')}, conf={strict_norm_reason.get('confidence')}, "
-                    f"net_match={strict_norm_reason.get('net_match')})",
-                    level=LogLevel.WARNING,
-                )
-        # 0) Manual override has top priority.
-        pin_inst = None
-        resolve_mode = "none"
-        resolved_pin_name = None
-        pin_trace_meta = {}
-        ov_key = (str(comp_name).upper(), str(target_pin_name).upper())
-        if ov_key in pin_override_map:
-            ov_pin_name = str(pin_override_map.get(ov_key, "")).strip()
-            ov_inst, ov_resolved_name = _find_component_pin_by_name_or_display(
-                comp_inst=comp_inst,
-                pin_name=ov_pin_name,
-                excluded=used_component_pins.get(comp_name, set()),
-            )
-            if ov_inst is not None:
-                pin_inst = ov_inst
-                resolved_pin_name = ov_resolved_name or ov_pin_name
-                resolve_mode = "pin_override"
-                logger.log(
-                    f"[SPEC][OVERRIDE] {comp_name}: {target_pin_name} -> {resolved_pin_name}",
-                    level=LogLevel.WARNING,
-                )
-            else:
-                logger.log(
-                    f"[SPEC][OVERRIDE][WARNING] Override target not found: {comp_name}:{target_pin_name} -> {ov_pin_name}",
-                    level=LogLevel.WARNING,
-                )
-
-        # 0.5) Designator + Pin number primary resolver (Spec-centric)
-        if pin_inst is None:
-            dsg_pin, dsg_mode, dsg_key, dsg_meta = resolve_spec_pin_designator_primary(
-                comp_inst=comp_inst,
-                spec_pin=target_pin_name,
-                spec_nets=spec_nets,
-                net_alias_map=net_alias_map,
-                ui_api_component_map=ui_api_component_map,
-                crosswalk_pin_record=crosswalk_pin_info,
-                cmp_pin_record=cmp_pin_info,
-                siw_pin_record=siw_pin_info,
-                excluded_pin_names=used_component_pins.get(comp_name, set()),
-            )
-            if dsg_pin is not None:
-                pin_inst = dsg_pin
-                resolved_pin_name = dsg_key or target_pin_name
-                resolve_mode = dsg_mode
-                pin_trace_meta = {
-                    "status": "direct",
-                    "reason": resolve_mode,
-                    "dsg_source": (dsg_meta or {}).get("source", ""),
-                    "dsg_d2": (dsg_meta or {}).get("d2", ""),
-                }
-                logger.log(
-                    f"[SPEC][PINMAP][D+P] {comp_name}: {target_pin_name} -> {resolved_pin_name} "
-                    f"(mode={resolve_mode}, net={getattr(pin_inst, 'net_name', '')}, source={(dsg_meta or {}).get('source', '')})",
-                    level=LogLevel.WARNING,
-                )
-
-        # 1) Spec + API key + EDB GUI pin (3-source) resolver
-        if pin_inst is None:
-            tri_pin, tri_name, tri_trace = resolve_spec_pin_via_spec_api_gui(
-                comp_inst=comp_inst,
-                spec_pin=target_pin_name,
-                spec_nets=spec_nets,
-                crosswalk_pin_record=crosswalk_pin_info,
-                ui_api_component_map=ui_api_component_map,
-                truth_component_rows=truth_component_rows,
-                net_alias_map=net_alias_map,
-                excluded_pin_names=used_component_pins.get(comp_name, set()),
-            )
-            tri_status = str((tri_trace or {}).get("status", "")).strip().lower()
-            tri_selected = (tri_trace or {}).get("selected", {}) if isinstance(tri_trace, dict) else {}
-            tri_relation_ok = bool(tri_selected.get("ui_hit", False))
-            if tri_pin is not None and ((not strict_refdes_pin) or tri_relation_ok):
-                pin_inst = tri_pin
-                resolved_pin_name = tri_name
-                resolve_mode = "spec_api_gui"
-                pin_trace_meta = {
-                    "status": "direct",
-                    "reason": resolve_mode,
-                    "tri_status": tri_status,
-                    "tri_reason": tri_selected.get("reason"),
-                    "tri_ui_hit": tri_relation_ok,
-                }
-                logger.log(
-                    f"[SPEC][PINMAP][3SRC] {comp_name}: {target_pin_name} -> {resolved_pin_name} "
-                    f"(net={getattr(pin_inst, 'net_name', '')}, tri_status={tri_status}, "
-                    f"reason={tri_selected.get('reason')}, ui_hit={tri_selected.get('ui_hit')}, "
-                    f"net_match={tri_selected.get('net_match')}, conf={tri_selected.get('confidence')})",
-                    level=LogLevel.WARNING,
-                )
-            elif tri_pin is not None and strict_refdes_pin and not tri_relation_ok:
-                logger.log(
-                    f"[SPEC][PINMAP][3SRC][STRICT-SKIP] {comp_name}:{target_pin_name} "
-                    f"spec-api candidate exists but api-ui relation is missing. tri_status={tri_status}",
-                    level=LogLevel.WARNING,
-                )
-
-        if pin_inst is None:
-            pin_inst, resolve_mode, resolved_pin_name = resolve_spec_pin_to_edb_pin(
-                comp_inst=comp_inst,
-                spec_pin=lookup_pin_name,
-                spec_nets=spec_nets,
-                net_alias_map=net_alias_map,
-                cmp_pin_record=cmp_pin_info,
-                cmp_component_record=(cmp_pin_records.get(comp_name, {}) or {}),
-                crosswalk_pin_record=crosswalk_pin_info,
-                components_api=getattr(app.edb, "components", None),
-                excluded_pin_names=used_component_pins.get(comp_name, set()),
-                edbapp=getattr(app, "edb", None),
-                truth_component_rows=truth_component_rows,
-                strict_refdes_pin=strict_refdes_pin,
-            )
-
-        # Net-referenced correction policy:
-        # If pin mapping net differs from Spec net (or no pin), remap by net and re-verify with UI evidence.
-        try:
-            fixed_inst, fixed_name, fixed_meta = remap_pin_by_net_then_ui(
-                comp_inst=comp_inst,
-                spec_pin=target_pin_name,
-                spec_nets=spec_nets,
-                current_pin_inst=pin_inst,
-                current_pin_name=resolved_pin_name,
-                crosswalk_pin_record=crosswalk_pin_info,
-                truth_component_rows=truth_component_rows,
-                cmp_pin_record=cmp_pin_info,
-                net_alias_map=net_alias_map,
-                excluded_pin_names=used_component_pins.get(comp_name, set()),
-            )
-            fixed_mode = str((fixed_meta or {}).get("mode", "")).strip()
-            if fixed_inst is None:
-                if pin_inst is not None:
-                    logger.log(
-                        f"[SPEC][NET-FIX][WARNING] Drop invalid mapping after net/ui verification: "
-                        f"{comp_name}:{target_pin_name} -> {resolved_pin_name} (mode={resolve_mode}, fix_mode={fixed_mode})",
-                        level=LogLevel.WARNING,
-                    )
-                pin_inst = None
-                resolved_pin_name = None
-                resolve_mode = "net_fix_unresolved"
-            else:
-                if (pin_inst is None) or (resolved_pin_name != fixed_name) or bool((fixed_meta or {}).get("changed", False)):
-                    logger.log(
-                        f"[SPEC][NET-FIX] {comp_name}:{target_pin_name} remap -> {fixed_name} "
-                        f"(prev={resolved_pin_name}, fix_mode={fixed_mode}, ui_verified={fixed_meta.get('ui_verified')})",
-                        level=LogLevel.WARNING,
-                    )
-                    pin_inst = fixed_inst
-                    resolved_pin_name = fixed_name
-                    if fixed_mode and fixed_mode not in {"net_valid_keep", "no_spec_net"}:
-                        resolve_mode = fixed_mode
-        except Exception as net_fix_exc:
-            logger.log(
-                f"[SPEC][NET-FIX][WARNING] Net/UI correction failed for {comp_name}:{target_pin_name}: {net_fix_exc}",
-                level=LogLevel.WARNING,
-            )
-
-        # Safety gate: reject coord-only mapping for power-like spec nets when resolved net mismatches.
-        if pin_inst is not None and resolve_mode in ("coord_only", "coord_only_net_mismatch", "coord_only_power_net_unvalidated"):
-            spec_nets_local = [str(n).strip() for n in (spec_nets or []) if str(n).strip()]
-            if spec_nets_local and any(_is_power_like_net(n) for n in spec_nets_local):
-                net_matched = any(_net_matches_spec(n, pin_inst.net_name, net_alias_map) for n in spec_nets_local)
-                signal_like = _is_signal_like_net(pin_inst.net_name)
-                if (not net_matched) or signal_like:
-                    logger.log(
-                        f"[SPEC][SAFETY] Reject coord-only power pin mapping: {comp_name}:{target_pin_name} -> {resolved_pin_name or target_pin_name} "
-                        f"(resolved_net={pin_inst.net_name}, spec_nets={spec_nets_local}, signal_like={signal_like})",
-                        level=LogLevel.WARNING,
-                    )
-                    # Recovery attempt after safety rejection:
-                    # 1) board-global padstack scan
-                    # 2) coordinate spatial query
-                    try:
-                        rec_inst, rec_key = _find_component_pin_by_global_padstack_scan(
-                            comp_inst=comp_inst,
-                            spec_pin=target_pin_name,
-                            spec_nets=spec_nets_local,
-                            net_alias_map=net_alias_map,
-                            excluded_pin_names=used_component_pins.get(comp_name, set()),
-                            edbapp=getattr(app, "edb", None),
-                        )
-                        if rec_inst is not None:
-                            pin_inst = rec_inst
-                            resolved_pin_name = rec_key or target_pin_name
-                            resolve_mode = "global_padstack_scan_recover"
-                            logger.log(
-                                f"[SPEC][RECOVER] Global padstack scan recovered mapping: {comp_name}:{target_pin_name} -> {resolved_pin_name} (net={pin_inst.net_name})",
-                                level=LogLevel.WARNING,
-                            )
-                        else:
-                            sq_inst, sq_key = _find_component_pin_by_spatial_query(
-                                comp_inst=comp_inst,
-                                spec_pin=target_pin_name,
-                                spec_nets=spec_nets_local,
-                                net_alias_map=net_alias_map,
-                                cmp_pin_record=cmp_pin_info,
-                                excluded_pin_names=used_component_pins.get(comp_name, set()),
-                                edbapp=getattr(app, "edb", None),
-                            )
-                            if sq_inst is not None:
-                                pin_inst = sq_inst
-                                resolved_pin_name = sq_key or target_pin_name
-                                resolve_mode = "spatial_query_recover"
-                                logger.log(
-                                    f"[SPEC][RECOVER] Spatial query recovered mapping: {comp_name}:{target_pin_name} -> {resolved_pin_name} (net={pin_inst.net_name})",
-                                    level=LogLevel.WARNING,
-                                )
-                    except Exception as rec_exc:
-                        logger.log(
-                            f"[SPEC][RECOVER][WARNING] Recovery attempt failed for {comp_name}:{target_pin_name}: {rec_exc}",
-                            level=LogLevel.WARNING,
-                        )
-
-                    if pin_inst is not None and resolve_mode in ("global_padstack_scan_recover", "spatial_query_recover"):
-                        # Recovered successfully; skip rejection path.
-                        pass
-                    else:
-                        # Recovery diagnostics
-                        try:
-                            gcnt = 0
-                            gtok = _normalize_pin_token(target_pin_name)
-                            gspec = [str(n).strip() for n in (spec_nets_local or []) if str(n).strip()]
-                            for pad in _iter_all_padstack_instances(getattr(app, "edb", None)):
-                                pname = str(getattr(pad, "name", "") or "")
-                                pnet = str(getattr(pad, "net_name", "") or "")
-                                pcname = _pad_component_name(pad)
-                                ptok = _normalize_pin_token(pname)
-                                if gtok and gtok not in ptok:
-                                    continue
-                                if pcname and str(pcname).upper() != str(comp_name).upper():
-                                    continue
-                                if gspec and not any(_net_matches_spec(sn, pnet, net_alias_map) for sn in gspec):
-                                    continue
-                                gcnt += 1
-                            logger.log(
-                                f"[SPEC][DEBUG] global scan candidates for {comp_name}:{target_pin_name} => {gcnt}",
-                                level=LogLevel.DETAIL1,
-                            )
-                        except Exception:
-                            pass
-                    # Detailed diagnostics to identify why helper-based mapping is not selected.
-                    try:
-                        helper = getattr(app.edb, "components", None)
-                        hp = helper.get_pin_from_component(comp_name, pin_name=target_pin_name) if helper else []
-                        hp = hp or []
-                        hp_brief = []
-                        for p in hp[:10]:
-                            hp_brief.append({
-                                "component_pin": str(getattr(p, "component_pin", "")),
-                                "aedt_name": str(getattr(p, "aedt_name", "")),
-                                "name": str(getattr(p, "name", "")),
-                                "net": str(getattr(p, "net_name", "")),
-                            })
-                        logger.log(
-                            f"[SPEC][DEBUG] helper pins for {comp_name}:{target_pin_name} => {hp_brief}",
-                            level=LogLevel.DETAIL1,
-                        )
-                    except Exception:
-                        pass
-                    try:
-                        raw_comp = getattr(comp_inst, "_edb_object", None) or getattr(comp_inst, "edbcomponent", None)
-                        dpins = _iter_dotnet_pins_from_component(raw_comp)
-                        ttok = _normalize_pin_token(target_pin_name)
-                        dbrief = []
-                        for dp in dpins:
-                            toks = sorted(list(_collect_dotnet_pin_tokens(dp, components_api=getattr(app.edb, "components", None))))
-                            if ttok and ttok not in toks:
-                                continue
-                            dbrief.append({
-                                "tokens": toks[:6],
-                                "net": _dotnet_pin_net_name(dp),
-                                "pos": _dotnet_pin_position(dp),
-                            })
-                            if len(dbrief) >= 10:
-                                break
-                        logger.log(
-                            f"[SPEC][DEBUG] dotnet pins for {comp_name}:{target_pin_name} => {dbrief}",
-                            level=LogLevel.DETAIL1,
-                        )
-                    except Exception:
-                        pass
-                    if resolve_mode not in ("global_padstack_scan_recover", "spatial_query_recover"):
-                        pin_inst = None
-                        resolve_mode = "coord_rejected_power_net_mismatch"
-                        resolved_pin_name = None
-        actual_pin_name = resolved_pin_name or target_pin_name
-        if not pin_inst:
-            if strict_refdes_pin:
-                trace_meta = {
-                    "status": "skip",
-                    "reason": "strict_refdes_pin_no_exact_match",
-                }
-                add_pin_mapping_record(
-                    case_row=case,
-                    resolved_comp=comp_name,
-                    spec_pin=target_pin_name,
-                    resolved_pin=actual_pin_name,
-                    mode=resolve_mode or "strict_no_exact_pin",
-                    spec_nets_row=spec_nets,
-                    resolved_net="",
-                    trace_meta=trace_meta,
-                )
-                spec_skip_missing_pin += 1
-                logger.log(
-                    f"[SPEC][SKIP][STRICT] Pin exact match not found: designator={comp_name}, pin={target_pin_name}, "
-                    f"lookup_pin={lookup_pin_name}, nets={spec_nets}. Net/coord fallback disabled by policy.",
-                    level=LogLevel.WARNING,
-                )
-                continue
-            # Net-only fallback: if pin cannot be resolved, continue with resolved PCB net.
-            try:
-                board_nets = list((getattr(app.edb, "nets", None).nets or {}).keys())
-            except Exception:
-                board_nets = []
-            fallback_net = _resolve_board_net_by_spec(spec_nets, board_nets, net_alias_map)
-            trace_meta = {
-                "start_net": fallback_net or "",
-                "reached_net": "",
-                "hops": "",
-                "status": "skip",
-                "reason": "",
-            }
-            if fallback_net:
-                traced_pin_name, traced_pin_net, traced_hops, trace_reason, trace_diag = trace_ic_local_power_pin(
-                    comp_inst_local=comp_inst,
-                    start_net=fallback_net,
-                    gnd_net=GND_NET,
-                    spec_nets=spec_nets,
-                    max_hops=10,
-                )
-                diag_hits = trace_diag.get("ic_hits", []) if isinstance(trace_diag, dict) else []
-                diag_visited = trace_diag.get("visited_nets", []) if isinstance(trace_diag, dict) else []
-                diag_hit_tokens = [f"{h.get('pin')}@{h.get('net')}(hop={h.get('hop')})" for h in diag_hits if isinstance(h, dict)]
-                trace_meta.update(
-                    {
-                        "start_net": fallback_net,
-                        "reached_net": traced_pin_net or "",
-                        "hops": traced_hops if traced_hops >= 0 else "",
-                        "reason": trace_reason,
-                        "candidate_pins": diag_hit_tokens,
-                        "visited_nets": diag_visited,
-                    }
-                )
-                if diag_hits:
-                    preview = ", ".join(diag_hit_tokens[:30])
-                    if len(diag_hit_tokens) > 30:
-                        preview += f", ...(+{len(diag_hit_tokens)-30})"
-                    logger.log(
-                        f"[SPEC][NET-FALLBACK][CANDIDATES] {comp_name}:{target_pin_name} traced_nets={diag_visited} | ic_hits={preview}",
-                        level=LogLevel.WARNING,
-                    )
-                else:
-                    logger.log(
-                        f"[SPEC][NET-FALLBACK][CANDIDATES] {comp_name}:{target_pin_name} traced_nets={diag_visited} | ic_hits=<none>",
-                        level=LogLevel.WARNING,
-                    )
-                if traced_pin_name:
-                    trace_meta["status"] = "ok"
-                    logger.log(
-                        f"[SPEC][NET-FALLBACK][TRACE] {comp_name}:{target_pin_name} -> IC pin {traced_pin_name} "
-                        f"(start_net={fallback_net}, reached_net={traced_pin_net}, hops={traced_hops})",
-                        level=LogLevel.WARNING,
-                    )
-                else:
-                    trace_meta["status"] = "skip"
-                    logger.log(
-                        f"[SPEC][NET-FALLBACK][TRACE][SKIP] Could not trace IC-local power pin from net={fallback_net} "
-                        f"for {comp_name}:{target_pin_name} (GND/signal excluded).",
-                        level=LogLevel.WARNING,
-                    )
-                    fallback_net = ""
-
-            if fallback_net:
-                if append_case_from_target_net(
-                    case_row=case,
-                    resolved_comp=comp_name,
-                    spec_pin=target_pin_name,
-                    resolved_pin=(traced_pin_name or target_pin_name),
-                    target_net=fallback_net,
-                    spec_nets_row=spec_nets,
-                    mapping_mode="net_only_fallback",
-                    trace_meta=trace_meta,
-                ):
-                    logger.log(
-                        f"[SPEC][NET-FALLBACK] Pin unresolved. Continue with net mapping: {comp_name}:{target_pin_name} -> net={fallback_net}",
-                        level=LogLevel.WARNING,
-                    )
-                    add_pin_mapping_record(
-                        case_row=case,
-                        resolved_comp=comp_name,
-                        spec_pin=target_pin_name,
-                        resolved_pin=(traced_pin_name or target_pin_name),
-                        mode="net_only_fallback",
-                        spec_nets_row=spec_nets,
-                        resolved_net=fallback_net,
-                        trace_meta=trace_meta,
-                    )
-                    continue
-
-            add_pin_mapping_record(
-                case_row=case,
-                resolved_comp=comp_name,
-                spec_pin=target_pin_name,
-                resolved_pin=actual_pin_name,
-                mode=resolve_mode,
-                spec_nets_row=spec_nets,
-                resolved_net="",
-                trace_meta=trace_meta,
-            )
-            spec_skip_missing_pin += 1
-            logger.log(
-                f"[SPEC][SKIP] Pin not resolved: designator={comp_name}, pin={target_pin_name}, mode={resolve_mode}, nets={spec_nets}",
-                level=LogLevel.WARNING,
-            )
-            continue
-        add_pin_mapping_record(
-            case_row=case,
-            resolved_comp=comp_name,
-            spec_pin=target_pin_name,
-            resolved_pin=actual_pin_name,
-            mode=resolve_mode,
-            spec_nets_row=spec_nets,
-            resolved_net=pin_inst.net_name,
-            trace_meta=(pin_trace_meta or {"status": "direct"}),
-        )
-        # Prevent duplicate mapping to the same resolved pin within one component.
-        used_component_pins[comp_name].add(actual_pin_name)
-        if resolve_mode != "exact":
-            logger.log(
-                f"[SPEC][PINMAP] {comp_name}: {target_pin_name} -> {actual_pin_name} (mode={resolve_mode}, net={pin_inst.net_name})",
-                level=LogLevel.WARNING,
-            )
-        append_case_from_target_net(
-            case_row=case,
-            resolved_comp=comp_name,
-            spec_pin=target_pin_name,
-            resolved_pin=actual_pin_name,
-            target_net=pin_inst.net.name,
-            spec_nets_row=spec_nets,
-            mapping_mode=resolve_mode,
-            trace_meta=(pin_trace_meta or {"status": "direct", "reason": resolve_mode}),
+        return step4_trace_ic_local_power_pin(
+            app=app,
+            comp_inst_local=comp_inst_local,
+            start_net=start_net,
+            gnd_net=gnd_net,
+            spec_nets=spec_nets,
+            max_hops=max_hops,
+            is_signal_like_net=_is_signal_like_net,
+            is_forbidden_trace_net=_is_forbidden_trace_net,
+            is_power_like_net=_is_power_like_net,
+            net_matches_spec=_net_matches_spec,
+            net_alias_map=net_alias_map,
         )
 
-    target_nets = {GND_NET} | {n for case in pdn_cases_info for n in case.get('Full_Net_Chain', [])}
-    if not app.sanitize_nets(target_nets): raise PDNSessionException(ErrorCode.SANITIZE_FAIL)
-    logger.log(
-        f"[SPEC] Case build summary: total_rows={len(spec_info)}, cases={len(pdn_cases_info)}, "
-        f"fallback_resolved={spec_fallback_resolved}, skip_missing_comp={spec_skip_missing_comp}, skip_missing_pin={spec_skip_missing_pin}",
-        level=LogLevel.INFO,
+    step4_loop_result = process_step4_cases(
+        app=app,
+        spec_info=spec_info,
+        normalize_name=normalize_name,
+        get_component_by_normalized=get_component_by_normalized,
+        strict_refdes_pin=strict_refdes_pin,
+        net_alias_map=net_alias_map,
+        cmp_pin_records=cmp_pin_records,
+        ndf_pin_records=ndf_pin_records,
+        siw_pin_records=siw_pin_records,
+        pin_crosswalk_cache=pin_crosswalk_cache,
+        edb_truth_cache=edb_truth_cache,
+        ui_api_crosswalk_cache=ui_api_crosswalk_cache,
+        pin_override_map=pin_override_map,
+        gnd_net=GND_NET,
+        used_component_pins=used_component_pins,
+        spec_skip_missing_comp=spec_skip_missing_comp,
+        spec_skip_missing_pin=spec_skip_missing_pin,
+        spec_fallback_resolved=spec_fallback_resolved,
+        add_pin_mapping_record_fn=add_pin_mapping_record,
+        append_case_from_target_net_fn=append_case_from_target_net,
+        trace_ic_local_power_pin_fn=trace_ic_local_power_pin,
+        build_component_pin_crosswalk_fn=build_component_pin_crosswalk,
+        build_component_edb_truth_table_fn=build_component_edb_truth_table,
+        build_component_ui_api_crosswalk_fn=build_component_ui_api_crosswalk,
+        normalize_spec_pin_for_strict_mode_fn=normalize_spec_pin_for_strict_mode,
+        find_component_pin_by_name_or_display_fn=_find_component_pin_by_name_or_display,
+        resolve_spec_pin_designator_primary_fn=resolve_spec_pin_designator_primary,
+        resolve_spec_pin_via_spec_api_gui_fn=resolve_spec_pin_via_spec_api_gui,
+        resolve_spec_pin_to_edb_pin_fn=resolve_spec_pin_to_edb_pin,
+        remap_pin_by_net_then_ui_fn=remap_pin_by_net_then_ui,
+        is_power_like_net_fn=_is_power_like_net,
+        is_signal_like_net_fn=_is_signal_like_net,
+        net_matches_spec_fn=_net_matches_spec,
+        spec_net_candidates_fn=_spec_net_candidates,
+        resolve_board_net_by_spec_fn=_resolve_board_net_by_spec,
+        normalize_pin_token_fn=_normalize_pin_token,
+        iter_all_padstack_instances_fn=_iter_all_padstack_instances,
+        pad_component_name_fn=_pad_component_name,
+        find_component_pin_by_global_padstack_scan_fn=_find_component_pin_by_global_padstack_scan,
+        find_component_pin_by_spatial_query_fn=_find_component_pin_by_spatial_query,
+        iter_dotnet_pins_from_component_fn=_iter_dotnet_pins_from_component,
+        collect_dotnet_pin_tokens_fn=_collect_dotnet_pin_tokens,
+        dotnet_pin_net_name_fn=_dotnet_pin_net_name,
+        dotnet_pin_position_fn=_dotnet_pin_position,
+        logger=logger,
     )
-    logger.log(f"[SPEC] Pin resolution modes: {dict(pin_resolution_stats)}", level=LogLevel.INFO)
-    logger.log(f"[SPEC] Pin mapping quality: {dict(pin_mapping_quality_stats)}", level=LogLevel.INFO)
-    cross_csv, cross_json = export_pin_crosswalk_reports(OUTPUT_DIR, pin_crosswalk_cache)
-    truth_csv, truth_json = export_edb_truth_table_reports(OUTPUT_DIR, edb_truth_cache)
-    ui_api_csv, ui_api_json = export_ui_api_crosswalk_reports(OUTPUT_DIR, ui_api_crosswalk_cache)
-    logger.log(f"[SPEC] Exported pin crosswalk CSV: {cross_csv}", level=LogLevel.DETAIL1)
-    logger.log(f"[SPEC] Exported pin crosswalk JSON: {cross_json}", level=LogLevel.DETAIL1)
-    logger.log(f"[SPEC] Exported EDB truth-table CSV: {truth_csv}", level=LogLevel.DETAIL1)
-    logger.log(f"[SPEC] Exported EDB truth-table JSON: {truth_json}", level=LogLevel.DETAIL1)
-    logger.log(f"[SPEC] Exported UI<->API crosswalk CSV: {ui_api_csv}", level=LogLevel.DETAIL1)
-    logger.log(f"[SPEC] Exported UI<->API crosswalk JSON: {ui_api_json}", level=LogLevel.DETAIL1)
-    pin_map_report = OUTPUT_DIR / "spec_to_edb_pin_map.json"
-    with open(pin_map_report, "w", encoding="utf-8") as f:
-        json.dump(
-            {
-                "Summary": {
-                    "TotalRows": len(spec_info),
-                    "ResolvedCases": len(pdn_cases_info),
-                    "ResolutionModes": dict(pin_resolution_stats),
-                    "MappingQuality": dict(pin_mapping_quality_stats),
-                },
-                "Records": pin_mapping_records,
-            },
-            f,
-            indent=2,
-            ensure_ascii=False,
-        )
-    logger.log(f"[SPEC] Exported Spec->EDB pin map: {pin_map_report}", level=LogLevel.DETAIL1)
+    spec_skip_missing_comp = step4_loop_result["spec_skip_missing_comp"]
+    spec_skip_missing_pin = step4_loop_result["spec_skip_missing_pin"]
+    spec_fallback_resolved = step4_loop_result["spec_fallback_resolved"]
 
-    run_tag = RUN_TAG or time.strftime('%Y%m%d_%H%M%S')
-    PRE_EDB_FILE_PATH = EDB_FILE_PATH.parent / f"{EDB_FILE_PATH.stem}_pre_{run_tag}{EDB_FILE_PATH.suffix}"
-    ensure_pre_edb_saved(app=app, source_edb_path=EDB_FILE_PATH, pre_edb_path=PRE_EDB_FILE_PATH, max_retries=2, timeout=300.0)
-    
-    if STAGE == "full":
-        app.set_cad_file(PRE_EDB_FILE_PATH)
-        EDB_SETUP_APP = app
-        app = None
+    step4_final = finalize_step4_outputs(
+        app=app,
+        gnd_net=GND_NET,
+        pdn_cases_info=pdn_cases_info,
+        spec_info=spec_info,
+        spec_fallback_resolved=spec_fallback_resolved,
+        spec_skip_missing_comp=spec_skip_missing_comp,
+        spec_skip_missing_pin=spec_skip_missing_pin,
+        pin_resolution_stats=pin_resolution_stats,
+        pin_mapping_quality_stats=pin_mapping_quality_stats,
+        pin_mapping_records=pin_mapping_records,
+        output_dir=OUTPUT_DIR,
+        edb_file_path=EDB_FILE_PATH,
+        run_tag=RUN_TAG,
+        stage=STAGE,
+        ensure_pre_edb_saved=ensure_pre_edb_saved,
+        export_pin_crosswalk_reports=export_pin_crosswalk_reports,
+        export_edb_truth_table_reports=export_edb_truth_table_reports,
+        export_ui_api_crosswalk_reports=export_ui_api_crosswalk_reports,
+        pin_crosswalk_cache=pin_crosswalk_cache,
+        edb_truth_cache=edb_truth_cache,
+        ui_api_crosswalk_cache=ui_api_crosswalk_cache,
+        logger=logger,
+    )
+    PRE_EDB_FILE_PATH = step4_final["PRE_EDB_FILE_PATH"]
+    EDB_SETUP_APP = step4_final["EDB_SETUP_APP"] if step4_final["EDB_SETUP_APP"] else EDB_SETUP_APP
+    app = step4_final["app"]
     step += 1
 
 except Exception:
@@ -5086,182 +4310,78 @@ if STAGE == "pre":
 # region 5. Modify CAD Data using SIwave and Set PDN Simulation
 try:
     logger.log(f"Step {step}. CAD Modification", level=LogLevel.INFO)
-    if not wait_for_edb_ready(PRE_EDB_FILE_PATH, timeout=300.0, check_interval=3.0):
-        raise FileNotFoundError(f"Target EDB path or edb.def is not ready after retries: {PRE_EDB_FILE_PATH}")
-
     app = None
     image_app = None
 
     try:
-        step5_backend = resolve_solver_backend(STACKUP_LAYER_COUNT, conf_manager.data, logger)
-        if step5_backend == "siwave":
-            app = SIwave(version=AEDT_VERSION, logger=logger)
-            app.import_edb(str(PRE_EDB_FILE_PATH))
-            edb_ops_app = EDB_SETUP_APP if (EDB_SETUP_APP and getattr(EDB_SETUP_APP, "edb", None)) else app
-            if edb_ops_app is app and not getattr(app, "edb", None):
-                app.set_cad_file(str(PRE_EDB_FILE_PATH))
-        else:
-            edb_ops_app = EDB_SETUP_APP if (EDB_SETUP_APP and getattr(EDB_SETUP_APP, "edb", None)) else None
-            if not edb_ops_app:
-                # Fallback for unexpected session loss: reopen EDB through wrapper.
-                edb_ops_app = SIwave(version=AEDT_VERSION, logger=logger)
-                edb_ops_app.set_cad_file(str(PRE_EDB_FILE_PATH))
-                app = edb_ops_app
-
-        log_signal_layer_thicknesses(edb_ops_app, logger, tag="[STACKUP][Step5]")
-
-        pdn_logic = PDN(logger=logger)
-        if hasattr(pdn_logic, "apply_dc_shorts"):
-            pdn_logic.apply_dc_shorts(
-                app=edb_ops_app,
-                shorted_comp_defs=conf_manager.data['PDN']['dcShort']['shortedComp'],
-                del_comps=DEL_COMP,
-                short_correction=SHORT_CORRECTION
-            )
-        else:
-            logger.log(
-                "[PDN][Short][WARNING] apply_dc_shorts() is not available in PDN class. Skip short replacement.",
-                level=LogLevel.WARNING,
-            )
-
-        stackup_input = STACKUP_EFFECTIVE_FILE if STACKUP_EFFECTIVE_FILE else (Path(STACKUP_INPUT_FILE) if STACKUP_INPUT_FILE else None)
-        profile_key, sws_name, sfsdf_name = resolve_zparam_profile(
-            conf_manager.data,
-            Path(stackup_input) if stackup_input else None,
-            STACKUP_LAYER_COUNT,
+        step5_ctx = initialize_step5_runtime(
+            stage=STAGE,
+            pre_edb_file_path=PRE_EDB_FILE_PATH,
+            aedt_version=AEDT_VERSION,
+            logger=logger,
+            stackup_layer_count=STACKUP_LAYER_COUNT,
+            conf_data=conf_manager.data,
+            wait_for_edb_ready=wait_for_edb_ready,
+            resolve_solver_backend=resolve_solver_backend,
+            siwave_cls=SIwave,
+            edb_setup_app=EDB_SETUP_APP,
         )
-        if step5_backend == "siwave" and stackup_input and not STACKUP_APPLIED_AT_PROJECT_CREATION:
-            raw_stackup = Path(stackup_input)
-            if app.import_layer_stackup(raw_stackup):
-                logger.log(f"[PRE] Raw stackup imported: {raw_stackup}", level=LogLevel.DETAIL1)
-            else:
-                raise RuntimeError(f"[PRE] Failed to import raw stackup file: {raw_stackup}")
-        elif step5_backend == "siwave" and STACKUP_APPLIED_AT_PROJECT_CREATION and stackup_input:
-            logger.log(
-                f"[PRE] Skip stackup re-import (already applied at create_project): {stackup_input}",
-                level=LogLevel.DETAIL1,
-            )
-            
-        SWS_FILE = WORKING_DIR / 'core' / sws_name
+        app = step5_ctx["app"]
+        image_app = step5_ctx["image_app"]
+        edb_ops_app = step5_ctx["edb_ops_app"]
+        step5_backend = step5_ctx["step5_backend"]
 
-        s2p_dir_conf = conf_manager.data.get('PDN', {}).get('sParameter', {}).get('s2pDirectory', '')
-        s2p_dir = Path(s2p_dir_conf) if s2p_dir_conf else None
-        if s2p_dir and not s2p_dir.is_absolute():
-            s2p_dir = INPUT_DIR / s2p_dir
-
-        if conf_manager.data.get('PDN', {}).get('sParameter', {}).get('enableAssign', True):
-            model_assign_app = edb_ops_app
-            innercap_name = settings_manager.data.get('CAE', {}).get('SOC', {}).get('Inner_cap')
-            innercap_csv_path = (INPUT_DIR / innercap_name) if innercap_name else None
-            bom_name = settings_manager.data.get('CAE', {}).get('PCB', {}).get('BOM')
-            bom_file_path = (INPUT_DIR / bom_name) if bom_name else None
-            model_lib_candidates = conf_manager.data.get('PDN', {}).get('sParameter', {}).get('model_library_dir_candidates', [])
-            resolved_candidates = [Path(cand) if Path(cand).is_absolute() else (INPUT_DIR / Path(cand)) for cand in model_lib_candidates if cand]
-            assign_sparameter_models(
-                app=model_assign_app,
-                bom_info=bom_info,
-                inner_cap_audit=inner_cap_audit,
-                pmap_file=None, 
-                s2p_dir=s2p_dir,
-                gnd_net=GND_NET,
-                output_dir=OUTPUT_DIR,
-                logger=logger,
-                innercap_csv_path=innercap_csv_path,
-                bom_file_path=bom_file_path,
-                search_roots=[INPUT_DIR, WORKING_DIR, OUTPUT_DIR] + resolved_candidates,
-            )
-
-        vrm_setup_conf = conf_manager.data.get("PDN", {}).get("vrmSetup", {})
-        vrm_records = configure_ports_and_vrms_from_spec(
-            app=edb_ops_app,
-            cases=pdn_cases_info,
-            gnd_net=GND_NET,
-            bulk_inductor_set=set(bom_info.get("bulkInd", [])),
+        step5_conf_data = dict(conf_manager.data)
+        step5_conf_data["__DEL_COMP__"] = DEL_COMP
+        step5_conf_data["__SHORT_CORRECTION__"] = SHORT_CORRECTION
+        step5_conf_data["__STAGE__"] = STAGE
+        step5_conf_data["__log_signal_layer_thicknesses_fn__"] = log_signal_layer_thicknesses
+        step5_conf_data["__pdn_logic_factory__"] = PDN
+        step5_state = configure_step5_settings(
+            app=app,
+            edb_ops_app=edb_ops_app,
+            step5_backend=step5_backend,
+            logger=logger,
+            stackup_effective_file=STACKUP_EFFECTIVE_FILE,
+            stackup_input_file=STACKUP_INPUT_FILE,
+            stackup_applied_at_project_creation=STACKUP_APPLIED_AT_PROJECT_CREATION,
+            conf_data=step5_conf_data,
+            stackup_layer_count=STACKUP_LAYER_COUNT,
+            working_dir=WORKING_DIR,
+            input_dir=INPUT_DIR,
             output_dir=OUTPUT_DIR,
-            logger=logger,
-            vrm_setup_conf=vrm_setup_conf,
-            port_app=(app if step5_backend == "siwave" else None),
-        )
-        vrm_done = sum(1 for r in vrm_records if r.get("Status") == "Done")
-        vrm_skipped = len(vrm_records) - vrm_done
-        logger.log(f"[VRM_SETUP] Summary: total={len(vrm_records)}, done={vrm_done}, skipped={vrm_skipped}", level=LogLevel.INFO)
-        if STAGE == "pre":
-            logger.log(
-                f"[PRE][CHECK] Port/VRM detail report: {OUTPUT_DIR / 'vrm_port_setup_result.json'}",
-                level=LogLevel.INFO,
-            )
-        if vrm_done == 0 and len(pdn_cases_info) > 0:
-            logger.log(
-                "[VRM_SETUP][WARNING] No Port/VRM termination was created. Solver may fail with no terminals/sources.",
-                level=LogLevel.WARNING,
-            )
-        exclude_tokens = conf_manager.data.get("PDN", {}).get("dcShort", {}).get("excludeNet", [])
-        analysis_nets = collect_analysis_nets(pdn_cases_info, GND_NET, exclude_tokens=exclude_tokens)
-        classify_and_audit_analysis_nets(
-            edb_ops_app,
-            analysis_nets=analysis_nets,
+            settings_data=settings_manager.data,
+            bom_info=bom_info,
+            inner_cap_audit=inner_cap_audit,
             gnd_net=GND_NET,
-            logger=logger,
-            exclude_tokens=exclude_tokens,
+            pdn_cases_info=pdn_cases_info,
+            input_cad_file=INPUT_CAD_FILE,
+            assign_sparameter_models_fn=assign_sparameter_models,
+            configure_ports_and_vrms_fn=configure_ports_and_vrms_from_spec,
+            collect_analysis_nets_fn=collect_analysis_nets,
+            classify_and_audit_analysis_nets_fn=classify_and_audit_analysis_nets,
+            sync_edb_changes_to_siw_project_fn=sync_edb_changes_to_siw_project,
+            resolve_zparam_profile_fn=resolve_zparam_profile,
+            apply_dynamic_frequency_setup_fn=apply_dynamic_frequency_setup,
         )
+        SWS_FILE = step5_state["SWS_FILE"]
 
-        # If ports/VRM were edited through a separate EDB session, sync back to the SIwave project session.
-        if step5_backend == "siwave" and edb_ops_app is not app:
-            base_cad_name = INPUT_CAD_FILE.stem.split('-')[0]
-            sync_edb_path = OUTPUT_DIR / f"{base_cad_name}_step5_sync.aedb"
-            sync_edb_changes_to_siw_project(
-                source_app=edb_ops_app,
-                target_app=app,
-                sync_edb_path=sync_edb_path,
-                logger=logger,
-            )
-
-        # Apply SIwave setup only when solver backend is SIwave.
-        if step5_backend == "siwave":
-            app.setup_simulation(None, SWS_FILE, None)
-            apply_dynamic_frequency_setup(app, STACKUP_LAYER_COUNT, conf_manager.data, logger)
-        else:
-            logger.log(
-                "[PRE] Skip SIwave setup import for AEDT cutout backend (avoid SIwave-only setup artifacts).",
-                level=LogLevel.INFO,
-            )
-
-        base_cad_name = INPUT_CAD_FILE.stem.split('-')[0]
-        run_tag = RUN_TAG or time.strftime('%Y%m%d_%H%M%S')
-        FINAL_EDB_FILE_PATH = OUTPUT_DIR / f"{base_cad_name}_ref_{run_tag}.aedb"
-        if step5_backend == "siwave":
-            REF_SIwave_FILE_PATH = SIwave_FILE_PATH
-            app.save_project_as(REF_SIwave_FILE_PATH)
-            if not REF_SIwave_FILE_PATH.exists():
-                raise FileNotFoundError(f"SIwave file was not created at {REF_SIwave_FILE_PATH}")
-            app.export_edb(FINAL_EDB_FILE_PATH)
-        else:
-            if FINAL_EDB_FILE_PATH.exists():
-                shutil.rmtree(FINAL_EDB_FILE_PATH, ignore_errors=True)
-            edb_ops_app.edb.save_as(str(FINAL_EDB_FILE_PATH))
-            if not wait_for_edb_ready(FINAL_EDB_FILE_PATH, timeout=300.0, check_interval=3.0):
-                raise FileNotFoundError(f"Final EDB was not created at {FINAL_EDB_FILE_PATH}")
-            REF_SIwave_FILE_PATH = SIwave_FILE_PATH
-            create_siw_snapshot_from_edb(
-                aedt_version=AEDT_VERSION,
-                source_edb_path=FINAL_EDB_FILE_PATH,
-                siw_output_path=REF_SIwave_FILE_PATH,
-                logger=logger,
-            )
-
-            # Export full-board pre-solve AEDT project (before cutout) for review/debug handoff.
-            try:
-                aedt_full = AEDT(version=AEDT_VERSION, logger=logger)
-                aedt_full.export_full_presolve_aedt(
-                    ref_edb_path=Path(FINAL_EDB_FILE_PATH),
-                    output_dir=OUTPUT_DIR,
-                    project_stem=base_cad_name,
-                )
-            except Exception as full_aedt_exc:
-                logger.log(
-                    f"[AEDT][FULL][WARNING] Failed to export full pre-solve AEDT project: {full_aedt_exc}",
-                    level=LogLevel.WARNING,
-                )
+        step5_artifacts = export_step5_design_artifacts(
+            step5_backend=step5_backend,
+            app=app,
+            edb_ops_app=edb_ops_app,
+            input_cad_file=INPUT_CAD_FILE,
+            run_tag=RUN_TAG,
+            output_dir=OUTPUT_DIR,
+            siwave_file_path=SIwave_FILE_PATH,
+            wait_for_edb_ready=wait_for_edb_ready,
+            create_siw_snapshot_from_edb_fn=create_siw_snapshot_from_edb,
+            aedt_version=AEDT_VERSION,
+            logger=logger,
+            aedt_cls=AEDT,
+        )
+        FINAL_EDB_FILE_PATH = step5_artifacts["FINAL_EDB_FILE_PATH"]
+        REF_SIwave_FILE_PATH = step5_artifacts["REF_SIwave_FILE_PATH"]
     finally:
         if app:
             safe_close_edb_session(app, logger, "step5-main")
@@ -5271,103 +4391,34 @@ try:
             EDB_SETUP_APP.quit_application()
             EDB_SETUP_APP = None
 
-    if step5_backend == "siwave":
-        image_app = None
-        try:
-            image_app = SIwave(version=AEDT_VERSION, logger=logger)
-            image_app.set_cad_file(str(FINAL_EDB_FILE_PATH))
-            image_app.export_layer_images(REF_SIwave_FILE_PATH, OUTPUT_DIR, GND_NET)
-            image_app.close_edb()
-        finally:
-            if image_app:
-                safe_close_edb_session(image_app, logger, "step5-image-export")
-                image_app.quit_application()
-    else:
-        try:
-            aedt_image = AEDT(version=AEDT_VERSION, logger=logger)
-            aedt_image.export_edb_preview_images(
-                ref_edb_path=Path(FINAL_EDB_FILE_PATH),
-                output_dir=OUTPUT_DIR,
-            )
-        except Exception as img_exc:
-            # Image export failure should not block solve stage.
-            logger.log(
-                f"[AEDT][IMG][WARNING] Preview image export failed but workflow will continue: {img_exc}",
-                level=LogLevel.WARNING,
-            )
-            # Fallback: generate top/bottom images through SIwave snapshot if available.
-            try:
-                image_app = SIwave(version=AEDT_VERSION, logger=logger)
-                image_app.set_cad_file(str(FINAL_EDB_FILE_PATH))
-                image_app.export_layer_images(REF_SIwave_FILE_PATH, OUTPUT_DIR, GND_NET)
-                image_app.close_edb()
-                logger.log("[AEDT][IMG] Fallback SIwave layer image export succeeded.", level=LogLevel.INFO)
-            except Exception as fallback_exc:
-                logger.log(f"[AEDT][IMG][WARNING] Fallback SIwave image export failed: {fallback_exc}", level=LogLevel.WARNING)
-            finally:
-                try:
-                    if 'image_app' in locals() and image_app:
-                        safe_close_edb_session(image_app, logger, "step5-image-fallback")
-                        image_app.quit_application()
-                except Exception:
-                    pass
+    export_step5_preview_images(
+        step5_backend=step5_backend,
+        aedt_version=AEDT_VERSION,
+        logger=logger,
+        final_edb_file_path=FINAL_EDB_FILE_PATH,
+        ref_siwave_file_path=REF_SIwave_FILE_PATH,
+        output_dir=OUTPUT_DIR,
+        gnd_net=GND_NET,
+        siwave_cls=SIwave,
+        aedt_cls=AEDT,
+        safe_close_edb_session_fn=safe_close_edb_session,
+    )
 
-    # stage=pre should stop after "Setting" phase (Port/VRM + setup artifacts).
-    if STAGE == "pre":
-        try:
-            pre_solver_backend = resolve_solver_backend(STACKUP_LAYER_COUNT, conf_manager.data, logger)
-        except Exception:
-            pre_solver_backend = "siwave"
-
-        pre_project_path = REF_SIwave_FILE_PATH if REF_SIwave_FILE_PATH else SIwave_FILE_PATH
-        pre_project_path = Path(pre_project_path)
-        pre_edb_dir = Path(FINAL_EDB_FILE_PATH) if FINAL_EDB_FILE_PATH else Path(PRE_EDB_FILE_PATH)
-
-        pre_records = []
-        for idx, case in enumerate(pdn_cases_info):
-            net = str(case.get("Display_Net", case.get("Spec_Net", case.get("Net", ""))))
-            ic = str(case.get("IC", ""))
-            safe_ic = "".join(c for c in ic if c.isalnum() or c == "_")
-            safe_net = "".join(c for c in net if c.isalnum() or c == "_")
-            pre_records.append(
-                build_preprocessing_record(
-                    case=case,
-                    idx=idx,
-                    net_siw_file=pre_project_path,
-                    net_edb_dir=pre_edb_dir,
-                    v_port_name=f"V_{safe_ic}_{safe_net}",
-                    i_port_name=f"I_{safe_ic}_{safe_net}",
-                    gnd_net=GND_NET,
-                    solver_backend=pre_solver_backend,
-                )
-            )
-
-        with open(OUTPUT_DIR / 'preprocessing_result.json', 'w', encoding='utf-8') as f:
-            json.dump(pre_records, f, indent=4, ensure_ascii=False)
-        logger.log(
-            f"[PRE] Exported preprocessing result to: {OUTPUT_DIR / 'preprocessing_result.json'}",
-            level=LogLevel.INFO,
-        )
-        logger.log(
-            f"[PRE][CHECK] Pin mapping report: {OUTPUT_DIR / 'spec_to_edb_pin_map.json'}",
-            level=LogLevel.INFO,
-        )
-        logger.log(
-            f"[PRE][CHECK] EDB truth table: {OUTPUT_DIR / 'edb_truth_table.csv'}",
-            level=LogLevel.INFO,
-        )
-        logger.log(
-            f"[PRE][CHECK] Final setting EDB: {FINAL_EDB_FILE_PATH}",
-            level=LogLevel.INFO,
-        )
-        logger.log(
-            f"[PRE][CHECK] Final setting SIW: {REF_SIwave_FILE_PATH}",
-            level=LogLevel.INFO,
-        )
-        logger.log(
-            "[PRE] Stage pre completed at Setting phase (Port/VRM + setup). Solve and report stages are skipped by design.",
-            level=LogLevel.INFO,
-        )
+    emit_step5_pre_stage_records(
+        stage=STAGE,
+        resolve_solver_backend_fn=resolve_solver_backend,
+        stackup_layer_count=STACKUP_LAYER_COUNT,
+        conf_data=conf_manager.data,
+        logger=logger,
+        ref_siwave_file_path=REF_SIwave_FILE_PATH,
+        siwave_file_path=SIwave_FILE_PATH,
+        final_edb_file_path=FINAL_EDB_FILE_PATH,
+        pre_edb_file_path=PRE_EDB_FILE_PATH,
+        pdn_cases_info=pdn_cases_info,
+        build_preprocessing_record_fn=build_preprocessing_record,
+        gnd_net=GND_NET,
+        output_dir=OUTPUT_DIR,
+    )
 
     step += 1
 
@@ -5387,84 +4438,50 @@ try:
         END_TIME = time.strftime('%Y.%m.%d, %H:%M:%S')
     else:
         logger.log(f"Step {step}. Generate Files and Run PDN Setup (Unified Flow)", level=LogLevel.INFO)
-        MODEL_NAME = INPUT_CAD_FILE.stem.split('-')[0]
-        pdn_setup_conf = conf_manager.data.get("PDN", {}).get("setup", {})
-        z_exec_name = str(pdn_setup_conf.get("zExecFile", "PDN.exec")).strip() or "PDN.exec"
-        exec_file = WORKING_DIR / 'core' / z_exec_name
-        if not exec_file.exists():
-            logger.log(
-                f"[WARNING] Z solve exec not found: {exec_file}. Fallback to DC exec.",
-                level=LogLevel.WARNING,
-            )
-            exec_file = WORKING_DIR / 'core' / 'PDN.exec'
-        runtime_edb_path = FINAL_EDB_FILE_PATH if (FINAL_EDB_FILE_PATH and Path(FINAL_EDB_FILE_PATH).exists()) else PRE_EDB_FILE_PATH
-        logger.log(f"[UNIFIED] Runtime EDB selected: {runtime_edb_path}", level=LogLevel.DETAIL1)
-        if not runtime_edb_path or not Path(runtime_edb_path).exists():
-            raise FileNotFoundError(f"Runtime EDB not found: {runtime_edb_path}")
-        solver_backend = resolve_solver_backend(STACKUP_LAYER_COUNT, conf_manager.data, logger)
+        step6_runtime = prepare_step6_runtime(
+            working_dir=WORKING_DIR,
+            input_cad_file=INPUT_CAD_FILE,
+            output_dir=OUTPUT_DIR,
+            final_edb_file_path=FINAL_EDB_FILE_PATH,
+            pre_edb_file_path=PRE_EDB_FILE_PATH,
+            stackup_layer_count=STACKUP_LAYER_COUNT,
+            conf_data=conf_manager.data,
+            logger=logger,
+            resolve_solver_backend_fn=resolve_solver_backend,
+        )
+        MODEL_NAME = step6_runtime["model_name"]
+        exec_file = step6_runtime["exec_file"]
+        runtime_edb_path = step6_runtime["runtime_edb_path"]
+        solver_backend = step6_runtime["solver_backend"]
         SOLVER_BACKEND_USED = solver_backend
         conf_manager.data.setdefault("PDN", {}).setdefault("runtime", {})["solver_backend"] = solver_backend
-        if solver_backend not in {"siwave", "aedt_cutout"}:
-            raise ValueError(f"Unsupported solver backend: {solver_backend}")
-        preprocessing_data = []
-        if solver_backend == "siwave":
-            siw_execute_file = resolve_siwave_executable(AEDT_VERSION)
-            case_data_app = EDB_SETUP_APP if EDB_SETUP_APP else app
-            if not case_data_app:
-                app = SIwave(version=AEDT_VERSION, logger=logger)
-                app.set_cad_file(str(runtime_edb_path))
-                case_data_app = app
-
-            signal_layers = list(case_data_app.edb.stackup.signal_layers.keys())
-            preprocessing_data = run_pdn_unified(
-                cases=pdn_cases_info,
-                model_name=MODEL_NAME,
-                output_dir=OUTPUT_DIR,
-                ref_siwave_file_path=REF_SIwave_FILE_PATH,
-                ref_edb_path=runtime_edb_path,
-                gnd_net=GND_NET,
-                aedt_version=AEDT_VERSION,
-                case_data_app=case_data_app,
-                signal_layers=signal_layers,
-                conf_data=conf_manager.data,
-                siw_execute_file=siw_execute_file,
-                exec_file=exec_file,
-                bulk_inductor_list=bom_info.get('bulkInd', []),
-                run_solve=True,
-            )
-        elif solver_backend == "aedt_cutout":
-            # Keep preprocessing schema for compatibility without opening SIwave/EDB sessions in Step6.
-            full_siw_file = (OUTPUT_DIR / f"{MODEL_NAME}_PDN_FULL.siw").resolve()
-            for idx, case in enumerate(pdn_cases_info):
-                net = str(case.get("Display_Net", case.get("Spec_Net", case.get("Net", ""))))
-                ic = str(case.get("IC", ""))
-                safe_ic = "".join(c for c in ic if c.isalnum() or c == "_")
-                safe_net = "".join(c for c in net if c.isalnum() or c == "_")
-                preprocessing_data.append(
-                    build_preprocessing_record(
-                        case=case,
-                        idx=idx,
-                        net_siw_file=full_siw_file,
-                        net_edb_dir=Path(runtime_edb_path),
-                        v_port_name=f"V_{safe_ic}_{safe_net}",
-                        i_port_name=f"I_{safe_ic}_{safe_net}",
-                        gnd_net=GND_NET,
-                        solver_backend="aedt_cutout",
-                    )
-                )
-            run_pdn_aedt_cutout_solve(
-                cases=pdn_cases_info,
-                model_name=MODEL_NAME,
-                ref_edb_path=Path(runtime_edb_path),
-                output_dir=OUTPUT_DIR,
-                aedt_version=AEDT_VERSION,
-                conf_data=conf_manager.data,
-                logger=logger,
-            )
-
-        with open(OUTPUT_DIR / 'preprocessing_result.json', 'w', encoding='utf-8') as f:
-            json.dump(preprocessing_data, f, indent=4, ensure_ascii=False)
-        logger.log(f"Exported preprocessing result to: {OUTPUT_DIR / 'preprocessing_result.json'}", level=LogLevel.DETAIL1)
+        step6_result = run_step6_solver(
+            solver_backend=solver_backend,
+            pdn_cases_info=pdn_cases_info,
+            model_name=MODEL_NAME,
+            output_dir=OUTPUT_DIR,
+            ref_siwave_file_path=REF_SIwave_FILE_PATH,
+            runtime_edb_path=Path(runtime_edb_path),
+            gnd_net=GND_NET,
+            aedt_version=AEDT_VERSION,
+            conf_data=conf_manager.data,
+            bom_info=bom_info,
+            logger=logger,
+            edb_setup_app=EDB_SETUP_APP,
+            app=app,
+            siwave_cls=SIwave,
+            resolve_siwave_executable_fn=resolve_siwave_executable,
+            run_pdn_unified_fn=run_pdn_unified,
+            run_pdn_aedt_cutout_solve_fn=run_pdn_aedt_cutout_solve,
+            build_preprocessing_record_fn=build_preprocessing_record,
+            exec_file=exec_file,
+        )
+        app = step6_result["app"]
+        write_step6_preprocessing_result(
+            output_dir=OUTPUT_DIR,
+            preprocessing_data=step6_result["preprocessing_data"],
+            logger=logger,
+        )
 
         step += 1
 
@@ -5508,3 +4525,4 @@ else:
     logger.fatal(f"Unsupported solver backend at post stage: {SOLVER_BACKEND_USED}")
     raise SystemExit(1)
 # endregion
+
