@@ -1,4 +1,4 @@
-# coding=utf-8
+﻿# coding=utf-8
 
 import json
 import re
@@ -439,9 +439,47 @@ def configure_ports_and_vrms_from_spec(app, cases, gnd_net, bulk_inductor_set, o
     vrm_r = float(vrm_conf.get("resistance_ohm", 0.005))
     vrm_l = float(vrm_conf.get("inductance_h", 1e-9))
     vrm_c = float(vrm_conf.get("capacitance_f", 0.0))
+    vrm_ideal_resistor_only = bool(vrm_conf.get("ideal_resistor_only", True))
+    if vrm_ideal_resistor_only:
+        vrm_l = 0.0
+        vrm_c = 0.0
     shunt_enabled = bool(shunt_conf.get("searchEnabled", True))
     allowed_prefixes = inductor_conf.get("allowedPrefixes", ["L", "B", "FB"])
 
+    runtime_conf = vrm_setup_conf.get("__runtime__", {}) if isinstance(vrm_setup_conf, dict) else {}
+    solver_backend = str(runtime_conf.get("solver_backend", "")).strip().lower()
+
+    # Cutout backend policy:
+    # - Always keep VRM termination present (no open-end net)
+    # - Avoid lumped-RLC interpolation path by using termination-port style resistor
+    vrm_termination_as_port = (solver_backend == "aedt_cutout")
+    if vrm_termination_as_port:
+        vrm_ideal_resistor_only = True
+        vrm_l = 0.0
+        vrm_c = 0.0
+
+    create_vrm_component_cfg = vrm_conf.get("createComponent", None)
+    if create_vrm_component_cfg is None:
+        create_vrm_component = (not vrm_termination_as_port)
+    else:
+        create_vrm_component = bool(create_vrm_component_cfg)
+
+    if vrm_termination_as_port and create_vrm_component:
+        logger.log(
+            "[VRM_SETUP][INFO] aedt_cutout enforces termination-port mode. "
+            "Ignoring createComponent=True to avoid lumped interpolation path.",
+            level=LogLevel.INFO,
+        )
+        create_vrm_component = False
+
+    logger.log(
+        f"[VRM_SETUP] Runtime mode: solver_backend={solver_backend or 'unknown'}, "
+        f"create_vrm_component={create_vrm_component}, "
+        f"termination_as_port={vrm_termination_as_port}, "
+        f"ideal_resistor_only={vrm_ideal_resistor_only}, "
+        f"R/L/C={vrm_r}/{vrm_l}/{vrm_c}",
+        level=LogLevel.INFO,
+    )
     records = []
     _clear_vrm_setup_artifacts(app, logger, clear_prefixes)
     logger.log(f"[VRM_SETUP] Cleared previous setup artifacts by prefixes: {clear_prefixes}", level=LogLevel.DETAIL1)
@@ -625,21 +663,46 @@ def configure_ports_and_vrms_from_spec(app, cases, gnd_net, bulk_inductor_set, o
 
             vrm_name = f"{vrm_prefix}{clean_net}"
             item["VRM_Name"] = vrm_name
-            created_vrm = app.create_rlc_component(
-                pins=[vrm_pos_pin, vrm_neg_pin],
-                comp_name=vrm_name,
-                part_name="VRM_RLC",
-                r_value=vrm_r,
-                l_value=vrm_l,
-                c_value=vrm_c,
-            )
-            if not created_vrm:
-                item["Status"] = "Skipped"
-                item["Message"] = f"Failed to create VRM element: {vrm_name}"
-                logger.log(f"[VRM_SETUP][SKIP] {item['Message']}", level=LogLevel.WARNING)
-                records.append(item)
-                continue
-
+            if vrm_termination_as_port:
+                try:
+                    term_port = _create_port_with_compat(app.edb, vrm_pos_pin, vrm_neg_pin, vrm_name)
+                except Exception as term_exc:
+                    item["Status"] = "Skipped"
+                    item["Message"] = f"Failed to create VRM termination port: {vrm_name} ({term_exc})"
+                    logger.log(f"[VRM_SETUP][SKIP] {item['Message']}", level=LogLevel.WARNING)
+                    records.append(item)
+                    continue
+                if term_port is not None and (not _apply_port_reference_impedance(term_port, vrm_r)):
+                    logger.log(
+                        f"[VRM_SETUP][WARNING] Could not set termination impedance to {vrm_r} ohm for {vrm_name}.",
+                        level=LogLevel.WARNING,
+                    )
+                t_boundary, t_is_circuit = _get_terminal_meta(term_port)
+                logger.log(
+                    f"[VRM_SETUP][TERM_META] {vrm_name}: boundary={t_boundary or 'unknown'}, "
+                    f"is_circuit_port={t_is_circuit}, Z={vrm_r}",
+                    level=LogLevel.DETAIL1,
+                )
+            elif create_vrm_component:
+                created_vrm = app.create_rlc_component(
+                    pins=[vrm_pos_pin, vrm_neg_pin],
+                    comp_name=vrm_name,
+                    part_name="VRM_RLC",
+                    r_value=vrm_r,
+                    l_value=vrm_l,
+                    c_value=vrm_c,
+                )
+                if not created_vrm:
+                    item["Status"] = "Skipped"
+                    item["Message"] = f"Failed to create VRM element: {vrm_name}"
+                    logger.log(f"[VRM_SETUP][SKIP] {item['Message']}", level=LogLevel.WARNING)
+                    records.append(item)
+                    continue
+            else:
+                logger.log(
+                    f"[VRM_SETUP][INFO] Skip VRM element creation for backend={solver_backend or 'unknown'}: {vrm_name}",
+                    level=LogLevel.INFO,
+                )
             try:
                 target_idx = full_chain.index(vrm_pos_pin.net_name)
                 item["Analysis_Target_Nets"] = full_chain[:target_idx + 1]
@@ -675,3 +738,6 @@ def configure_ports_and_vrms_from_spec(app, cases, gnd_net, bulk_inductor_set, o
         json.dump(report, f, indent=4, ensure_ascii=False)
     logger.log(f"[VRM_SETUP] Exported setup report: {report_file}", level=LogLevel.DETAIL1)
     return records
+
+
+
