@@ -1,4 +1,4 @@
-﻿{
+{
   "PDN": {
     "version": "2025.2",
     "plot": {
@@ -145,15 +145,17 @@
     "setup": {
       "zExecFile": "PDN.exec",
       "solver_backend_policy": "auto",
-      "Vsource_Res": 1e-6,
+      "Vsource_Res": 1E-06,
       "Isource_Res": 50000000,
       "aedtCutout": {
-        "extent_type": "Bounding",
-        "expansion_size": 0.002,
+        "extent_type": "Conforming",
+        "expansion_size": 0.005,
         "check_terminals": true,
         "include_pingroups": true,
         "preserve_components_with_model": true,
-        "non_graphical": false
+        "non_graphical": false,
+        "port_boundary_min_margin_mm": 5.0,
+        "port_boundary_margin_max_retries": 2
       },
       "syzPlaneFilter": {
         "ignore_small_planes": false,
@@ -164,6 +166,7 @@
     },
     "vrmSetup": {
       "enable": true,
+      "termination_mode": "circuit_port",
       "clearPrefixes": [
         "PORT_",
         "Rvrm_"
@@ -179,8 +182,10 @@
       },
       "vrm": {
         "resistance_ohm": 0.005,
-        "inductance_h": 1e-9,
-        "capacitance_f": 0.0
+        "inductance_h": 0.0,
+        "capacitance_f": 0.0,
+        "ideal_resistor_only": true,
+        "createComponent": true
       },
       "shuntCap": {
         "searchEnabled": true
@@ -197,3 +202,6 @@
     "HPC": "Auto"
   }
 }
+
+
+

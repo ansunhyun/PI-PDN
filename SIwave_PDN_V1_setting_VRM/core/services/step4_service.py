@@ -414,23 +414,82 @@ def process_step4_cases(
         pin_trace_meta = {}
         ov_key = (str(comp_name).upper(), str(target_pin_name).upper())
         if ov_key in pin_override_map:
-            ov_pin_name = str(pin_override_map.get(ov_key, "")).strip()
+            ov_raw = pin_override_map.get(ov_key, {})
+            if isinstance(ov_raw, dict):
+                ov_pin_name = str(ov_raw.get("edb_pin", "")).strip()
+                ov_expected_net = str(ov_raw.get("expected_net", "")).strip()
+            else:
+                # Backward compatibility for legacy override format (string value only).
+                ov_pin_name = str(ov_raw or "").strip()
+                ov_expected_net = ""
             ov_inst, ov_resolved_name = find_component_pin_by_name_or_display_fn(
                 comp_inst=comp_inst,
                 pin_name=ov_pin_name,
                 excluded=used_component_pins.get(comp_name, set()),
             )
+            if ov_inst is None and ov_pin_name and ov_expected_net:
+                # Conservative bridge: interpret override pin as UI/API label and map to EDB pin.
+                ui_api_by_ui = (ui_api_component_map or {}).get("by_ui", {}) if isinstance(ui_api_component_map, dict) else {}
+                ui_api_by_token = (ui_api_component_map or {}).get("by_token", {}) if isinstance(ui_api_component_map, dict) else {}
+                cand_records = []
+                cand_records.extend(ui_api_by_ui.get(ov_pin_name, []) or [])
+                ov_tok = normalize_pin_token_fn(ov_pin_name)
+                if ov_tok:
+                    cand_records.extend(ui_api_by_token.get(ov_tok, []) or [])
+                dedup = {}
+                for rec in cand_records:
+                    if not isinstance(rec, dict):
+                        continue
+                    edb_pin = str(rec.get("edb_pin", "")).strip()
+                    if not edb_pin:
+                        continue
+                    if edb_pin in dedup:
+                        continue
+                    dedup[edb_pin] = rec
+                ranked = []
+                for edb_pin, rec in dedup.items():
+                    if edb_pin not in comp_inst.pins:
+                        continue
+                    if edb_pin in used_component_pins.get(comp_name, set()):
+                        continue
+                    rec_net = str(getattr(comp_inst.pins[edb_pin], "net_name", "") or "").strip()
+                    net_score = 0
+                    if ov_expected_net:
+                        net_score = 1 if net_matches_spec_fn(ov_expected_net, rec_net, net_alias_map) else -1
+                    confidence = float(rec.get("confidence", 0.0) or 0.0)
+                    ranked.append((net_score, confidence, edb_pin, rec_net, str(rec.get("source", ""))))
+                if ranked:
+                    ranked.sort(key=lambda x: (x[0], x[1], x[2]), reverse=True)
+                    net_score, _, best_pin, best_net, best_source = ranked[0]
+                    if net_score >= 0:
+                        ov_inst = comp_inst.pins.get(best_pin)
+                        ov_resolved_name = best_pin
+                        logger.log(
+                            f"[SPEC][OVERRIDE][MAP] {comp_name}:{target_pin_name} UI/API '{ov_pin_name}' -> EDB '{best_pin}' "
+                            f"(source={best_source}, net={best_net})",
+                            level=LogLevel.WARNING,
+                        )
             if ov_inst is not None:
-                pin_inst = ov_inst
-                resolved_pin_name = ov_resolved_name or ov_pin_name
-                resolve_mode = "pin_override"
+                if ov_expected_net and (not net_matches_spec_fn(ov_expected_net, getattr(ov_inst, "net_name", ""), net_alias_map)):
+                    logger.log(
+                        f"[SPEC][OVERRIDE][WARNING] Override net mismatch: {comp_name}:{target_pin_name} -> {ov_resolved_name} "
+                        f"(resolved_net={getattr(ov_inst, 'net_name', '')}, expected_net={ov_expected_net})",
+                        level=LogLevel.WARNING,
+                    )
+                    ov_inst = None
+                    ov_resolved_name = None
+                else:
+                    pin_inst = ov_inst
+                    resolved_pin_name = ov_resolved_name or ov_pin_name
+                    resolve_mode = "pin_override"
+                    logger.log(
+                        f"[SPEC][OVERRIDE] {comp_name}: {target_pin_name} -> {resolved_pin_name}",
+                        level=LogLevel.WARNING,
+                    )
+            if ov_inst is None:
+                exp_msg = f", expected_net={ov_expected_net}" if ov_expected_net else ""
                 logger.log(
-                    f"[SPEC][OVERRIDE] {comp_name}: {target_pin_name} -> {resolved_pin_name}",
-                    level=LogLevel.WARNING,
-                )
-            else:
-                logger.log(
-                    f"[SPEC][OVERRIDE][WARNING] Override target not found: {comp_name}:{target_pin_name} -> {ov_pin_name}",
+                    f"[SPEC][OVERRIDE][WARNING] Override target not found: {comp_name}:{target_pin_name} -> {ov_pin_name}{exp_msg}",
                     level=LogLevel.WARNING,
                 )
 

@@ -1,4 +1,4 @@
-from pathlib import Path
+﻿from pathlib import Path
 import json
 
 from core.logger import LogLevel
@@ -125,13 +125,15 @@ def run_step6_solver(
                     solver_backend="aedt_cutout",
                 )
             )
+        aedt_conf_data = dict(conf_data or {})
+        aedt_conf_data["__BOM_INFO__"] = bom_info if isinstance(bom_info, dict) else {}
         run_pdn_aedt_cutout_solve_fn(
             cases=pdn_cases_info,
             model_name=model_name,
             ref_edb_path=Path(runtime_edb_path),
             output_dir=output_dir,
             aedt_version=aedt_version,
-            conf_data=conf_data,
+            conf_data=aedt_conf_data,
             logger=logger,
         )
 
@@ -145,3 +147,4 @@ def write_step6_preprocessing_result(*, output_dir: Path, preprocessing_data, lo
         json.dump(preprocessing_data, f, indent=4, ensure_ascii=False)
     temp_output.replace(final_output)
     logger.log(f"Exported preprocessing result to: {final_output}", level=LogLevel.DETAIL1)
+

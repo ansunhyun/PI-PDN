@@ -19,6 +19,12 @@ from core.logger import Logger, LogLevel
 from core.database import DCIRSessionException, ErrorCode, InValChk, Database, DCIRCase, extract_voltage, sanitize_str
 from core.post_processing import PostProcessing
 from core.post_stage import PostStageError, append_post_detail, prepare_post_settings, reconstruct_post_state
+from core.services import (
+    handle_pre_stage_exit,
+    run_step5_cad_modification,
+    run_step6_simulation,
+    run_step8_post_processing,
+)
 
 MODE = 0  # Generic Mode
 
@@ -854,15 +860,39 @@ try:
     original_bom_name = settings_manager.data.get('CAE', {}).get('PCB', {}).get('BOM', '')
     if original_bom_name:
         primary_bom_path = INPUT_DIR / original_bom_name
-        
-        if not primary_bom_path.exists() and primary_bom_path.suffix.lower() == '.csv':
-            for ext in ['.xlsx', '.xls']:
-                fallback_bom_path = primary_bom_path.with_suffix(ext)
-                if fallback_bom_path.exists():
-                    new_bom_name = original_bom_name.rsplit('.', 1)[0] + ext
-                    logger.log(f"Primary BOM '{original_bom_name}' not found. Fallback to '{new_bom_name}'", level=LogLevel.WARNING)
-                    settings_manager.data['CAE']['PCB']['BOM'] = new_bom_name
-                    break
+        if not primary_bom_path.exists():
+            # Fallback 1: keep filename only (ignore missing nested folders from JSON path)
+            flat_bom_path = INPUT_DIR / Path(original_bom_name).name
+            if flat_bom_path.exists():
+                logger.log(
+                    f"Primary BOM '{original_bom_name}' not found. Fallback to '{flat_bom_path.name}'",
+                    level=LogLevel.WARNING,
+                )
+                settings_manager.data['CAE']['PCB']['BOM'] = flat_bom_path.name
+            elif primary_bom_path.suffix.lower() == '.csv':
+                # Fallback 2: same path, different extension
+                for ext in ['.xlsx', '.xls']:
+                    fallback_bom_path = primary_bom_path.with_suffix(ext)
+                    if fallback_bom_path.exists():
+                        new_bom_name = original_bom_name.rsplit('.', 1)[0] + ext
+                        logger.log(
+                            f"Primary BOM '{original_bom_name}' not found. Fallback to '{new_bom_name}'",
+                            level=LogLevel.WARNING,
+                        )
+                        settings_manager.data['CAE']['PCB']['BOM'] = new_bom_name
+                        break
+                else:
+                    # Fallback 3: filename-only + different extension
+                    flat_base = flat_bom_path.with_suffix("")
+                    for ext in ['.csv', '.xlsx', '.xls']:
+                        alt = flat_base.with_suffix(ext)
+                        if alt.exists():
+                            logger.log(
+                                f"Primary BOM '{original_bom_name}' not found. Fallback to '{alt.name}'",
+                                level=LogLevel.WARNING,
+                            )
+                            settings_manager.data['CAE']['PCB']['BOM'] = alt.name
+                            break
 
     input_valchk = InValChk(settings_manager.data, INPUT_DIR, logger)
     default, optional = input_valchk.is_valid()
@@ -1299,195 +1329,76 @@ finally:
 # endregion
 
 if STAGE == "pre":
-    try:
-        logger.log(
-            f"Step {step}. PRE report export (DCIR setup and simulation steps are skipped by design)",
-            level=LogLevel.INFO,
-        )
-        spec_file_for_report = Path(input_valchk._default_inputFiles['Spec']) if input_valchk else INPUT_JSON
-        export_pre_stage_reports(
-            OUTPUT_DIR,
-            spec_file_for_report,
-            PRE_EDB_FILE_PATH,
-            dcir_cases_info,
-            inner_cap_audit,
-            logger,
-        )
-    except Exception:
-        logger.fatal(f"Failed to export pre-stage reports: {traceback.format_exc()}")
-        raise SystemExit(1)
-    END_TIME = time.strftime('%Y.%m.%d, %H:%M:%S')
-    raise SystemExit(0)
+    should_exit, END_TIME = handle_pre_stage_exit(
+        stage=STAGE,
+        step=step,
+        input_valchk=input_valchk,
+        input_json=INPUT_JSON,
+        output_dir=OUTPUT_DIR,
+        pre_edb_file_path=PRE_EDB_FILE_PATH,
+        dcir_cases_info=dcir_cases_info,
+        inner_cap_audit=inner_cap_audit,
+        logger=logger,
+        export_pre_stage_reports=export_pre_stage_reports,
+    )
+    if should_exit:
+        raise SystemExit(0)
 
 # region 5. Modify CAD Data using SIwave and Set DCIR Simulation
-try:
-    logger.log(f"Step {step}. CAD Modification", level=LogLevel.INFO)
-
-    logger.log("Waiting for EDB file I/O completion...", level=LogLevel.DETAIL2)
-    max_wait_time = 300.0
-    if not wait_for_edb_ready(PRE_EDB_FILE_PATH, timeout=max_wait_time, check_interval=3.0):
-        logger.log(
-            "[WARNING] PRE EDB not ready in time. Trying one recovery save from source EDB...",
-            level=LogLevel.WARNING,
-        )
-        recovery_app = None
-        try:
-            recovery_app = SIwave(version=AEDT_VERSION, logger=logger)
-            recovery_app.set_cad_file(EDB_FILE_PATH)
-            ensure_pre_edb_saved(
-                app=recovery_app,
-                source_edb_path=EDB_FILE_PATH,
-                pre_edb_path=PRE_EDB_FILE_PATH,
-                max_retries=2,
-                timeout=max_wait_time,
-            )
-        finally:
-            if recovery_app:
-                recovery_app.quit_application()
-
-    if not _is_edb_ready(PRE_EDB_FILE_PATH):
-        raise FileNotFoundError(
-            f"Target EDB path or edb.def is not ready after retries: {PRE_EDB_FILE_PATH}"
-        )
-
-    app = None
-    image_app = None
-
-    try:
-        app = SIwave(version=AEDT_VERSION, logger=logger)
-        
-        time.sleep(3.0) 
-        
-        max_retries = 3
-        for attempt in range(max_retries):
-            try:
-                logger.log(f"Importing EDB to SIwave (Attempt {attempt + 1}/{max_retries}): {PRE_EDB_FILE_PATH.name}", level=LogLevel.DETAIL1)
-                app.import_edb(str(PRE_EDB_FILE_PATH))
-                break
-            except Exception as e:
-                if attempt < max_retries - 1:
-                    logger.log(f"[WARNING] Failed to import EDB. Retrying in 5 seconds... ({e})", level=LogLevel.WARNING)
-                    time.sleep(5.0)
-                else:
-                    logger.log(f"[ERROR] Failed to import EDB after {max_retries} attempts.", level=LogLevel.ERROR)
-                    raise
-
-        dcir_logic = DCIR(logger=logger)
-        dcir_logic.apply_dc_shorts(
-            app=app, 
-            shorted_comp_defs=conf_manager.data['DCIR']['dcShort']['shortedComp'], 
-            del_comps=DEL_COMP, 
-            short_correction=SHORT_CORRECTION
-        )
-
-        PMAP_FILE = INPUT_DIR / settings_manager.data['CAE']['PCB']['Pmap'] if settings_manager.data['CAE']['PCB']['Pmap'] else None
-        SWS_FILE = WORKING_DIR / 'core' / conf_manager.data['DCIR']['sws']
-        
-        app.setup_simulation(PMAP_FILE, SWS_FILE)
-
-        REF_SIwave_FILE_PATH = SIwave_FILE_PATH.parent / f"{SIwave_FILE_PATH.stem}_ref{SIwave_FILE_PATH.suffix}"
-        app.save_project_as(REF_SIwave_FILE_PATH)
-
-        base_cad_name = INPUT_CAD_FILE.stem.split('-')[0]
-        FINAL_EDB_FILE_PATH = OUTPUT_DIR / f"{base_cad_name}_ref.aedb"
-        app.export_edb(FINAL_EDB_FILE_PATH)
-    finally:
-        if app:
-            app.quit_application()
-
-    try:
-        image_app = SIwave(version=AEDT_VERSION, logger=logger)
-        image_app.set_cad_file(str(FINAL_EDB_FILE_PATH))
-        image_app.export_layer_images(REF_SIwave_FILE_PATH, OUTPUT_DIR, GND_NET)
-        image_app.close_edb()
-    finally:
-        if image_app:
-            image_app.quit_application()
-
-    step += 1
-
-except Exception:
-    logger.fatal(f"An error occurred while CAD modification process : {traceback.format_exc()}")
+step, REF_SIwave_FILE_PATH, FINAL_EDB_FILE_PATH = run_step5_cad_modification(
+    step=step,
+    pre_edb_file_path=PRE_EDB_FILE_PATH,
+    edb_file_path=EDB_FILE_PATH,
+    aedt_version=AEDT_VERSION,
+    logger=logger,
+    conf_manager=conf_manager,
+    del_comp=DEL_COMP,
+    short_correction=SHORT_CORRECTION,
+    input_dir=INPUT_DIR,
+    settings_manager=settings_manager,
+    working_dir=WORKING_DIR,
+    siwave_file_path=SIwave_FILE_PATH,
+    input_cad_file=INPUT_CAD_FILE,
+    output_dir=OUTPUT_DIR,
+    gnd_net=GND_NET,
+    wait_for_edb_ready=wait_for_edb_ready,
+    ensure_pre_edb_saved=ensure_pre_edb_saved,
+    is_edb_ready=_is_edb_ready,
+)
 # endregion
 
 # region 6. Generate Files and Run DCIR Simulation
-app = None
-try:
-    logger.log(f"Step {step}. Generate Files and Run DCIR Simulation", level=LogLevel.INFO)
-    preprocessing_data = []
-    MODEL_NAME = INPUT_CAD_FILE.stem.split('-')[0]
-
-    app = SIwave(version=AEDT_VERSION, logger=logger)
-    app.set_cad_file(str(PRE_EDB_FILE_PATH))
-    signal_layers = list(app.edb.stackup.signal_layers.keys())
-
-    siw_execute_file = resolve_siwave_executable(AEDT_VERSION)
-    exec_file = WORKING_DIR / 'core' / 'DCIR.exec'
-
-    for idx, case in enumerate(dcir_cases_info):
-        case_record = run_dcir_case(
-            case=case,
-            idx=idx,
-            total_cases=len(dcir_cases_info),
-            mode=MODE,
-            model_name=MODEL_NAME,
-            output_dir=OUTPUT_DIR,
-            ref_siwave_file_path=REF_SIwave_FILE_PATH,
-            gnd_net=GND_NET,
-            aedt_version=AEDT_VERSION,
-            case_data_app=app,
-            signal_layers=signal_layers,
-            conf_data=conf_manager.data,
-            siw_execute_file=siw_execute_file,
-            exec_file=exec_file,
-            bulk_inductor_list=bom_info.get('bulkInd', []), 
-            run_solve=(STAGE != "pre")
-        )
-        if case_record:
-            preprocessing_data.append(case_record)
-
-    app.close_edb()
-
-    with open(OUTPUT_DIR / 'preprocessing_result.json', 'w', encoding='utf-8') as f:
-        json.dump(preprocessing_data, f, indent=4, ensure_ascii=False)
-    logger.log(f"Exported preprocessing result to: {OUTPUT_DIR / 'preprocessing_result.json'}", level=LogLevel.DETAIL1)
-
-    try:
-        if EDB_FILE_PATH.exists(): shutil.rmtree(EDB_FILE_PATH)
-        if PRE_EDB_FILE_PATH.exists(): shutil.rmtree(PRE_EDB_FILE_PATH)
-        logger.log("Cleaned up intermediate EDB files to save disk space.", level=LogLevel.DETAIL1)
-    except Exception as e:
-        logger.log(f"Failed to clean up intermediate files: {e}", level=LogLevel.WARNING)
-
-    step += 1
-
-except Exception:
-    logger.fatal(f"An error occurred while generating files and running simulation : {traceback.format_exc()}")
-finally:
-    if app:
-        app.quit_application()
-    END_TIME = time.strftime('%Y.%m.%d, %H:%M:%S')
+step, END_TIME = run_step6_simulation(
+    step=step,
+    logger=logger,
+    input_cad_file=INPUT_CAD_FILE,
+    aedt_version=AEDT_VERSION,
+    pre_edb_file_path=PRE_EDB_FILE_PATH,
+    working_dir=WORKING_DIR,
+    dcir_cases_info=dcir_cases_info,
+    mode=MODE,
+    output_dir=OUTPUT_DIR,
+    ref_siwave_file_path=REF_SIwave_FILE_PATH,
+    gnd_net=GND_NET,
+    conf_manager=conf_manager,
+    bom_info=bom_info,
+    stage=STAGE,
+    run_dcir_case=run_dcir_case,
+    resolve_siwave_executable=resolve_siwave_executable,
+    edb_file_path=EDB_FILE_PATH,
+)
 # endregion
 
 # region 8. Post-Processing
-if STAGE == "pre":
-    logger.log(f"Step {step}. Post-processing skipped (stage=pre)", level=LogLevel.INFO)
-else:
-    try:
-        logger.log(f"Step {step}. Post-processing : Extracting DCIR results", level=LogLevel.INFO)
-        full_state = run_standalone_post(
-            conf_manager,
-            INPUT_JSON,
-            OUTPUT_DIR,
-            analysis_start=START_TIME,
-            analysis_end=END_TIME,
-        )
-        complete_count = sum(1 for case in full_state.summary if case.get('is_done'))
-        if complete_count == 0:
-            raise PostStageError(
-                f"FullBatch Post failed: no completed result was detected "
-                f"(0/{len(full_state.summary)} cases)"
-            )
-    except Exception:
-        logger.fatal(f"An error occurred while performing DCIR results extracting : {traceback.format_exc()}")
+run_step8_post_processing(
+    stage=STAGE,
+    step=step,
+    logger=logger,
+    conf_manager=conf_manager,
+    input_json=INPUT_JSON,
+    output_dir=OUTPUT_DIR,
+    analysis_start=START_TIME,
+    analysis_end=END_TIME,
+    run_standalone_post=run_standalone_post,
+)
 # endregion

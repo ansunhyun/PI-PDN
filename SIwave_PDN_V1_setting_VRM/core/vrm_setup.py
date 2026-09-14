@@ -1,4 +1,4 @@
-﻿# coding=utf-8
+# coding=utf-8
 
 import json
 import re
@@ -129,6 +129,30 @@ def _find_nearest_gnd_pin(edb, ref_coord, gnd_net):
     return best_pin
 
 
+def _find_nearest_gnd_pins(edb, ref_coord, gnd_net, limit=8):
+    rows = []
+    for comp in edb._components.components.values():
+        for pin in comp.pins.values():
+            if str(pin.net_name or "") != str(gnd_net or ""):
+                continue
+            try:
+                dist = (float(pin.position[0]) - float(ref_coord[0])) ** 2 + (float(pin.position[1]) - float(ref_coord[1])) ** 2
+            except Exception:
+                continue
+            rows.append((dist, pin))
+    rows.sort(key=lambda x: x[0])
+    out = []
+    seen = set()
+    for _, pin in rows:
+        if id(pin) in seen:
+            continue
+        seen.add(id(pin))
+        out.append(pin)
+        if len(out) >= max(1, int(limit)):
+            break
+    return out
+
+
 def _find_nearest_shunt_cap_pin(edb, ref_coord, target_net, gnd_net):
     best_pin = None
     min_dist = float("inf")
@@ -147,6 +171,82 @@ def _find_nearest_shunt_cap_pin(edb, ref_coord, target_net, gnd_net):
     return best_pin
 
 
+def _resolve_pin_refdes(edb, pin_obj):
+    if pin_obj is None:
+        return ""
+    try:
+        pin_name = str(getattr(pin_obj, "name", "") or "")
+    except Exception:
+        pin_name = ""
+    try:
+        pin_net = str(getattr(pin_obj, "net_name", "") or "")
+    except Exception:
+        pin_net = ""
+    try:
+        pin_x = float(pin_obj.position[0])
+        pin_y = float(pin_obj.position[1])
+        pin_has_pos = True
+    except Exception:
+        pin_x, pin_y = 0.0, 0.0
+        pin_has_pos = False
+
+    for cname, comp in edb._components.components.items():
+        try:
+            for p in comp.pins.values():
+                # Fast-path identity comparison.
+                if p is pin_obj:
+                    return str(cname)
+
+                # Fallback for API wrappers/proxies where object identity differs.
+                same_name = (pin_name and str(getattr(p, "name", "") or "") == pin_name)
+                same_net = (pin_net and str(getattr(p, "net_name", "") or "") == pin_net)
+                if same_name and same_net:
+                    if pin_has_pos:
+                        try:
+                            px = float(p.position[0])
+                            py = float(p.position[1])
+                            if abs(px - pin_x) <= 1e-9 and abs(py - pin_y) <= 1e-9:
+                                return str(cname)
+                        except Exception:
+                            pass
+                    else:
+                        return str(cname)
+        except Exception:
+            continue
+    return ""
+
+def _find_nearest_non_cap_pin_on_net(edb, ref_coord, target_net, gnd_net, skip_prefixes=None):
+    best_pin = None
+    best_refdes = ""
+    min_dist = float("inf")
+    target_net = str(target_net or "")
+    skip_prefixes = tuple(str(x or "").upper() for x in (skip_prefixes or ()))
+    for comp_name, comp_inst in edb._components.components.items():
+        cname = str(comp_name or "")
+        cname_u = cname.upper()
+        if cname_u.startswith("C"):
+            continue
+        if skip_prefixes and any(cname_u.startswith(pref) for pref in skip_prefixes if pref):
+            continue
+        try:
+            target_pins = [p for p in comp_inst.pins.values() if str(p.net_name or "") == target_net]
+            gnd_pins = [p for p in comp_inst.pins.values() if str(p.net_name or "") == str(gnd_net or "")]
+        except Exception:
+            continue
+        if not target_pins or not gnd_pins:
+            continue
+        for pin in target_pins:
+            try:
+                dist = (float(pin.position[0]) - float(ref_coord[0])) ** 2 + (float(pin.position[1]) - float(ref_coord[1])) ** 2
+            except Exception:
+                continue
+            if dist < min_dist:
+                min_dist = dist
+                best_pin = pin
+                best_refdes = cname
+    return best_pin, best_refdes
+
+
 def _component_anchor_point(comp_inst):
     pts = []
     for p in comp_inst.pins.values():
@@ -159,6 +259,135 @@ def _component_anchor_point(comp_inst):
     sx = sum(x for x, _ in pts)
     sy = sum(y for _, y in pts)
     return (sx / len(pts), sy / len(pts))
+
+
+def _pin_distance_sq(pin_a, pin_b):
+    try:
+        ax, ay = float(pin_a.position[0]), float(pin_a.position[1])
+        bx, by = float(pin_b.position[0]), float(pin_b.position[1])
+    except Exception:
+        return float("inf")
+    dx = ax - bx
+    dy = ay - by
+    return dx * dx + dy * dy
+
+
+def _score_vrm_pair(edb, pos_pin, neg_pin):
+    # Lower is better. Penalize ambiguous terminal-face candidates.
+    d2 = _pin_distance_sq(pos_pin, neg_pin)
+    pos_ref = str(_resolve_pin_refdes(edb, pos_pin) or "").upper()
+    neg_ref = str(_resolve_pin_refdes(edb, neg_pin) or "").upper()
+
+    penalty = 0.0
+    if not (d2 < float("inf")):
+        penalty += 1e6
+    # Too short edge often causes ambiguous terminal face.
+    if d2 < 4e-8:      # ~0.2 mm
+        penalty += 600.0
+    elif d2 < 2.5e-7:  # ~0.5 mm
+        penalty += 180.0
+    elif d2 < 1e-6:    # ~1.0 mm
+        penalty += 40.0
+
+    if pos_ref and (pos_ref == neg_ref):
+        penalty += 300.0
+    if pos_ref.startswith("IC"):
+        penalty += 140.0
+    elif pos_ref.startswith("C"):
+        penalty += 90.0
+    if neg_ref.startswith("IC"):
+        penalty += 80.0
+    elif neg_ref.startswith("C"):
+        penalty += 35.0
+
+    # Keep reasonable locality after ambiguity penalties.
+    locality = d2 * 1e6
+    return penalty + locality
+
+
+def _is_vrm_pair_geometry_safe(edb, pos_pin, neg_pin):
+    d2 = _pin_distance_sq(pos_pin, neg_pin)
+    if not (d2 < float("inf")):
+        return False
+
+    # Avoid very short terminal edges that often trigger ambiguous horizontal-face errors.
+    if d2 < 1.6e-6:  # ~1.26 mm
+        return False
+
+    pos_ref = str(_resolve_pin_refdes(edb, pos_pin) or "").upper()
+    neg_ref = str(_resolve_pin_refdes(edb, neg_pin) or "").upper()
+
+    # Same-component pair on dense packages is risky for termination-port faces.
+    if pos_ref and neg_ref and pos_ref == neg_ref:
+        return False
+
+    # Avoid IC<->IC termination pair when alternatives exist.
+    if pos_ref.startswith("IC") and neg_ref.startswith("IC"):
+        return False
+
+    return True
+
+
+def _build_vrm_pair_candidates(edb, pos_seed_pin, gnd_net, limit_pos=4, limit_gnd=10):
+    pos_candidates = []
+    seen_pos = set()
+
+    def _push_pos(pin):
+        if pin is None:
+            return
+        k = id(pin)
+        if k in seen_pos:
+            return
+        seen_pos.add(k)
+        pos_candidates.append(pin)
+
+    # 1) Keep current behavior first.
+    _push_pos(pos_seed_pin)
+
+    # 2) Prefer non-IC/non-cap anchors for robust termination face generation.
+    alt_nc, _ = _find_nearest_non_cap_pin_on_net(
+        edb,
+        pos_seed_pin.position,
+        pos_seed_pin.net_name,
+        gnd_net,
+        skip_prefixes=("IC",),
+    )
+    _push_pos(alt_nc)
+
+    # 3) Relaxed non-cap candidate as fallback.
+    alt_nocap, _ = _find_nearest_non_cap_pin_on_net(
+        edb,
+        pos_seed_pin.position,
+        pos_seed_pin.net_name,
+        gnd_net,
+        skip_prefixes=(),
+    )
+    _push_pos(alt_nocap)
+
+    safe = []
+    unsafe = []
+    for pos_pin in pos_candidates[: max(1, int(limit_pos))]:
+        gnd_candidates = _find_nearest_gnd_pins(edb, pos_pin.position, gnd_net, limit=limit_gnd)
+        for neg_pin in gnd_candidates:
+            row = (pos_pin, neg_pin, _score_vrm_pair(edb, pos_pin, neg_pin))
+            if _is_vrm_pair_geometry_safe(edb, pos_pin, neg_pin):
+                safe.append(row)
+            else:
+                unsafe.append(row)
+
+    safe.sort(key=lambda x: x[2])
+    unsafe.sort(key=lambda x: x[2])
+    # Prefer geometry-safe pairs first, then keep unsafe as last-resort fallback.
+    return safe + unsafe
+
+
+def _delete_component_if_exists(edb, comp_name):
+    try:
+        comp = edb._components.components.get(comp_name)
+        if comp:
+            comp.delete()
+    except Exception:
+        pass
 
 
 def _find_nearest_pin_on_net_to_component(edb, target_net, ref_comp):
@@ -340,24 +569,24 @@ def _create_pin_group_for_component(edb, refdes, pin_names, group_name):
     raise RuntimeError("No component pin-group API available")
 
 
-def _create_port_with_compat(edb, pos_obj, gnd_obj, port_name):
-    # Preferred: create non-circuit (lumped/EM) port explicitly for SYZ recognition.
+def _create_port_with_compat(edb, pos_obj, gnd_obj, port_name, is_circuit_port=False):
+    # Preferred: allow explicit circuit/non-circuit mode for solver stability tuning.
     try:
         if hasattr(pos_obj, "create_terminal") and hasattr(gnd_obj, "create_terminal") and hasattr(edb, "create_port"):
             pos_term = pos_obj.create_terminal(f"{port_name}_POS")
             neg_term = gnd_obj.create_terminal(f"{port_name}_NEG")
-            return edb.create_port(pos_term, neg_term, is_circuit_port=False, name=port_name)
+            return edb.create_port(pos_term, neg_term, is_circuit_port=bool(is_circuit_port), name=port_name)
     except Exception:
         pass
 
-    # Fallback: pin-level non-circuit port
+    # Fallback: pin-level port with explicit circuit flag
     try:
         if hasattr(pos_obj, "create_port"):
-            return pos_obj.create_port(name=port_name, reference=gnd_obj, is_circuit_port=False)
+            return pos_obj.create_port(name=port_name, reference=gnd_obj, is_circuit_port=bool(is_circuit_port))
     except Exception:
         pass
 
-    # Legacy compatibility fallbacks (may produce circuit-port depending on backend).
+    # Legacy compatibility fallbacks (some backends may ignore circuit/non-circuit flag).
     if hasattr(edb, "ports") and hasattr(edb.ports, "create_port_between_pin_groups"):
         for args in ((pos_obj, gnd_obj), (pos_obj, gnd_obj, port_name)):
             try:
@@ -449,31 +678,31 @@ def configure_ports_and_vrms_from_spec(app, cases, gnd_net, bulk_inductor_set, o
     runtime_conf = vrm_setup_conf.get("__runtime__", {}) if isinstance(vrm_setup_conf, dict) else {}
     solver_backend = str(runtime_conf.get("solver_backend", "")).strip().lower()
 
-    # Cutout backend policy:
-    # - Always keep VRM termination present (no open-end net)
-    # - Avoid lumped-RLC interpolation path by using termination-port style resistor
-    vrm_termination_as_port = (solver_backend == "aedt_cutout")
+    # Termination mode policy:
+    # - default: ideal resistor component (more stable than port-face termination)
+    # - optional: force termination-port mode by config when explicitly needed
+    term_mode = str(vrm_setup_conf.get("termination_mode", "component_ideal") or "component_ideal").strip().lower()
+    vrm_termination_as_port = term_mode in ("port", "termination_port", "circuit_port")
+
     if vrm_termination_as_port:
         vrm_ideal_resistor_only = True
         vrm_l = 0.0
         vrm_c = 0.0
-
-    create_vrm_component_cfg = vrm_conf.get("createComponent", None)
-    if create_vrm_component_cfg is None:
-        create_vrm_component = (not vrm_termination_as_port)
-    else:
-        create_vrm_component = bool(create_vrm_component_cfg)
-
-    if vrm_termination_as_port and create_vrm_component:
-        logger.log(
-            "[VRM_SETUP][INFO] aedt_cutout enforces termination-port mode. "
-            "Ignoring createComponent=True to avoid lumped interpolation path.",
-            level=LogLevel.INFO,
-        )
         create_vrm_component = False
+    else:
+        create_vrm_component_cfg = vrm_conf.get("createComponent", None)
+        if create_vrm_component_cfg is None:
+            create_vrm_component = True
+        else:
+            create_vrm_component = bool(create_vrm_component_cfg)
+        # component mode still forces ideal-only to avoid interpolation fragility
+        vrm_ideal_resistor_only = True
+        vrm_l = 0.0
+        vrm_c = 0.0
 
     logger.log(
         f"[VRM_SETUP] Runtime mode: solver_backend={solver_backend or 'unknown'}, "
+        f"termination_mode={term_mode}, "
         f"create_vrm_component={create_vrm_component}, "
         f"termination_as_port={vrm_termination_as_port}, "
         f"ideal_resistor_only={vrm_ideal_resistor_only}, "
@@ -624,12 +853,20 @@ def configure_ports_and_vrms_from_spec(app, cases, gnd_net, bulk_inductor_set, o
 
             ind_comp, ind_target_pin, _ = _find_series_inductor_on_chain(app.edb, full_chain, bulk_inductor_set, allowed_prefixes)
             vrm_pos_pin = None
+            vrm_force_inductor_anchor = False
             if ind_comp and ind_target_pin:
                 try:
                     ind_comp.enabled = False
                 except Exception as e:
                     logger.log(f"[VRM_SETUP][WARN] Failed to deactivate inductor {ind_comp.name}: {e}", level=LogLevel.WARNING)
                 vrm_pos_pin = ind_target_pin
+                # Requested policy: in termination mode, prioritize the inductor-side pad for VRM+ anchor.
+                if vrm_termination_as_port:
+                    vrm_force_inductor_anchor = True
+                    logger.log(
+                        f"[VRM_SETUP][TERM_SAFE] Force inductor-anchor for {target_net}: {ind_comp.name}",
+                        level=LogLevel.DETAIL1,
+                    )
             else:
                 # Fallback: when no series inductor exists, place VRM on source pin directly.
                 if preferred_vrm_anchor_pin is not None:
@@ -648,12 +885,57 @@ def configure_ports_and_vrms_from_spec(app, cases, gnd_net, bulk_inductor_set, o
                     records.append(item)
                     continue
 
-            if shunt_enabled:
+            if shunt_enabled and (not vrm_termination_as_port):
                 shunt_pin = _find_nearest_shunt_cap_pin(app.edb, vrm_pos_pin.position, vrm_pos_pin.net_name, gnd_net)
                 if shunt_pin:
                     vrm_pos_pin = shunt_pin
+            elif shunt_enabled and vrm_termination_as_port:
+                logger.log(
+                    "[VRM_SETUP][TERM_SAFE] Skip shunt-cap anchor for termination-port mode.",
+                    level=LogLevel.DETAIL1,
+                )
 
-            vrm_neg_pin = _find_nearest_gnd_pin(app.edb, vrm_pos_pin.position, gnd_net)
+            vrm_pair_candidates = []
+            if vrm_termination_as_port:
+                if vrm_force_inductor_anchor:
+                    gnd_candidates = _find_nearest_gnd_pins(app.edb, vrm_pos_pin.position, gnd_net, limit=12)
+                    safe_rows = []
+                    unsafe_rows = []
+                    for gpin in gnd_candidates:
+                        row = (vrm_pos_pin, gpin, _score_vrm_pair(app.edb, vrm_pos_pin, gpin))
+                        if _is_vrm_pair_geometry_safe(app.edb, vrm_pos_pin, gpin):
+                            safe_rows.append(row)
+                        else:
+                            unsafe_rows.append(row)
+                    safe_rows.sort(key=lambda x: x[2])
+                    unsafe_rows.sort(key=lambda x: x[2])
+                    vrm_pair_candidates = safe_rows + unsafe_rows
+                else:
+                    vrm_pair_candidates = _build_vrm_pair_candidates(
+                        app.edb,
+                        vrm_pos_pin,
+                        gnd_net,
+                        limit_pos=4,
+                        limit_gnd=10,
+                    )
+
+                if vrm_pair_candidates:
+                    best_pos, best_neg, best_score = vrm_pair_candidates[0]
+                    vrm_pos_pin = best_pos
+                    vrm_neg_pin = best_neg
+                    safe_count = 0
+                    for cp, cn, _cs in vrm_pair_candidates:
+                        if _is_vrm_pair_geometry_safe(app.edb, cp, cn):
+                            safe_count += 1
+                    logger.log(
+                        f"[VRM_SETUP][TERM_SAFE] Candidate pairs for {target_net}: total={len(vrm_pair_candidates)}, safe={safe_count}, best_score={best_score:.3f}",
+                        level=LogLevel.DETAIL1,
+                    )
+                else:
+                    vrm_neg_pin = _find_nearest_gnd_pin(app.edb, vrm_pos_pin.position, gnd_net)
+            else:
+                vrm_neg_pin = _find_nearest_gnd_pin(app.edb, vrm_pos_pin.position, gnd_net)
+
             if not vrm_neg_pin:
                 item["Status"] = "Skipped"
                 item["Message"] = f"No nearby GND pin for VRM placement: {target_net}"
@@ -664,11 +946,40 @@ def configure_ports_and_vrms_from_spec(app, cases, gnd_net, bulk_inductor_set, o
             vrm_name = f"{vrm_prefix}{clean_net}"
             item["VRM_Name"] = vrm_name
             if vrm_termination_as_port:
-                try:
-                    term_port = _create_port_with_compat(app.edb, vrm_pos_pin, vrm_neg_pin, vrm_name)
-                except Exception as term_exc:
+                pos_refdes = _resolve_pin_refdes(app.edb, vrm_pos_pin)
+                neg_refdes = _resolve_pin_refdes(app.edb, vrm_neg_pin)
+                logger.log(
+                    f"[VRM_SETUP][TERM_SAFE] Pair selected for {vrm_name}: pos={pos_refdes}:{getattr(vrm_pos_pin, 'name', '?')}, "
+                    f"neg={neg_refdes}:{getattr(vrm_neg_pin, 'name', '?')}",
+                    level=LogLevel.DETAIL1,
+                )
+                term_port = None
+                last_term_exc = None
+                force_circuit = (term_mode == "circuit_port")
+                pair_attempts = vrm_pair_candidates if vrm_pair_candidates else [(vrm_pos_pin, vrm_neg_pin, 0.0)]
+                for attempt_idx, (cand_pos, cand_neg, cand_score) in enumerate(pair_attempts[:8], start=1):
+                    try:
+                        _delete_component_if_exists(app.edb, vrm_name)
+                        term_port = _create_port_with_compat(app.edb, cand_pos, cand_neg, vrm_name, is_circuit_port=force_circuit)
+                        vrm_pos_pin, vrm_neg_pin = cand_pos, cand_neg
+                        pos_refdes = _resolve_pin_refdes(app.edb, vrm_pos_pin)
+                        neg_refdes = _resolve_pin_refdes(app.edb, vrm_neg_pin)
+                        logger.log(
+                            f"[VRM_SETUP][TERM_SAFE] Created {vrm_name} on attempt#{attempt_idx}: "
+                            f"score={cand_score:.3f}, pos={pos_refdes}, neg={neg_refdes}",
+                            level=LogLevel.DETAIL1,
+                        )
+                        break
+                    except Exception as term_exc:
+                        last_term_exc = term_exc
+                        logger.log(
+                            f"[VRM_SETUP][TERM_SAFE][WARNING] Attempt#{attempt_idx} failed for {vrm_name}: {term_exc}",
+                            level=LogLevel.WARNING,
+                        )
+                        term_port = None
+                if term_port is None and last_term_exc is not None:
                     item["Status"] = "Skipped"
-                    item["Message"] = f"Failed to create VRM termination port: {vrm_name} ({term_exc})"
+                    item["Message"] = f"Failed to create VRM termination port: {vrm_name} ({last_term_exc})"
                     logger.log(f"[VRM_SETUP][SKIP] {item['Message']}", level=LogLevel.WARNING)
                     records.append(item)
                     continue
@@ -738,6 +1049,14 @@ def configure_ports_and_vrms_from_spec(app, cases, gnd_net, bulk_inductor_set, o
         json.dump(report, f, indent=4, ensure_ascii=False)
     logger.log(f"[VRM_SETUP] Exported setup report: {report_file}", level=LogLevel.DETAIL1)
     return records
+
+
+
+
+
+
+
+
 
 
 

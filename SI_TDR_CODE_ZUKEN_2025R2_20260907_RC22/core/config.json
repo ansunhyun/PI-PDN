@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "aedtVersion": "2025.2",
+  "isZuken": true,
+  "DF_path": "C:\\Program Files\\Zuken\\CR-8000\\Design Force\\bin",
+  "exportANF": true,
+  "exportCMP": true,
+  "exportODB": true,
+  "exportEDB": false,
+  "preprocessing": {
+    "referencePolicy": "dcir_reference_v1",
+    "dcShort": {
+      "excludeNet": [
+        "DUMMY",
+        "ZUKEN_DUMMY",
+        "OUTLINES"
+      ],
+      "shortedComp": [
+        "SHORT_1005",
+        "SHORT_1005_BOT",
+        "SHORT_3030",
+        "SHORT_NARROW_1MM",
+        "SHORT_ZEROFUSE_M10MM",
+        "SHORT_ZEROFUSE_M10MM_0.12"
+      ],
+      "shortKey": "SIGN",
+      "excludePrefixes": [
+        "AR",
+        "JK",
+        "P",
+        "IC",
+        "X",
+        "D"
+      ],
+      "deleteCompTypes": [
+        "IC",
+        "IO",
+        "Other"
+      ],
+      "powerNetKeywords": [
+        "+",
+        "-",
+        "V",
+        "PWR"
+      ]
+    },
+    "BOM": {
+      "colKey": [
+        "Description",
+        "Designator"
+      ],
+      "designatorColumns": [
+        "Designator",
+        "Reference Designator"
+      ],
+      "expandedDesignatorPolicy": "parent_numeric_suffix"
+    }
+  },
+  "nets": {
+    "reference": "GND"
+  },
+  "BOM": {
+    "schemaVersion": 2,
+    "colKey": [
+      "Designator"
+    ],
+    "arrayResistanceSourceColumns": [
+      "Site Specification",
+      "Technical Spec",
+      "Description"
+    ]
+  },
+  "ports": {
+    "singleEndedImpedanceOhm": 50
+  },
+  "tdrReport": {
+    "yAxisMarginOhm": 30
+  },
+  "pcbCapture": {
+    "route": {
+      "enabled": true
+    },
+    "overview": {
+      "enabled": true
+    }
+  },
+  "analysisOptions": {
+    "defaults": {
+      "syzProfileId": "SYZ_DEFAULT",
+      "tdrProfileId": "TDR_DEFAULT"
+    },
+    "syz": {
+      "SYZ_DEFAULT": {
+        "sws": "SYZ_Default.sws",
+        "sfsdf": "SYZ_Default.sfsdf",
+        "sweepMode": "discrete",
+        "computeExactDcPoint": false,
+        "enforceCausality": false,
+        "enforcePassivity": false
+      }
+    },
+    "tdr": {
+      "TDR_DEFAULT": {
+        "file": "TDR_Default.json"
+      }
+    }
+  }
+}

@@ -18,6 +18,7 @@ import logging
 import ctypes
 import sys
 from collections import defaultdict
+from datetime import datetime
 from importlib import metadata as importlib_metadata
 from pathlib import Path
 
@@ -247,6 +248,116 @@ def log_runtime_preflight(logger: Logger, aedt_version: str) -> None:
             logger.log(f"[PREFLIGHT] {pkg_name} version: {importlib_metadata.version(pkg_name)}", level=LogLevel.DETAIL1)
         except Exception:
             logger.log(f"[PREFLIGHT][WARNING] Could not read package version: {pkg_name}", level=LogLevel.WARNING)
+
+
+def preflight_probe_siwave_com(logger: Logger, aedt_version: str) -> None:
+    enabled = os.environ.get("PDN_PREFLIGHT_SIWAVE_COM_CHECK", "").strip().lower()
+    if enabled in {"0", "false", "n", "no", "off"}:
+        logger.log("[PREFLIGHT] SIwave COM probe disabled by PDN_PREFLIGHT_SIWAVE_COM_CHECK=0.", level=LogLevel.WARNING)
+        return
+    if os.name != "nt":
+        logger.log("[PREFLIGHT] SIwave COM probe skipped on non-Windows platform.", level=LogLevel.DETAIL1)
+        return
+
+    strict_mode = os.environ.get("PDN_PREFLIGHT_SIWAVE_COM_STRICT", "").strip().lower() not in {
+        "0",
+        "false",
+        "n",
+        "no",
+        "off",
+    }
+    timeout_raw = os.environ.get("PDN_SIWAVE_COM_TIMEOUT_SEC", "").strip()
+    try:
+        timeout_sec = float(timeout_raw) if timeout_raw else 120.0
+    except Exception:
+        timeout_sec = 120.0
+    timeout_sec = max(20.0, timeout_sec)
+    retries_raw = os.environ.get("PDN_SIWAVE_COM_PROBE_RETRIES", "").strip()
+    try:
+        probe_retries = int(retries_raw) if retries_raw else 2
+    except Exception:
+        probe_retries = 2
+    probe_retries = max(1, probe_retries)
+
+    probe_code = "\n".join(
+        [
+            "import sys",
+            "import time",
+            "import traceback",
+            "from pyedb.siwave import Siwave",
+            "ver = sys.argv[1]",
+            "app = None",
+            "t0 = time.time()",
+            "try:",
+            "    app = Siwave(specified_version=ver)",
+            "    print(f'COM_PROBE_OK elapsed={time.time()-t0:.2f}s version={ver}', flush=True)",
+            "except Exception as e:",
+            "    print(f'COM_PROBE_ERROR {e}', flush=True)",
+            "    traceback.print_exc()",
+            "    raise",
+            "finally:",
+            "    try:",
+            "        if app:",
+            "            app.quit_application()",
+            "    except Exception:",
+            "        pass",
+        ]
+    )
+    cmd = [sys.executable, "-c", probe_code, aedt_version]
+    last_reason = ""
+    for attempt in range(1, probe_retries + 1):
+        cleanup_siwave_background_processes(logger)
+        logger.log(
+            f"[PREFLIGHT] Probing SIwave COM launch (attempt={attempt}/{probe_retries}, "
+            f"timeout={timeout_sec:.0f}s, version={aedt_version})...",
+            level=LogLevel.DETAIL1,
+        )
+        try:
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=timeout_sec,
+            )
+        except subprocess.TimeoutExpired:
+            last_reason = (
+                "[PREFLIGHT][SIWAVE_COM][TIMEOUT] "
+                f"attempt={attempt}/{probe_retries}, timeout={timeout_sec:.0f}s"
+            )
+            logger.log(last_reason, level=LogLevel.WARNING)
+            continue
+        except Exception as e:
+            last_reason = f"[PREFLIGHT][SIWAVE_COM][ERROR] probe execution failed: {e}"
+            logger.log(last_reason, level=LogLevel.WARNING)
+            continue
+
+        stdout = (result.stdout or "").strip()
+        stderr = (result.stderr or "").strip()
+        if result.returncode == 0:
+            if stdout:
+                logger.log(f"[PREFLIGHT] {stdout.splitlines()[-1]}", level=LogLevel.DETAIL1)
+            logger.log("[PREFLIGHT] SIwave COM probe passed.", level=LogLevel.DETAIL1)
+            return
+
+        if stdout:
+            logger.log(f"[PREFLIGHT][SIWAVE_COM][stdout]\n{stdout}", level=LogLevel.WARNING)
+        if stderr:
+            logger.log(f"[PREFLIGHT][SIWAVE_COM][stderr]\n{stderr}", level=LogLevel.WARNING)
+        last_reason = f"[PREFLIGHT][SIWAVE_COM][RC] attempt={attempt}/{probe_retries}, rc={result.returncode}"
+        logger.log(last_reason, level=LogLevel.WARNING)
+
+    fatal_msg = (
+        "[PREFLIGHT][FATAL] SIwave COM probe failed before Step 3. "
+        f"attempts={probe_retries}, timeout={timeout_sec:.0f}s, last={last_reason}. "
+        "Likely causes: blocked first-run popup, license dialog, or COM policy. "
+        "Run SIwave once manually as Administrator, close dialogs, then retry. "
+        "You can disable probe with PDN_PREFLIGHT_SIWAVE_COM_CHECK=0. "
+        "To continue despite failed probe, set PDN_PREFLIGHT_SIWAVE_COM_STRICT=0."
+    )
+    if strict_mode:
+        logger.fatal(fatal_msg)
+        raise SystemExit(1)
+    logger.log(fatal_msg, level=LogLevel.WARNING)
 
 def cleanup_failed_files(target_dir):
     patterns_to_delete = [
@@ -689,6 +800,45 @@ def assign_sparameter_models(
 def resolve_zparam_profile(conf_data, stackup_file: Path | None, layer_count: int | None):
     return pdn_setup_utils.resolve_zparam_profile(conf_data, stackup_file, layer_count)
 
+
+def resolve_pdn_setup_asset(file_name: str, working_dir: Path, input_dir: Path, logger: Logger | None = None) -> Path:
+    """Resolve PDN setup asset path with system layout priority.
+
+    Priority:
+    1) <input_dir>/Data/Library/PDN_setup
+    2) <input_dir>/Library/PDN_setup
+    3) <input_dir>/PDN_setup
+    4) <working_dir>/../PDN_setup
+    5) <working_dir>/PDN_setup
+    6) <working_dir>/core (legacy)
+    """
+    name = str(file_name or "").strip()
+    if not name:
+        return working_dir / "core"
+
+    candidates = [
+        input_dir / "Data" / "Library" / "PDN_setup" / name,
+        input_dir / "Library" / "PDN_setup" / name,
+        input_dir / "PDN_setup" / name,
+        working_dir.parent / "PDN_setup" / name,
+        working_dir / "PDN_setup" / name,
+        working_dir / "core" / name,
+    ]
+    for p in candidates:
+        if p.exists():
+            if logger:
+                logger.log(f"[PRE] PDN setup asset resolved: {name} -> {p}", level=LogLevel.DETAIL1)
+            return p
+
+    fallback = working_dir / "core" / name
+    if logger:
+        logger.log(
+            f"[PRE][WARNING] PDN setup asset not found in Data/Library/PDN_setup search roots: {name}. "
+            f"Fallback={fallback}",
+            level=LogLevel.WARNING,
+        )
+    return fallback
+
 def build_pre_stage_siw_snapshot(
     *,
     aedt_version: str,
@@ -728,7 +878,7 @@ def build_pre_stage_siw_snapshot(
             else:
                 raise RuntimeError(f"[PRE] Failed to import raw stackup file: {raw_stackup}")
         
-        sws_file = working_dir / 'core' / sws_name
+        sws_file = resolve_pdn_setup_asset(sws_name, working_dir, input_dir, logger)
         
         s2p_dir_conf = conf_data.get('PDN', {}).get('sParameter', {}).get('s2pDirectory', '')
         s2p_dir = None
@@ -1759,7 +1909,9 @@ def _build_pin_rows_multisource(comp_inst, components_api=None, cmp_pin_record=N
 def _load_pin_overrides(project_dir: Path):
     """
     Optional manual override table.
-    CSV headers: Designator, Spec_Pin, EDB_Pin
+    CSV headers:
+      - required: Designator, Spec_Pin, EDB_Pin
+      - optional: Expected_Net (or Spec_Net)
     """
     candidates = [
         project_dir / "pin_override.csv",
@@ -1776,8 +1928,12 @@ def _load_pin_overrides(project_dir: Path):
                     d = str(r.get("Designator", "")).strip().upper()
                     s = str(r.get("Spec_Pin", "")).strip().upper()
                     e = str(r.get("EDB_Pin", "")).strip()
+                    expected_net = str(r.get("Expected_Net", r.get("Spec_Net", "")) or "").strip()
                     if d and s and e:
-                        rows[(d, s)] = e
+                        rows[(d, s)] = {
+                            "edb_pin": e,
+                            "expected_net": expected_net,
+                        }
             return rows, p
         except Exception:
             return {}, p
@@ -3522,7 +3678,7 @@ def detect_solver_backend_from_preprocessing(output_dir: Path) -> str:
 
 
 def export_aedt_cutout_post_reports(output_dir: Path, logger: Logger):
-    """Generate minimal post artifacts for AEDT-cutout backend without SIwave result dependency."""
+    """Generate PDN_post-compatible artifacts for AEDT-cutout backend."""
     pre_file = output_dir / "preprocessing_result.json"
     cut_file = output_dir / "aedt_cutout_result.json"
     if not pre_file.exists() or not cut_file.exists():
@@ -3534,11 +3690,94 @@ def export_aedt_cutout_post_reports(output_dir: Path, logger: Logger):
         cut = json.load(f)
 
     by_case = {int(r.get("Case_Index")): r for r in (cut.get("Records", []) if isinstance(cut, dict) else [])}
+
+    def _basename(path_like):
+        try:
+            s = str(path_like or "").strip()
+            return Path(s).name if s else ""
+        except Exception:
+            return ""
+
+    def _fnum(val, default=0.0):
+        try:
+            return float(val)
+        except Exception:
+            return float(default)
+
+    request_meta = {
+        "model": "",
+        "year": "",
+        "requestDate": "",
+        "targetDate": "",
+        "event": "",
+        "socName": "",
+        "pcbPartNo": "",
+        "pcbRevision": "",
+        "stackup": "",
+        "bom": "",
+        "purpose": "",
+    }
+    tool_version = ""
+    try:
+        # Stage=post (aedt_cutout)에서도 request/title 정보를 PDN_post 포맷으로 유지.
+        sm = SettingsManager(INPUT_JSON, configuration=conf_manager, logger=logger)
+        sdata = sm.data or {}
+        req = sdata.get("Request", {}) if isinstance(sdata, dict) else {}
+        cae = sdata.get("CAE", {}) if isinstance(sdata, dict) else {}
+        pcb = cae.get("PCB", {}) if isinstance(cae, dict) else {}
+        soc = cae.get("SOC", {}) if isinstance(cae, dict) else {}
+        request_meta.update(
+            {
+                "model": str(req.get("Model", "") or ""),
+                "year": str(req.get("Year", "") or ""),
+                "requestDate": str(req.get("Start_date", "") or ""),
+                "targetDate": str(req.get("Target_date", "") or ""),
+                "event": str(req.get("Event", "") or ""),
+                "socName": str(soc.get("Name", "") or ""),
+                "pcbPartNo": str(pcb.get("PN", "") or ""),
+                "pcbRevision": str(pcb.get("Rev", "") or ""),
+                "stackup": _basename(pcb.get("Stackup", "")),
+                "bom": _basename(pcb.get("BOM", "")),
+                "purpose": str(cae.get("Purpose", "") or ""),
+            }
+        )
+    except Exception as meta_exc:
+        logger.log(f"[POST][AEDT][WARNING] Failed to load request metadata: {meta_exc}", level=LogLevel.WARNING)
+
+    try:
+        tool_version = str(conf_manager.data.get("PDN", {}).get("version", "")).replace(".", " R")
+    except Exception:
+        tool_version = ""
+
     summary = []
     for rec in pre if isinstance(pre, list) else []:
         idx = int(rec.get("Case_Index", 0) or 0)
         cr = by_case.get(idx, {})
         done = str(cr.get("Status", "")).lower() == "done"
+        inferred_profile = str(cr.get("Solve_Profile", "") or "").strip()
+        if not inferred_profile:
+            aedt_name = _basename(cr.get("Aedt_Project", "")).lower()
+            if "model_retry_substitute" in aedt_name:
+                inferred_profile = "model_retry_substitute"
+            elif "mesh_retry_expand" in aedt_name:
+                inferred_profile = "mesh_retry_expand"
+            elif "safe_minimal" in aedt_name:
+                inferred_profile = "safe_minimal"
+            else:
+                inferred_profile = "base"
+        inferred_model_sub = cr.get("Model_Substitute", [])
+        if (not inferred_model_sub) and ("model_retry_substitute" in inferred_profile):
+            inferred_model_sub = ["(inferred-from-project-name)"]
+        inferred_reliability = str(cr.get("Result_Reliability", "") or "").strip()
+        if not inferred_reliability:
+            inferred_reliability = "Reduced" if inferred_profile != "base" else "Nominal"
+        inferred_reliability_reason = str(cr.get("Result_Reliability_Reason", "") or "").strip()
+        if not inferred_reliability_reason:
+            inferred_reliability_reason = (
+                f"inferred profile={inferred_profile}"
+                if inferred_profile != "base"
+                else "profile=base"
+            )
         item = {
             "IC": rec.get("IC_Designator", ""),
             "IC_pin": rec.get("IC_Pin", ""),
@@ -3547,21 +3786,202 @@ def export_aedt_cutout_post_reports(output_dir: Path, logger: Logger):
             "Source_pin": rec.get("Source_Pin", ""),
             "Source_net": rec.get("Net_Chain", []),
             "Full_Net_Chain": rec.get("Full_Net_Chain", []),
+            "Vmag": _fnum(rec.get("Voltage_V", rec.get("Vmag", 0.0))),
+            "Imag": _fnum(rec.get("Current_A", rec.get("Imag", 0.0))),
+            "MinSpec": _fnum(rec.get("Min_Spec_V", rec.get("MinSpec", 0.0))),
+            "MaxSpec": _fnum(rec.get("Max_Spec_V", rec.get("MaxSpec", 0.0))),
+            "Result": "",
+            "Drop Voltage": "",
+            "Drop Rate": "",
+            "Pass/Fail": "",
             "is_done": done,
             "Status": "Complete" if done else "Error",
             "Backend": "aedt_cutout",
-            "Aedt_Project": cr.get("Aedt_Project", ""),
-            "Cutout_Edb": cr.get("Cutout_Edb", ""),
-            "Message": cr.get("Reason", "OK" if done else "Unknown"),
-            "Impedance_Plot": cr.get("Impedance_Plot", ""),
-            "Impedance_CSV": cr.get("Impedance_CSV", ""),
-            "Touchstone": cr.get("Touchstone", ""),
-            "FitView": cr.get("FitView", ""),
-            "ZoomView": cr.get("ZoomView", ""),
+            "Aedt_Project": _basename(cr.get("Aedt_Project", "")),
+            "Cutout_Edb": _basename(cr.get("Cutout_Edb", "")),
+            "Message": cr.get("Message", "OK" if done else "Unknown"),
+            "Impedance_Plot": _basename(cr.get("Impedance_Plot", "")),
+            "Impedance_CSV": _basename(cr.get("Impedance_CSV", "")),
+            "Touchstone": _basename(cr.get("Touchstone", "")),
+            "FitView": _basename(cr.get("FitView", "")),
+            "ZoomView": _basename(cr.get("ZoomView", "")),
+            "Failure_Label": cr.get("Failure_Label", ""),
+            "Failure_Detail": cr.get("Failure_Detail", ""),
+            "Setup_Name": cr.get("Setup_Name", ""),
+            "Sweep_Name": cr.get("Sweep_Name", ""),
+            "Ports": cr.get("Ports", []),
+            "Solve_Profile": inferred_profile,
+            "Model_Substitute": inferred_model_sub,
+            "Result_Reliability": inferred_reliability,
+            "Result_Reliability_Reason": inferred_reliability_reason,
         }
         summary.append(item)
 
+    def _safe_text(text):
+        return "".join(c for c in str(text or "") if c.isalnum() or c in ("_", "-")).strip("_-")
+
+    def _load_impedance_csv_points(csv_path: Path):
+        points = []
+        if not csv_path.exists():
+            return points
+        try:
+            with csv_path.open("r", encoding="utf-8", errors="ignore") as f:
+                header = (f.readline() or "").strip().lower()
+                freq_scale = 1.0
+                if "ghz" in header:
+                    freq_scale = 1e9
+                elif "mhz" in header:
+                    freq_scale = 1e6
+                elif "khz" in header:
+                    freq_scale = 1e3
+                for line in f:
+                    s = line.strip()
+                    if not s:
+                        continue
+                    parts = s.split(",")
+                    if len(parts) < 2:
+                        continue
+                    try:
+                        freq_hz = float(parts[0]) * freq_scale
+                        zmag = float(parts[1])
+                    except Exception:
+                        continue
+                    if freq_hz > 0 and zmag > 0:
+                        points.append((freq_hz, zmag))
+        except Exception:
+            return []
+        return points
+
+    def _export_zprofile_images(summary_rows, out_dir: Path):
+        try:
+            import matplotlib
+            matplotlib.use("Agg")
+            import matplotlib.pyplot as plt
+        except Exception as e:
+            logger.log(f"[POST][AEDT][WARNING] Matplotlib unavailable; z-profile plots skipped: {e}", level=LogLevel.WARNING)
+            return ""
+
+        max_freq_hz = 1e9
+        min_plot_freq_ghz = 1e-4
+        max_plot_freq_ghz = 1.0
+        imp_spec_ohm = 10.0
+
+        all_traces = []
+        for row in summary_rows:
+            csv_name = str(row.get("Impedance_CSV", "") or "").strip()
+            if not csv_name:
+                continue
+            csv_path = out_dir / csv_name
+            pts = _load_impedance_csv_points(csv_path)
+            pts = [p for p in pts if 0 < p[0] <= max_freq_hz and p[1] > 0]
+            if len(pts) < 1:
+                continue
+            freqs_hz = [p[0] for p in pts]
+            zvals = [p[1] for p in pts]
+            freqs_ghz = [f / 1e9 for f in freqs_hz]
+
+            port_label = ""
+            ports = row.get("Ports", [])
+            if isinstance(ports, list) and ports:
+                port_label = str(ports[0])
+            if not port_label:
+                port_label = f"{row.get('IC','')}_{row.get('Net','')}".strip("_")
+            safe_port = _safe_text(port_label) or "PORT"
+
+            fig = plt.figure(figsize=(14, 4.2))
+            if len(freqs_ghz) >= 2:
+                plt.plot(freqs_ghz, zvals, color="#00cc33", linewidth=1.4, label=port_label)
+            else:
+                plt.plot(freqs_ghz, zvals, "o", color="#00cc33", markersize=6, label=port_label)
+            plt.axhline(imp_spec_ohm, color="#d64545", linewidth=1.1, linestyle="--", label=f"Spec {imp_spec_ohm:.1f} Ohm")
+            plt.xscale("log")
+            plt.yscale("log")
+            plt.xlim(min_plot_freq_ghz, max_plot_freq_ghz)
+            plt.xlabel("Frequency [GHz]")
+            plt.ylabel("|Z| (Ohm)")
+            plt.title("Z-parameters")
+            plt.grid(which="both", color="#e0e0e0", linestyle="-", linewidth=0.7)
+            plt.minorticks_on()
+            try:
+                max_idx = max(range(len(zvals)), key=lambda i: zvals[i])
+                max_freq_ghz = freqs_ghz[max_idx]
+                max_z = zvals[max_idx]
+                plt.plot(max_freq_ghz, max_z, "o", color="green", markersize=6)
+                plt.annotate(
+                    f"Max: {max_z:.3g} Ohm @ {max_freq_ghz:.4g}GHz",
+                    xy=(max_freq_ghz, max_z),
+                    xytext=(max_freq_ghz, max_z * 1.2),
+                    arrowprops=dict(facecolor="green", shrink=0.05),
+                    fontsize=8,
+                    color="green",
+                )
+                row["maxImp"] = f"{max_z:.6f}"
+                row["maxImpFreq"] = f"{max_freq_ghz:.6f}GHz"
+                row["minFreq"] = f"{min(freqs_hz)/1e9:.6f}GHz"
+                row["maxFreq"] = f"{max(freqs_hz)/1e9:.3f}GHz"
+                row["impSpec"] = f"{imp_spec_ohm:.3f}"
+            except Exception:
+                pass
+            plt.legend(fontsize=7, loc="lower right")
+            plot_file = out_dir / f"{safe_port}_imp.png"
+            plt.savefig(str(plot_file), dpi=300, bbox_inches="tight")
+            plt.close(fig)
+            row["zPlot"] = plot_file.name
+            all_traces.append((port_label, freqs_ghz, zvals))
+
+        if not all_traces:
+            return ""
+
+        fig = plt.figure(figsize=(14, 4.2))
+        for label, fx, zv in all_traces:
+            if len(fx) >= 2:
+                plt.plot(fx, zv, linewidth=1.2, label=label)
+            else:
+                plt.plot(fx, zv, "o", markersize=5, label=label)
+        plt.axhline(imp_spec_ohm, color="#d64545", linewidth=1.1, linestyle="--", label=f"Spec {imp_spec_ohm:.1f} Ohm")
+        plt.xscale("log")
+        plt.yscale("log")
+        plt.xlim(min_plot_freq_ghz, max_plot_freq_ghz)
+        plt.xlabel("Frequency [GHz]")
+        plt.ylabel("|Z| (Ohm)")
+        plt.title("Z-parameters")
+        plt.grid(which="both", color="#e0e0e0", linestyle="-", linewidth=0.7)
+        plt.minorticks_on()
+        plt.legend(fontsize=6, loc="lower right")
+        all_plot = out_dir / "all_ports_imp.png"
+        plt.savefig(str(all_plot), dpi=300, bbox_inches="tight")
+        plt.close(fig)
+        return all_plot.name
+
+    all_zplot_name = _export_zprofile_images(summary, output_dir)
+
     now = time.strftime('%Y.%m.%d, %H:%M:%S')
+    title_payload = {
+        "model": request_meta["model"],
+        "revision": request_meta["pcbRevision"],
+        "date": datetime.now().strftime("%Y-%m-%d"),
+    }
+    request_payload = {
+        "modelInfo": {
+            "name": request_meta["model"],
+            "year": request_meta["year"],
+            "requestDate": request_meta["requestDate"],
+            "targetDate": request_meta["targetDate"],
+            "event": request_meta["event"],
+        },
+        "requestData": {
+            "socName": request_meta["socName"],
+            "pcbPartNo": request_meta["pcbPartNo"],
+            "pcbRevision": request_meta["pcbRevision"],
+            "Stackup": request_meta["stackup"],
+            "bom": request_meta["bom"],
+            "purpose": request_meta["purpose"],
+        },
+        "Image": {
+            "pcbTopImage": "top.png" if (output_dir / "top.png").exists() else "",
+            "pcbBtmImage": "btm.png" if (output_dir / "btm.png").exists() else "",
+        },
+    }
     result_payload = {
         "simSchedule": {"startDate": now, "endData": now},
         "summary": summary,
@@ -3581,20 +4001,24 @@ def export_aedt_cutout_post_reports(output_dir: Path, logger: Logger):
             },
             "viewerArtifacts": [],
         },
+        "zplot": all_zplot_name or ("all_ports_imp.png" if (output_dir / "all_ports_imp.png").exists() else ""),
     }
     setting_payload = {
-        "tool": {"comp": "ANSYS", "name": "AEDT-HFSS3DLayout", "version": ""},
+        "tool": {"comp": "ANSYS", "name": "AEDT-HFSS3DLayout", "version": tool_version},
+        "stackup": "stackup.xml",
         "setting": summary,
         "backend": "aedt_cutout",
     }
     for name, payload in (
+        ("title.json", title_payload),
+        ("request.json", request_payload),
         ("result.json", result_payload),
         ("result_detail.json", result_detail_payload),
         ("setting.json", setting_payload),
     ):
         with open(output_dir / name, "w", encoding="utf-8") as f:
             json.dump(payload, f, indent=2, ensure_ascii=False)
-    logger.log(f"[POST][AEDT] Exported minimal post reports for backend=aedt_cutout at {output_dir}", level=LogLevel.INFO)
+    logger.log(f"[POST][AEDT] Exported PDN_post-style reports for backend=aedt_cutout at {output_dir}", level=LogLevel.INFO)
 
 def run_standalone_post(conf_manager, input_json, output_dir, analysis_start=None, analysis_end=None):
     settings_manager = SettingsManager(input_json, configuration=conf_manager, logger=logger)
@@ -3904,16 +4328,34 @@ def run_pdn_unified(
 
 
 def resolve_solver_backend(layer_count: int | None, conf_data: dict, logger: Logger) -> str:
-    """Resolve PDN solve backend by policy and layer count."""
+    """Resolve PDN solve backend by stackup layer count.
+
+    Project policy:
+    - 2-layer  : AEDT 3D cutout backend
+    - 4+ layers: SIwave backend
+    - other/unknown: SIwave fallback (safer default)
+    """
     policy = str(
         conf_data.get("PDN", {}).get("setup", {}).get("solver_backend_policy", "auto")
     ).strip().lower()
+
     if policy == "force_aedt":
         backend = "aedt_cutout"
     elif policy == "force_siwave":
         backend = "siwave"
     else:
-        backend = "aedt_cutout" if (layer_count is not None and layer_count <= 2) else "siwave"
+        if layer_count == 2:
+            backend = "aedt_cutout"
+        elif layer_count is not None and layer_count >= 4:
+            backend = "siwave"
+        else:
+            backend = "siwave"
+            logger.log(
+                f"[BACKEND][WARNING] Non-standard layer_count={layer_count}. "
+                "Fallback to SIwave backend.",
+                level=LogLevel.WARNING,
+            )
+
     logger.log(
         f"[BACKEND] Solver backend resolved: {backend} (policy={policy}, layer_count={layer_count})",
         level=LogLevel.INFO,
@@ -3982,6 +4424,7 @@ try:
     conf_manager.data['PDN'] = conf_manager.data.get('PDN', {})
     AEDT_VERSION = conf_manager.data['PDN']['version']
     log_runtime_preflight(logger, AEDT_VERSION)
+    preflight_probe_siwave_com(logger, AEDT_VERSION)
     step += 1
 except Exception: logger.fatal(f"An error occurred while loading configurations: {traceback.format_exc()}")
 
@@ -4363,6 +4806,7 @@ try:
             classify_and_audit_analysis_nets_fn=classify_and_audit_analysis_nets,
             sync_edb_changes_to_siw_project_fn=sync_edb_changes_to_siw_project,
             resolve_zparam_profile_fn=resolve_zparam_profile,
+            resolve_pdn_setup_asset_fn=resolve_pdn_setup_asset,
             apply_dynamic_frequency_setup_fn=apply_dynamic_frequency_setup,
         )
         SWS_FILE = step5_state["SWS_FILE"]

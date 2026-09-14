@@ -1,0 +1,269 @@
+{
+  "schema": "si-tdr-customer-package-manifest/1",
+  "packageName": "si-tdr-customer-package",
+  "version": "1.0.0-rc.22",
+  "releaseDate": "2026-09-07",
+  "releaseStatus": "candidate",
+  "files": [
+    {
+      "path": "BUILD-INFO.json",
+      "sizeBytes": 352,
+      "sha256": "fbf6ed2eb452f8c3660adac1e303b7416c6a4d909273e99b2e23feca782a56f1"
+    },
+    {
+      "path": "core/__init__.py",
+      "sizeBytes": 78,
+      "sha256": "877a9aa0bffcb164a6fe979d5b8b395bf905a83ee81fb515cafeefaa367bfc0f"
+    },
+    {
+      "path": "core/admin_config.py",
+      "sizeBytes": 18246,
+      "sha256": "469e6a730f4e8f4d37f9c6c92dbab484a9e90628483392710deb59576cdd0a46"
+    },
+    {
+      "path": "core/channel/__init__.py",
+      "sizeBytes": 6389,
+      "sha256": "d3f6eeb2fc6acfa6eaec6a615dcafeb34b250874888f7162188500800baf3b10"
+    },
+    {
+      "path": "core/channel/aedb_lookup.py",
+      "sizeBytes": 6598,
+      "sha256": "661692a2be6537455f9a3e97ecf5f4b2f87e1885e921f6d31bfb8debfed5c6bd"
+    },
+    {
+      "path": "core/channel/analysis_options.py",
+      "sizeBytes": 14475,
+      "sha256": "0f190dc54213d3406705cfb7f9ce2e14bab5922d9cd31018915ee4e2384c5fa1"
+    },
+    {
+      "path": "core/channel/analysis_templates.py",
+      "sizeBytes": 4147,
+      "sha256": "9d11789b774816896eab0d509d89a0f374710338d3e4d6e8ec09a59f2176f796"
+    },
+    {
+      "path": "core/channel/array_mapping.py",
+      "sizeBytes": 4924,
+      "sha256": "d03c656c9a96d47d865ff323c8b41fceb934af3876a5fb5348dcd9596bac3cfe"
+    },
+    {
+      "path": "core/channel/array_model_result.py",
+      "sizeBytes": 13016,
+      "sha256": "18e2c66b342f54034c058283e63b7a9d64f9a7265925892ac891be7a980ab459"
+    },
+    {
+      "path": "core/channel/array_resistor_bom.py",
+      "sizeBytes": 23072,
+      "sha256": "47a4aff24f1bf1715e76efbf9619222b7a67c68d0505983bf1258e3f631d7f00"
+    },
+    {
+      "path": "core/channel/customer_components.py",
+      "sizeBytes": 48778,
+      "sha256": "1dc2e3d5a56ca579a27f2b138412c020b037bc65c95e38cfe752590e39125f0f"
+    },
+    {
+      "path": "core/channel/detailed_input.py",
+      "sizeBytes": 31142,
+      "sha256": "c39ec614c19d2c335cec9e7fe5c8cc9e4a54ef38d1cabdee768e9a3d13123d24"
+    },
+    {
+      "path": "core/channel/direction.py",
+      "sizeBytes": 5081,
+      "sha256": "1c5ada98c0c2cdad0fceeceaa59c424d6f9c40dd1c01d7618056cb7c6f0cf2a6"
+    },
+    {
+      "path": "core/channel/minimal_input.py",
+      "sizeBytes": 58003,
+      "sha256": "89e8a475cb1e63e4a6e287977f6d36a01346c91a57b7bfa497a2cf5cbf6a2969"
+    },
+    {
+      "path": "core/channel/part_library.py",
+      "sizeBytes": 34624,
+      "sha256": "9a3dacd206ce93b068afb75a6e0ce7c2d2d93ff391059a8c96506392210ac77f"
+    },
+    {
+      "path": "core/channel/path_traversal.py",
+      "sizeBytes": 31837,
+      "sha256": "78f85a39f5407f1c45740321811236fdd42c2bb38c8c1f10da0d59478bb8a0c2"
+    },
+    {
+      "path": "core/channel/port_contract.py",
+      "sizeBytes": 14285,
+      "sha256": "01d001344c30d6a66bf9c6b95c0bbf3f3f9003736072c0e9262a95bd80a36611"
+    },
+    {
+      "path": "core/channel/port_metadata.py",
+      "sizeBytes": 9906,
+      "sha256": "f631675b0fa868964cfe1b91dccaa0feb8d7d405e05e3d3112dcaa0877494c9f"
+    },
+    {
+      "path": "core/channel/run_config.py",
+      "sizeBytes": 23736,
+      "sha256": "bd2a744352a38d7185c1cb80e1ce12829df61f1229d4187f32285f27e2c9fab3"
+    },
+    {
+      "path": "core/channel/series_models.py",
+      "sizeBytes": 16462,
+      "sha256": "39cc44d69cd419cff30e722328b1baedd7a6c94edd504264eeefad75101471a7"
+    },
+    {
+      "path": "core/channel/target_band.py",
+      "sizeBytes": 19451,
+      "sha256": "79fc1cd725f04470e4ab6b7d883495110bf80ef9498a10701da2a0326d243eb5"
+    },
+    {
+      "path": "core/channel/targets.py",
+      "sizeBytes": 20499,
+      "sha256": "a7e72163f544bef8922a24c0cce216318505146231085a646470ef257396a04c"
+    },
+    {
+      "path": "core/channel/tdr_config.py",
+      "sizeBytes": 25425,
+      "sha256": "7385ec7754fd6e517030adf8c1a9f64ba40af1d27237bd71ff1bb1cdc3f22e61"
+    },
+    {
+      "path": "core/channel/time_range.py",
+      "sizeBytes": 68767,
+      "sha256": "b848a7a3db92ff5cdbd2ebba8c3a60f90907e6bba8420634b624202affe937f9"
+    },
+    {
+      "path": "core/config_generation.py",
+      "sizeBytes": 68191,
+      "sha256": "cecbbc3c2f0a6c3adaac54d66bdb03ee17021940d9733e0d4057ff794d60fc71"
+    },
+    {
+      "path": "core/config.json",
+      "sizeBytes": 2189,
+      "sha256": "53f86daa32b69bdaf14ffe545d0e9419745d9382fd6e6877ebf42f81f288efc1"
+    },
+    {
+      "path": "core/console_progress.py",
+      "sizeBytes": 13294,
+      "sha256": "b40f1ce22beda023cbaa4088a2155f7f210e4d76bc51f66e176799ffacba0977"
+    },
+    {
+      "path": "core/customer_pre_solve.py",
+      "sizeBytes": 66146,
+      "sha256": "b9efa90f16958eeae7e9bb8b63fda3527ba456ac7eb1a9ebaddffc4b6bd38c65"
+    },
+    {
+      "path": "core/docs/README.md",
+      "sizeBytes": 9967,
+      "sha256": "27cedf1533b5cf188102ce8f0acf5c7bc79bb525606f94dd2c85684eff5a3144"
+    },
+    {
+      "path": "core/docs/SI-TDR_User_Config_Guide.html",
+      "sizeBytes": 47621,
+      "sha256": "4d412061aa5a888d72acea0dc10a71d333d305cd7568c40b07c01b39d6504a6c"
+    },
+    {
+      "path": "core/fullbatch_publish.py",
+      "sizeBytes": 140365,
+      "sha256": "7e345628c66ac30507ee75018e0473e7102e301acb8596f0dbbb0cd0cb6e13f8"
+    },
+    {
+      "path": "core/job_inputs.py",
+      "sizeBytes": 12952,
+      "sha256": "b49b277838acb1b8df028940eeb430a21e7a8328986f9d3dfec1a2c7fac9da44"
+    },
+    {
+      "path": "core/marker_evaluation.py",
+      "sizeBytes": 4452,
+      "sha256": "44610c3f73d12100128749adc78be9b2bc670d934c5685ef42b61d709b9bee83"
+    },
+    {
+      "path": "core/pcb_capture.py",
+      "sizeBytes": 183627,
+      "sha256": "6f2b7e80ac076f3118428c09acb5fceb16272d661877cc36573dad4bc0ab69b9"
+    },
+    {
+      "path": "core/preprocess/__init__.py",
+      "sizeBytes": 1504,
+      "sha256": "17f4dfe9c3650a596137c5c58be28a89e0855c5a5363ac1b09be808df10db03d"
+    },
+    {
+      "path": "core/preprocess/ansys_backend.py",
+      "sizeBytes": 24704,
+      "sha256": "80f3fc53a50e1e18aa4facc0464623dbdb8d24852891acc93d8394a31309b9fa"
+    },
+    {
+      "path": "core/preprocess/bom.py",
+      "sizeBytes": 8072,
+      "sha256": "d99dd85e1d8b65d4d9dc018e6578526e30f3a4b0b9890faaf9c340890ba92962"
+    },
+    {
+      "path": "core/preprocess/contracts.py",
+      "sizeBytes": 16027,
+      "sha256": "e374d45e9f66acb191d4c260f09b9fb4ba06b74341a487ae583daae6c2b69602"
+    },
+    {
+      "path": "core/preprocess/external_request.py",
+      "sizeBytes": 16017,
+      "sha256": "df7bb3e0779d01127c64b77b7fbd36e9c94d451234dc670a3f96704d8e5762cd"
+    },
+    {
+      "path": "core/preprocess/public_artifacts.py",
+      "sizeBytes": 7319,
+      "sha256": "503405d0f6177aa72aeb02d58df09e59d61f6917ed407f2c817aabc8c6aa486d"
+    },
+    {
+      "path": "core/preprocess/reference_preprocessor.py",
+      "sizeBytes": 19366,
+      "sha256": "1266b529f4baed5b45e51bc641466f37dc054a3fae32a01b8f12947fe755705f"
+    },
+    {
+      "path": "core/preprocess/stackup.py",
+      "sizeBytes": 9683,
+      "sha256": "4d326a47326ab2823d23ee3ce5fcba71b2b90733d1e4c188531313fa0a3bd539"
+    },
+    {
+      "path": "core/result_export.py",
+      "sizeBytes": 45438,
+      "sha256": "1df9b06a8d6b3152263fec69181b23f6eaef279e846ad6b9ca30e92e291e4ea2"
+    },
+    {
+      "path": "core/runtime.py",
+      "sizeBytes": 255916,
+      "sha256": "b4ab5de797a1ed2ae40925ab2b1440df5568d51faea6649d938d152ea063b86d"
+    },
+    {
+      "path": "core/sfsdf_sweep.py",
+      "sizeBytes": 24987,
+      "sha256": "3895632b7656f89c1a66dd4edc0cfc398d9a28e221f26078e08a8e451458a7f6"
+    },
+    {
+      "path": "core/syz_options.py",
+      "sizeBytes": 3736,
+      "sha256": "8dd314bafd1e6a0d5c3d47bc1342fe0191f737ac1f3ccee43b9dc83105051f08"
+    },
+    {
+      "path": "core/syz_runtime.py",
+      "sizeBytes": 50360,
+      "sha256": "fdcbd49122315266e11a666385270590a1d210b020c1a6d45ead713c4231a27f"
+    },
+    {
+      "path": "core/tdr_endpoint_annotations.py",
+      "sizeBytes": 20559,
+      "sha256": "b9beedda9573baf05439c32d3e67a8a7f0e80e6be1b062c7345258046922f53c"
+    },
+    {
+      "path": "core/tdr_native_target_range.py",
+      "sizeBytes": 12151,
+      "sha256": "9d2c10e4f98cd4a19d96a902da278b92d5fda1eb24dacbeeca61042ca9771f83"
+    },
+    {
+      "path": "core/tdr_runtime.py",
+      "sizeBytes": 79755,
+      "sha256": "1f0f4ef560fa162c5a41ff0ab760bde6ffc18017815e4345161260487d95cdcf"
+    },
+    {
+      "path": "main.py",
+      "sizeBytes": 995,
+      "sha256": "7715fcbd77cd9053c373ac5beb72f7c1d352b4c12b756858d2ba13387320fbba"
+    },
+    {
+      "path": "requirements.txt",
+      "sizeBytes": 70,
+      "sha256": "52b21522147692bc2174e80e2f50d3572c4b4d4b5fffb760108a7d0d1a8e54db"
+    }
+  ]
+}

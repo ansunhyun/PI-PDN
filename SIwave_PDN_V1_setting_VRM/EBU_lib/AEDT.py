@@ -1,4 +1,4 @@
-﻿# coding=utf-8
+# coding=utf-8
 # <2025> ANSYS, Inc. Unauthorized use, distribution, or duplication is prohibited
 
 import json
@@ -2163,6 +2163,150 @@ class AEDT:
 
         return True, f"ok:components={comp_count},nets={len(net_set_u)}"
 
+    def _compute_cutout_board_bbox(self, cutout_path: Path):
+        """Return cutout board bbox as (min_x, min_y, max_x, max_y) in EDB length unit (usually meter)."""
+        try:
+            from pyaedt import Edb
+        except Exception:
+            return None
+        cutout_path = Path(cutout_path)
+        if not cutout_path.exists():
+            return None
+        edb = None
+        min_x = float("inf")
+        min_y = float("inf")
+        max_x = float("-inf")
+        max_y = float("-inf")
+        try:
+            edb = Edb(str(cutout_path), edbversion=self.version)
+            nets_obj = getattr(getattr(edb, "nets", None), "nets", {}) or {}
+            for _n, nobj in nets_obj.items():
+                try:
+                    prims = list(getattr(nobj, "primitives", []) or [])
+                except Exception:
+                    prims = []
+                for prim in prims:
+                    try:
+                        bbox = prim.bbox
+                        if not bbox or len(bbox) != 4:
+                            continue
+                        x1, y1, x2, y2 = [float(v) for v in bbox]
+                    except Exception:
+                        continue
+                    if x2 < x1:
+                        x1, x2 = x2, x1
+                    if y2 < y1:
+                        y1, y2 = y2, y1
+                    min_x = min(min_x, x1)
+                    min_y = min(min_y, y1)
+                    max_x = max(max_x, x2)
+                    max_y = max(max_y, y2)
+            if min_x == float("inf"):
+                return None
+            return (min_x, min_y, max_x, max_y)
+        except Exception:
+            return None
+        finally:
+            if edb:
+                try:
+                    edb.close_edb()
+                except Exception:
+                    pass
+
+    def _measure_case_port_boundary_margin_mm(self, cutout_path: Path, case: dict, gnd_net: str = "GND"):
+        """
+        Measure minimum distance from VRM termination pins to cutout boundary.
+        Returns (ok, margin_mm, detail).
+        """
+        try:
+            from pyaedt import Edb
+        except Exception as e:
+            return False, None, f"edb_import_failed:{e}"
+        bbox = self._compute_cutout_board_bbox(cutout_path)
+        if not bbox:
+            return False, None, "bbox_missing"
+        min_x, min_y, max_x, max_y = bbox
+
+        net = str(case.get("Display_Net", case.get("Spec_Net", case.get("Net", ""))))
+        token = self._safe(net)
+        target_name = f"Rvrm_{token}".upper()
+
+        edb = None
+        try:
+            edb = Edb(str(cutout_path), edbversion=self.version)
+            comps = getattr(getattr(edb, "_components", None), "components", {}) or {}
+            vrm_comp = None
+            for cname, comp in comps.items():
+                if str(cname).upper() == target_name:
+                    vrm_comp = comp
+                    break
+            if vrm_comp is None:
+                # fallback: prefix match if tokenization differs slightly
+                for cname, comp in comps.items():
+                    cu = str(cname).upper()
+                    if cu.startswith("RVRM_") and token in cu:
+                        vrm_comp = comp
+                        break
+
+            pin_pts = []
+            margin_source = "vrm_component"
+            if vrm_comp is not None:
+                for _pn, pin in getattr(vrm_comp, "pins", {}).items():
+                    try:
+                        px, py = float(pin.position[0]), float(pin.position[1])
+                    except Exception:
+                        continue
+                    pin_pts.append((px, py))
+            else:
+                # Termination-as-port mode may not have a physical RVRM component.
+                # Fall back to case-net pin cloud so PORT_MARGIN auto-retry still works.
+                margin_source = "case_net_fallback"
+                probe_nets = set()
+                for k in ("Net", "Spec_Net", "Display_Net"):
+                    nv = str(case.get(k, "") or "").strip().upper()
+                    if nv:
+                        probe_nets.add(nv)
+                for n in (case.get("Full_Net_Chain", []) or []):
+                    nv = str(n or "").strip().upper()
+                    if nv:
+                        probe_nets.add(nv)
+                gnd_u = str(gnd_net or "GND").strip().upper()
+                if gnd_u:
+                    probe_nets.add(gnd_u)
+
+                for _cname, comp in comps.items():
+                    for _pn, pin in getattr(comp, "pins", {}).items():
+                        try:
+                            pnet = str(getattr(pin, "net_name", "") or "").strip().upper()
+                            if pnet not in probe_nets:
+                                continue
+                            px, py = float(pin.position[0]), float(pin.position[1])
+                        except Exception:
+                            continue
+                        pin_pts.append((px, py))
+
+            if not pin_pts:
+                return False, None, f"vrm_component_missing:{target_name};fallback_pin_cloud_empty"
+
+            min_margin = float("inf")
+            for px, py in pin_pts:
+                d = min(px - min_x, max_x - px, py - min_y, max_y - py)
+                min_margin = min(min_margin, d)
+            if min_margin == float("inf"):
+                return False, None, "margin_calc_failed"
+
+            # EDB length is typically meter. Convert to mm.
+            margin_mm = float(min_margin) * 1000.0
+            return True, margin_mm, f"ok:mm={margin_mm:.3f}, vrm={target_name}, source={margin_source}, pins={len(pin_pts)}"
+        except Exception as e:
+            return False, None, f"margin_measure_failed:{e}"
+        finally:
+            if edb:
+                try:
+                    edb.close_edb()
+                except Exception:
+                    pass
+
     def _create_cutout_with_validation(
         self,
         source_edb_path: Path,
@@ -2194,7 +2338,7 @@ class AEDT:
             {
                 "label": "validated_expand",
                 "extent": str(extent_type),
-                "expand": max(float(expansion_size) * 1.5, float(expansion_size) + 0.0015),
+                "expand": max(float(expansion_size) * 2.2, float(expansion_size) + 0.0030),
                 "include_pg": False,
                 "check_terms": False,
             }
@@ -2203,7 +2347,7 @@ class AEDT:
             {
                 "label": "validated_conforming",
                 "extent": "Conforming",
-                "expand": max(float(expansion_size) * 2.0, float(expansion_size) + 0.0025),
+                "expand": max(float(expansion_size) * 2.6, float(expansion_size) + 0.0040),
                 "include_pg": False,
                 "check_terms": False,
             }
@@ -2673,6 +2817,52 @@ class AEDT:
                     except Exception:
                         pass
 
+    def _render_siwave_fit_zoom_images(
+        self,
+        edb_path: Path,
+        target_nets,
+        fit_view_path: Path,
+        zoom_view_path: Path,
+    ):
+        """SIwave-native fit/zoom capture (TDR-style API path, best-effort)."""
+        try:
+            from EBU_lib.SIwave import SIwave
+        except Exception as e:
+            self._log(f"[AEDT][IMG][WARNING] SIwave capture dependency unavailable: {e}", level=LogLevel.WARNING)
+            return False
+
+        app = None
+        try:
+            app = SIwave(version=self.version, logger=self.logger)
+            res = app.capture_fit_zoom_images_from_edb(
+                edb_path=Path(edb_path).resolve(),
+                target_nets=list(target_nets or []),
+                fit_view_path=Path(fit_view_path).resolve(),
+                zoom_view_path=Path(zoom_view_path).resolve(),
+            )
+            ok = bool((res or {}).get("ok"))
+            if ok:
+                self._log(
+                    f"[AEDT][IMG] SIwave-fit-selection exported: {Path(fit_view_path).name}, {Path(zoom_view_path).name}; "
+                    f"selected={(res or {}).get('selected_nets', [])}",
+                    level=LogLevel.INFO,
+                )
+            else:
+                self._log(
+                    f"[AEDT][IMG][WARNING] SIwave-fit-selection unavailable: {res}",
+                    level=LogLevel.WARNING,
+                )
+            return ok
+        except Exception as e:
+            self._log(f"[AEDT][IMG][WARNING] SIwave-fit-selection failed: {e}", level=LogLevel.WARNING)
+            return False
+        finally:
+            if app:
+                try:
+                    app.quit_application()
+                except Exception:
+                    pass
+
     def _render_fullboard_highlight_images(
         self,
         full_edb_path: Path,
@@ -2893,8 +3083,8 @@ class AEDT:
             raise RuntimeError(f"AEDT import failed: {e}")
 
         cut_cfg = conf_data.get("PDN", {}).get("setup", {}).get("aedtCutout", {})
-        extent_type = str(cut_cfg.get("extent_type", "Bounding"))
-        expansion_size = float(cut_cfg.get("expansion_size", 0.002))
+        extent_type = str(cut_cfg.get("extent_type", "Conforming"))
+        expansion_size = float(cut_cfg.get("expansion_size", 0.005))
         include_pingroups = bool(cut_cfg.get("include_pingroups", True))
         check_terminals = bool(cut_cfg.get("check_terminals", True))
         preserve_models = bool(cut_cfg.get("preserve_components_with_model", True))
@@ -2902,6 +3092,15 @@ class AEDT:
         model_safety_filter_enabled = bool(cut_cfg.get("model_safety_filter_enabled", True))
         sweep_force_recreate = bool(cut_cfg.get("sweep_force_recreate", True))
         safe_minimal_retry_enabled = bool(cut_cfg.get("safe_minimal_retry_enabled", True))
+        try:
+            port_boundary_min_margin_mm = float(cut_cfg.get("port_boundary_min_margin_mm", 5.0))
+        except Exception:
+            port_boundary_min_margin_mm = 5.0
+        try:
+            max_port_margin_retries = int(cut_cfg.get("port_boundary_margin_max_retries", 2))
+        except Exception:
+            max_port_margin_retries = 2
+        max_port_margin_retries = max(0, min(max_port_margin_retries, 6))
         seed_global = self._dedupe_keep_order(cut_cfg.get("model_substitute_seed", []) or [])
         if not seed_global:
             # Default safeguard for recurring low-compatibility embedded model in this project.
@@ -2998,7 +3197,7 @@ class AEDT:
                     },
                     {
                         "extent": extent_type,
-                        "expand": max(expansion_size * 1.8, expansion_size + 0.0015),
+                        "expand": max(expansion_size * 2.2, expansion_size + 0.0030),
                         "include_pg": False,  # mesh-safe: reduce inherited pin-groups
                         "check_terms": False,  # mesh-safe: avoid terminal carry-over complexity
                         "tag": "mesh_retry_expand",
@@ -3010,7 +3209,7 @@ class AEDT:
                     retry_profiles.append(
                         {
                             "extent": "Conforming",
-                            "expand": max(expansion_size * 2.0, expansion_size + 0.0020),
+                            "expand": max(expansion_size * 2.6, expansion_size + 0.0040),
                             "include_pg": False,
                             "check_terms": False,
                             "tag": "safe_minimal",
@@ -3019,6 +3218,7 @@ class AEDT:
                         }
                     )
                 model_sub_retry_count = 0
+                port_margin_retry_count = 0
                 model_sub_changes = {"disabled": [], "deleted": [], "missing": [], "errors": []}
 
                 for prof in retry_profiles:
@@ -3079,6 +3279,51 @@ class AEDT:
                         gnd_net=gnd,
                         safe_case=safe_case,
                     )
+                    # Port-boundary compensation: ensure VRM termination has minimum clearance to cutout edge.
+                    margin_ok, margin_mm, margin_detail = self._measure_case_port_boundary_margin_mm(
+                        cutout_path=profile_cutout,
+                        case=case,
+                        gnd_net=gnd,
+                    )
+                    if margin_ok and (margin_mm is not None) and (margin_mm < port_boundary_min_margin_mm):
+                        deficit_mm = max(0.0, float(port_boundary_min_margin_mm) - float(margin_mm))
+                        if port_margin_retry_count < max_port_margin_retries:
+                            port_margin_retry_count += 1
+                            extra_m = (deficit_mm / 1000.0) + 0.0015
+                            compensated_expand = max(
+                                float(prof_expand) + extra_m,
+                                max(float(prof_expand) * 1.35, float(prof_expand) + 0.0025),
+                            )
+                            retry_tag = f"port_margin_retry_{port_margin_retry_count}"
+                            retry_profiles.append(
+                                {
+                                    "extent": "Conforming",
+                                    "expand": compensated_expand,
+                                    "include_pg": False,
+                                    "check_terms": False,
+                                    "tag": retry_tag,
+                                    "model_substitute": list(prof_model_substitute or []),
+                                    "safety_aggressive": True,
+                                }
+                            )
+                            self._log(
+                                f"[AEDT][CUTOUT][PORT_MARGIN] case#{idx} ({prof_tag}): margin={margin_mm:.3f}mm < "
+                                f"target={port_boundary_min_margin_mm:.3f}mm. "
+                                f"Scheduled {retry_tag} with expansion={compensated_expand:.6f}",
+                                level=LogLevel.WARNING,
+                            )
+                            continue
+                        else:
+                            self._log(
+                                f"[AEDT][CUTOUT][PORT_MARGIN][WARNING] case#{idx} ({prof_tag}): "
+                                f"margin still low ({margin_mm:.3f}mm), retry limit reached. detail={margin_detail}",
+                                level=LogLevel.WARNING,
+                            )
+                    elif not margin_ok:
+                        self._log(
+                            f"[AEDT][CUTOUT][PORT_MARGIN][WARNING] case#{idx} ({prof_tag}): measure failed: {margin_detail}",
+                            level=LogLevel.WARNING,
+                        )
                     _bom_cap_changes = self._apply_bom_capacitor_policy(
                         cutout_path=profile_cutout,
                         signal_nets=signal_nets,
@@ -3355,7 +3600,7 @@ class AEDT:
                                 retry_profiles.append(
                                     {
                                         "extent": prof_extent,
-                                        "expand": max(prof_expand, max(expansion_size * 1.8, expansion_size + 0.0015)),
+                                        "expand": max(prof_expand, max(expansion_size * 2.2, expansion_size + 0.0030)),
                                         "include_pg": False,
                                         "check_terms": False,
                                         "tag": retry_tag,
@@ -3439,175 +3684,183 @@ class AEDT:
                         )
                         base_detail = solve_fail_detail or "Solve did not produce valid solution data."
                         failure_detail = f"{base_detail} | {sub_summary}"
-                        msg = "OK (solve failed, export skipped)"
+                        msg = "OK (solve failed, export skipped, image only)"
                         self._log(
                             f"[AEDT][ART][WARNING] Export skipped for case#{idx}: {failure_label} | {failure_detail}",
                             level=LogLevel.WARNING,
                         )
-                        raise RuntimeError(failure_detail)
 
-                    port_catalog = self._build_port_catalog(
-                        h3dl=h3dl,
-                        cutout_path=active_cutout_path,
-                        ensured_ports=ensured_ports,
-                    )
-                    ports = self._pick_case_ports(port_catalog, case, safe_case)
-                    self._log(
-                        f"[AEDT][ART] Ports detected for case#{idx}: usable={ports}, "
-                        f"sources={port_catalog.get('by_source', {})}",
-                        level=LogLevel.DETAIL1,
-                    )
-                    setup_name = str(solve_setup_name or "")
-                    sweep_name = str(solve_sweep_name or "")
-                    if not setup_name:
-                        setup_name, sweep_name = self._ensure_sweep_for_touchstone(h3dl, setup, idx)
-                    self._log(
-                        f"[AEDT][ART] Setup/Sweep selected for case#{idx}: setup={setup_name}, sweep={sweep_name or '<none>'}",
-                        level=LogLevel.DETAIL1,
-                    )
-                    solution_name = f"{setup_name} : {sweep_name}" if (setup_name and sweep_name) else setup_name
-
-                    if setup_name and ports:
-                        plot_name = f"Z_Param_{safe_case}"
-                        # Export touchstone first so report API issues do not block solver artifacts.
-                        ts_file = output_dir / f"{plot_name}.s1p"
-                        ts_errors = []
-                        touchstone, ts_err = self._export_touchstone_best_effort(
-                            h3dl,
-                            setup_name,
-                            sweep_name,
-                            ts_file,
-                            debug_case=safe_case,
-                            debug_output_dir=output_dir,
-                            export_port=(ports[0] if ports else None),
+                    if solve_ok:
+                        port_catalog = self._build_port_catalog(
+                            h3dl=h3dl,
+                            cutout_path=active_cutout_path,
+                            ensured_ports=ensured_ports,
                         )
-                        if (not touchstone) and ts_err:
-                            ts_errors.append(f"{ts_file}: {ts_err}")
-                        if (not touchstone) and ts_errors:
-                            failure_label = "EXPORT_API_NO_OUTPUT"
-                            failure_detail = " | ".join(ts_errors)
-                            self._log(
-                                f"[AEDT][ART][WARNING] Touchstone export failed for case#{idx}: {' | '.join(ts_errors)}",
-                                level=LogLevel.WARNING,
-                            )
-                        try:
-                            expressions = [f"mag(Z({p},{p}))" for p in ports]
-                            h3dl.post.create_report(
-                                expressions=expressions,
-                                setup_sweep_name=solution_name,
-                                domain="Sweep",
-                                plot_type="Rectangular Plot",
-                                plot_name=plot_name,
-                            )
-                            h3dl.post.export_report_to_jpg(str(output_dir), plot_name)
-                            h3dl.post.export_report_to_file(str(output_dir), plot_name, extension=".csv")
-                            jpg_candidates = sorted(output_dir.glob(f"{plot_name}*.jpg"))
-                            csv_candidates = sorted(output_dir.glob(f"{plot_name}*.csv"))
-                            if jpg_candidates and not z_plot.exists():
-                                z_plot = jpg_candidates[0]
-                            if csv_candidates and not z_csv.exists():
-                                z_csv = csv_candidates[0]
-                        except Exception as report_err:
-                            self._log(
-                                f"[AEDT][ART][WARNING] Report generation failed for case#{idx}: {report_err}",
-                                level=LogLevel.WARNING,
-                            )
-                            if not failure_label:
-                                failure_label = "REPORT_EXPORT_EXCEPTION"
-                                failure_detail = str(report_err)
-                    else:
-                        if not setup_name:
-                            failure_label = "NO_SETUP"
-                            failure_detail = "Setup name is empty; report/export step skipped."
-                        elif not ports:
-                            failure_label = "NO_PORTS"
-                            failure_detail = (
-                                f"No usable ports after catalog normalization. "
-                                f"all_ports={port_catalog.get('all_ports', [])}, "
-                                f"errors={port_catalog.get('errors', {})}, "
-                                f"cutout={cutout_path}"
-                            )
-                        else:
-                            failure_label = "REPORT_EXPORT_SKIPPED"
-                            failure_detail = f"Report export skipped for setup={setup_name}, ports={ports}"
+                        ports = self._pick_case_ports(port_catalog, case, safe_case)
                         self._log(
-                            f"[AEDT][ART][WARNING] Report export skipped for case#{idx}: setup={setup_name}, ports={ports}",
-                            level=LogLevel.WARNING,
+                            f"[AEDT][ART] Ports detected for case#{idx}: usable={ports}, "
+                            f"sources={port_catalog.get('by_source', {})}",
+                            level=LogLevel.DETAIL1,
                         )
+                        setup_name = str(solve_setup_name or "")
+                        sweep_name = str(solve_sweep_name or "")
+                        if not setup_name:
+                            setup_name, sweep_name = self._ensure_sweep_for_touchstone(h3dl, setup, idx)
+                        self._log(
+                            f"[AEDT][ART] Setup/Sweep selected for case#{idx}: setup={setup_name}, sweep={sweep_name or '<none>'}",
+                            level=LogLevel.DETAIL1,
+                        )
+                        solution_name = f"{setup_name} : {sweep_name}" if (setup_name and sweep_name) else setup_name
 
-                    if not touchstone:
-                        extra_roots = []
-                        for attr_name in ("project_path", "working_directory"):
+                        if setup_name and ports:
+                            plot_name = f"Z_Param_{safe_case}"
+                            # Export touchstone first so report API issues do not block solver artifacts.
+                            ts_file = output_dir / f"{plot_name}.s1p"
+                            ts_errors = []
+                            touchstone, ts_err = self._export_touchstone_best_effort(
+                                h3dl,
+                                setup_name,
+                                sweep_name,
+                                ts_file,
+                                debug_case=safe_case,
+                                debug_output_dir=output_dir,
+                                export_port=(ports[0] if ports else None),
+                            )
+                            if (not touchstone) and ts_err:
+                                ts_errors.append(f"{ts_file}: {ts_err}")
+                            if (not touchstone) and ts_errors:
+                                failure_label = "EXPORT_API_NO_OUTPUT"
+                                failure_detail = " | ".join(ts_errors)
+                                self._log(
+                                    f"[AEDT][ART][WARNING] Touchstone export failed for case#{idx}: {' | '.join(ts_errors)}",
+                                    level=LogLevel.WARNING,
+                                )
                             try:
-                                v = getattr(h3dl, attr_name, None)
-                            except Exception:
-                                v = None
-                            if v:
-                                extra_roots.append(v)
-                        ts_found = self._find_touchstone_artifact(
-                            output_dir,
-                            active_aedt_proj,
-                            safe_case,
-                            extra_roots=extra_roots,
-                        )
-                        if ts_found:
-                            touchstone = str(ts_found)
-                    if touchstone:
-                        failure_label = ""
-                        failure_detail = ""
-                    elif not failure_label:
-                        failure_label = "TOUCHSTONE_NOT_FOUND"
-                        failure_detail = (
-                            "Touchstone was not generated by export APIs and not found by artifact scan."
-                        )
+                                expressions = [f"mag(Z({p},{p}))" for p in ports]
+                                h3dl.post.create_report(
+                                    expressions=expressions,
+                                    setup_sweep_name=solution_name,
+                                    domain="Sweep",
+                                    plot_type="Rectangular Plot",
+                                    plot_name=plot_name,
+                                )
+                                h3dl.post.export_report_to_jpg(str(output_dir), plot_name)
+                                h3dl.post.export_report_to_file(str(output_dir), plot_name, extension=".csv")
+                                jpg_candidates = sorted(output_dir.glob(f"{plot_name}*.jpg"))
+                                csv_candidates = sorted(output_dir.glob(f"{plot_name}*.csv"))
+                                if jpg_candidates and not z_plot.exists():
+                                    z_plot = jpg_candidates[0]
+                                if csv_candidates and not z_csv.exists():
+                                    z_csv = csv_candidates[0]
+                            except Exception as report_err:
+                                self._log(
+                                    f"[AEDT][ART][WARNING] Report generation failed for case#{idx}: {report_err}",
+                                    level=LogLevel.WARNING,
+                                )
+                                if not failure_label:
+                                    failure_label = "REPORT_EXPORT_EXCEPTION"
+                                    failure_detail = str(report_err)
+                        else:
+                            if not setup_name:
+                                failure_label = "NO_SETUP"
+                                failure_detail = "Setup name is empty; report/export step skipped."
+                            elif not ports:
+                                failure_label = "NO_PORTS"
+                                failure_detail = (
+                                    f"No usable ports after catalog normalization. "
+                                    f"all_ports={port_catalog.get('all_ports', [])}, "
+                                    f"errors={port_catalog.get('errors', {})}, "
+                                    f"cutout={cutout_path}"
+                                )
+                            else:
+                                failure_label = "REPORT_EXPORT_SKIPPED"
+                                failure_detail = f"Report export skipped for setup={setup_name}, ports={ports}"
+                            self._log(
+                                f"[AEDT][ART][WARNING] Report export skipped for case#{idx}: setup={setup_name}, ports={ports}",
+                                level=LogLevel.WARNING,
+                            )
 
-                    if touchstone and (not z_plot.exists() or not z_csv.exists()):
-                        self._write_impedance_artifacts_from_touchstone(
-                            ts_path=Path(touchstone),
-                            z_csv=z_csv,
-                            z_plot=z_plot,
-                        )
+                        if not touchstone:
+                            extra_roots = []
+                            for attr_name in ("project_path", "working_directory"):
+                                try:
+                                    v = getattr(h3dl, attr_name, None)
+                                except Exception:
+                                    v = None
+                                if v:
+                                    extra_roots.append(v)
+                            ts_found = self._find_touchstone_artifact(
+                                output_dir,
+                                active_aedt_proj,
+                                safe_case,
+                                extra_roots=extra_roots,
+                            )
+                            if ts_found:
+                                touchstone = str(ts_found)
+                        if touchstone:
+                            failure_label = ""
+                            failure_detail = ""
+                        elif not failure_label:
+                            failure_label = "TOUCHSTONE_NOT_FOUND"
+                            failure_detail = (
+                                "Touchstone was not generated by export APIs and not found by artifact scan."
+                            )
 
-                    # Image policy: DCIR-style PyVista capture first.
-                    # Prefer reference EDB first to avoid "same EDB opened twice" conflicts
-                    # while AEDT/H3DL session keeps cutout EDB handles alive.
-                    dcir_primary_edb = Path(ref_edb_path).resolve()
-                    dcir_fallback_edb = Path(active_cutout_path).resolve()
-                    dcir_style_ok = self._render_dcir_style_net_path_images(
-                        edb_path=dcir_primary_edb,
+                        if touchstone and (not z_plot.exists() or not z_csv.exists()):
+                            self._write_impedance_artifacts_from_touchstone(
+                                ts_path=Path(touchstone),
+                                z_csv=z_csv,
+                                z_plot=z_plot,
+                            )
+
+                    # Image policy:
+                    # 1) SIwave-native fit-selection capture first (TDR-style)
+                    # 2) DCIR-style PyVista fallback
+                    # 3) Full-board highlight fallback
+                    siwave_img_ok = self._render_siwave_fit_zoom_images(
+                        edb_path=Path(ref_edb_path).resolve(),
                         target_nets=signal_nets,
                         fit_view_path=fit_view,
                         zoom_view_path=zoom_view,
-                        ic_name=str(case.get("IC", "")).strip(),
-                        source_name=str(case.get("Source_name", "")).strip(),
                     )
-                    if (not dcir_style_ok) and (dcir_fallback_edb != dcir_primary_edb):
-                        self._log(
-                            f"[AEDT][IMG] DCIR-style retry from cutout EDB for case={safe_case}",
-                            level=LogLevel.DETAIL1,
-                        )
+                    if not siwave_img_ok:
+                        dcir_primary_edb = Path(ref_edb_path).resolve()
+                        dcir_fallback_edb = Path(active_cutout_path).resolve()
                         dcir_style_ok = self._render_dcir_style_net_path_images(
-                            edb_path=dcir_fallback_edb,
+                            edb_path=dcir_primary_edb,
                             target_nets=signal_nets,
                             fit_view_path=fit_view,
                             zoom_view_path=zoom_view,
                             ic_name=str(case.get("IC", "")).strip(),
                             source_name=str(case.get("Source_name", "")).strip(),
                         )
-                    if not dcir_style_ok:
-                        fullboard_img_ok = self._render_fullboard_highlight_images(
-                            full_edb_path=ref_edb_path,
-                            target_nets=signal_nets,
-                            fit_view_path=fit_view,
-                            zoom_view_path=zoom_view,
-                            title_text=f"{ic} | {net}",
-                        )
-                        if not fullboard_img_ok:
-                            preview_ok = h3dl.export_design_preview_to_jpg(str(fit_view))
-                            if (preview_ok is False) or (not fit_view.exists()):
-                                msg = "OK (solve done, image unavailable)"
-                            else:
-                                shutil.copy2(fit_view, zoom_view)
+                        if (not dcir_style_ok) and (dcir_fallback_edb != dcir_primary_edb):
+                            self._log(
+                                f"[AEDT][IMG] DCIR-style retry from cutout EDB for case={safe_case}",
+                                level=LogLevel.DETAIL1,
+                            )
+                            dcir_style_ok = self._render_dcir_style_net_path_images(
+                                edb_path=dcir_fallback_edb,
+                                target_nets=signal_nets,
+                                fit_view_path=fit_view,
+                                zoom_view_path=zoom_view,
+                                ic_name=str(case.get("IC", "")).strip(),
+                                source_name=str(case.get("Source_name", "")).strip(),
+                            )
+                        if not dcir_style_ok:
+                            fullboard_img_ok = self._render_fullboard_highlight_images(
+                                full_edb_path=ref_edb_path,
+                                target_nets=signal_nets,
+                                fit_view_path=fit_view,
+                                zoom_view_path=zoom_view,
+                                title_text=f"{ic} | {net}",
+                            )
+                            if not fullboard_img_ok:
+                                preview_ok = h3dl.export_design_preview_to_jpg(str(fit_view))
+                                if (preview_ok is False) or (not fit_view.exists()):
+                                    msg = "OK (image unavailable)"
+                                else:
+                                    shutil.copy2(fit_view, zoom_view)
                 except Exception as artifact_err:
                     if solve_ok:
                         self._log(
@@ -3881,6 +4134,14 @@ class AEDT:
                     edb.close_edb()
                 except Exception:
                     pass
+
+
+
+
+
+
+
+
 
 
 

@@ -4,6 +4,7 @@
 import clr
 import os
 import time
+import shutil
 from pathlib import Path
 
 clr.AddReference("System.Core")
@@ -92,6 +93,46 @@ class SIwave:
                 except Exception:
                     continue
         return getattr(self.siw_app, "oeditor", None)
+
+    def _maximize_window(self, key="siwave", retries=8, interval_sec=0.8):
+        """Best-effort SIwave window maximize for higher-quality ScrSaveToPngFile capture."""
+        try:
+            import win32con
+            import win32gui
+        except Exception:
+            return False
+
+        def _enum_windows(hwnd, windows):
+            try:
+                if win32gui.IsWindowVisible(hwnd):
+                    title = win32gui.GetWindowText(hwnd) or ""
+                    cls = win32gui.GetClassName(hwnd) or ""
+                    if title or cls:
+                        windows.append((hwnd, title, cls))
+            except Exception:
+                pass
+            return True
+
+        key_l = str(key or "").lower()
+        for _ in range(max(1, int(retries))):
+            hwnd = None
+            windows = []
+            try:
+                win32gui.EnumWindows(_enum_windows, windows)
+            except Exception:
+                return False
+            for h, title, _ in windows:
+                if key_l in title.lower():
+                    hwnd = h
+                    break
+            if hwnd:
+                try:
+                    win32gui.ShowWindow(hwnd, win32con.SW_MAXIMIZE)
+                    return True
+                except Exception:
+                    return False
+            time.sleep(max(0.1, float(interval_sec)))
+        return False
 
     def _com_owners(self):
         """Return available COM owners safely for version-agnostic fallback."""
@@ -558,21 +599,9 @@ class SIwave:
                     except Exception:
                         pass
 
-                    # Try component-definition assignment path as fallback.
-                    try:
-                        part_name = getattr(comp, "part_name", None)
-                        definitions = getattr(self.edb._components, "definitions", {})
-                        comp_def = definitions.get(part_name) if part_name and isinstance(definitions, dict) else None
-                        if comp_def and hasattr(comp_def, "assign_s_param_model"):
-                            comp_def.assign_s_param_model(str(s2p_path), model_name=model_name, reference_net=None)
-                            if self.logger and self._log_each_sparam_assignment:
-                                self.logger.log(
-                                    f"[SParam] Assigned via EDB component_def.assign_s_param_model: {component_name}({part_name}) -> {s2p_path}",
-                                    level=LogLevel.DETAIL2,
-                                )
-                            return True
-                    except Exception:
-                        pass
+                    # Intentionally avoid component-definition-level assignment here.
+                    # Definition scope can propagate one model to heterogeneous instances
+                    # and create pin-count/N-port mismatches during cutout solves.
 
                     # Legacy/variant API names.
                     for method_name in (
@@ -771,7 +800,10 @@ class SIwave:
                 temp_app.open_project(str(out_path))
                 try:
                     temp_app.oSiwave.RestoreWindow()
+                    temp_app._maximize_window("siwave")
+                    time.sleep(0.5)
                     temp_app.oproject.ScrFitAll()
+                    time.sleep(0.2)
                     img_file = Path(output_dir) / f"{suffix[1:]}.png"
                     temp_app.oproject.ScrSaveToPngFile(str(img_file))
                 finally:
@@ -779,3 +811,148 @@ class SIwave:
                     
         except Exception as e:
             if self.logger: self.logger.log(f"Export Layer Images Failed: {e}", level=LogLevel.ERROR)
+
+
+    def capture_fit_zoom_images_from_edb(self, edb_path, target_nets, fit_view_path, zoom_view_path):
+        """
+        Best-effort SIwave-native Fit/Zoom capture from EDB.
+        Flow:
+          1) import EDB
+          2) fit-view: full-board (ScrFitAll) with target-net highlight
+          3) zoom-view: target-net focused (ScrFitSelection)
+        """
+        edb_path = Path(edb_path).resolve()
+        fit_view_path = Path(fit_view_path).resolve()
+        zoom_view_path = Path(zoom_view_path).resolve()
+        fit_view_path.parent.mkdir(parents=True, exist_ok=True)
+
+        nets = [str(n).strip() for n in (target_nets or []) if str(n).strip()]
+        evidence = {
+            "status": "",
+            "selected_nets": [],
+            "fit_selection": False,
+            "zoom_selection": False,
+            "show_selected_only": None,
+            "fit_saved": False,
+            "zoom_saved": False,
+        }
+
+        try:
+            self.import_edb(str(edb_path))
+            try:
+                self.oSiwave.RestoreWindow()
+            except Exception:
+                pass
+            self._maximize_window("siwave")
+            time.sleep(0.3)
+
+            prj = self.oproject
+            if prj is None:
+                raise RuntimeError("oproject API unavailable in current SIwave backend")
+
+            fn_unselect = getattr(prj, "ScrUnselectAll", None)
+            fn_select_net = getattr(prj, "ScrSelectNet", None)
+            fn_fit_sel = getattr(prj, "ScrFitSelection", None)
+            fn_fit_all = getattr(prj, "ScrFitAll", None)
+            fn_show_sel_only = getattr(prj, "ScrShowSelectedNetsOnly", None)
+            fn_save_png = getattr(prj, "ScrSaveToPngFile", None)
+
+            if not fn_save_png:
+                raise RuntimeError("ScrSaveToPngFile API unavailable")
+
+            def _result_ok(ret):
+                if ret is None:
+                    return True
+                if isinstance(ret, bool):
+                    return ret
+                try:
+                    return str(ret).strip().lower() in {"", "true", "1", "ok", "success"}
+                except Exception:
+                    return True
+
+            def _select_targets():
+                chosen = []
+                if fn_unselect:
+                    try:
+                        fn_unselect()
+                    except Exception:
+                        pass
+                if (not fn_select_net) or (not nets):
+                    return chosen
+                for net in nets:
+                    try:
+                        ret = fn_select_net(net, 1)
+                        if _result_ok(ret):
+                            chosen.append(net)
+                    except Exception:
+                        continue
+                return chosen
+
+            # Fit view: full-board context with target nets highlighted.
+            selected_ok = _select_targets()
+            evidence["selected_nets"] = selected_ok
+            if fn_show_sel_only:
+                try:
+                    # Ensure full-board context remains visible for FitView.
+                    show_ret = fn_show_sel_only(0)
+                    evidence["show_selected_only"] = _result_ok(show_ret)
+                except Exception:
+                    evidence["show_selected_only"] = False
+            if fn_fit_all:
+                fn_fit_all()
+                evidence["fit_selection"] = False
+            elif selected_ok and fn_fit_sel:
+                # Fallback when ScrFitAll is unavailable.
+                try:
+                    fit_ret = fn_fit_sel()
+                    evidence["fit_selection"] = _result_ok(fit_ret)
+                except Exception:
+                    evidence["fit_selection"] = False
+            else:
+                raise RuntimeError("Neither ScrFitAll nor ScrFitSelection usable")
+            time.sleep(0.15)
+            save_fit_ret = fn_save_png(str(fit_view_path))
+            evidence["fit_saved"] = _result_ok(save_fit_ret) and fit_view_path.exists() and fit_view_path.stat().st_size > 0
+
+            # Zoom view: net-focused (former FitView behavior).
+            if selected_ok and fn_fit_sel:
+                selected_zoom = _select_targets()
+                evidence["zoom_selection"] = bool(selected_zoom)
+                if fn_show_sel_only:
+                    try:
+                        # Keep surrounding context visible in ZoomView.
+                        fn_show_sel_only(0)
+                    except Exception:
+                        pass
+                try:
+                    fn_fit_sel()
+                except Exception:
+                    if fn_fit_all:
+                        fn_fit_all()
+                time.sleep(0.15)
+                save_zoom_ret = fn_save_png(str(zoom_view_path))
+                evidence["zoom_saved"] = _result_ok(save_zoom_ret) and zoom_view_path.exists() and zoom_view_path.stat().st_size > 0
+            else:
+                if fit_view_path.exists():
+                    shutil.copy2(fit_view_path, zoom_view_path)
+                    evidence["zoom_saved"] = True
+
+            # Restore context view best-effort.
+            if fn_show_sel_only:
+                try:
+                    fn_show_sel_only(0)
+                except Exception:
+                    pass
+            if fn_unselect:
+                try:
+                    fn_unselect()
+                except Exception:
+                    pass
+
+            ok = bool(evidence["fit_saved"] and evidence["zoom_saved"])
+            evidence["status"] = "ok" if ok else "partial"
+            return {"ok": ok, **evidence}
+        except Exception as e:
+            if self.logger:
+                self.logger.log(f"[WARNING] SIwave fit/zoom capture failed: {e}", level=LogLevel.WARNING)
+            return {"ok": False, "status": "error", "error": str(e), **evidence}

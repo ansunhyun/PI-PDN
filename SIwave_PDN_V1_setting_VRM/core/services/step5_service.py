@@ -71,6 +71,7 @@ def configure_step5_settings(
     classify_and_audit_analysis_nets_fn,
     sync_edb_changes_to_siw_project_fn,
     resolve_zparam_profile_fn,
+    resolve_pdn_setup_asset_fn,
     apply_dynamic_frequency_setup_fn,
 ):
     log_signal_layer_thicknesses = conf_data.get("__log_signal_layer_thicknesses_fn__")
@@ -109,7 +110,10 @@ def configure_step5_settings(
             level=LogLevel.DETAIL1,
         )
 
-    sws_file = working_dir / "core" / sws_name
+    if callable(resolve_pdn_setup_asset_fn):
+        sws_file = resolve_pdn_setup_asset_fn(sws_name, working_dir, input_dir, logger)
+    else:
+        sws_file = working_dir / "core" / sws_name
 
     s2p_dir_conf = conf_data.get("PDN", {}).get("sParameter", {}).get("s2pDirectory", "")
     s2p_dir = Path(s2p_dir_conf) if s2p_dir_conf else None
@@ -136,8 +140,10 @@ def configure_step5_settings(
             bom_file_path=bom_file_path,
             search_roots=[input_dir, working_dir, output_dir] + resolved_candidates,
         )
-
-    vrm_setup_conf = conf_data.get("PDN", {}).get("vrmSetup", {})
+    vrm_setup_conf = dict(conf_data.get("PDN", {}).get("vrmSetup", {}) or {})
+    vrm_runtime = dict(vrm_setup_conf.get("__runtime__", {}) or {})
+    vrm_runtime["solver_backend"] = step5_backend
+    vrm_setup_conf["__runtime__"] = vrm_runtime
     vrm_records = configure_ports_and_vrms_fn(
         app=edb_ops_app,
         cases=pdn_cases_info,
@@ -263,6 +269,8 @@ def export_step5_preview_images(
     aedt_cls,
     safe_close_edb_session_fn,
 ):
+    # Keep Top/Bottom capture quality aligned with legacy DCIR report pipeline:
+    # prefer SIwave ScrSaveToPngFile capture for both backends.
     if step5_backend == "siwave":
         image_app = None
         try:
@@ -275,32 +283,34 @@ def export_step5_preview_images(
                 safe_close_edb_session_fn(image_app, logger, "step5-image-export")
                 image_app.quit_application()
     else:
+        image_app = None
         try:
-            aedt_image = aedt_cls(version=aedt_version, logger=logger)
-            aedt_image.export_edb_preview_images(
-                ref_edb_path=Path(final_edb_file_path),
-                output_dir=output_dir,
-            )
+            image_app = siwave_cls(version=aedt_version, logger=logger)
+            image_app.set_cad_file(str(final_edb_file_path))
+            image_app.export_layer_images(ref_siwave_file_path, output_dir, gnd_net)
+            image_app.close_edb()
+            logger.log("[AEDT][IMG] SIwave capture mode applied for top/btm images.", level=LogLevel.INFO)
         except Exception as img_exc:
             logger.log(
-                f"[AEDT][IMG][WARNING] Preview image export failed but workflow will continue: {img_exc}",
+                f"[AEDT][IMG][WARNING] SIwave capture failed. Fallback to offline EDB renderer: {img_exc}",
                 level=LogLevel.WARNING,
             )
             try:
-                image_app = siwave_cls(version=aedt_version, logger=logger)
-                image_app.set_cad_file(str(final_edb_file_path))
-                image_app.export_layer_images(ref_siwave_file_path, output_dir, gnd_net)
-                image_app.close_edb()
-                logger.log("[AEDT][IMG] Fallback SIwave layer image export succeeded.", level=LogLevel.INFO)
+                aedt_image = aedt_cls(version=aedt_version, logger=logger)
+                aedt_image.export_edb_preview_images(
+                    ref_edb_path=Path(final_edb_file_path),
+                    output_dir=output_dir,
+                )
+                logger.log("[AEDT][IMG] Offline EDB preview fallback succeeded.", level=LogLevel.INFO)
             except Exception as fallback_exc:
-                logger.log(f"[AEDT][IMG][WARNING] Fallback SIwave image export failed: {fallback_exc}", level=LogLevel.WARNING)
-            finally:
-                try:
-                    if "image_app" in locals() and image_app:
-                        safe_close_edb_session_fn(image_app, logger, "step5-image-fallback")
-                        image_app.quit_application()
-                except Exception:
-                    pass
+                logger.log(f"[AEDT][IMG][WARNING] Offline EDB preview fallback failed: {fallback_exc}", level=LogLevel.WARNING)
+        finally:
+            try:
+                if "image_app" in locals() and image_app:
+                    safe_close_edb_session_fn(image_app, logger, "step5-image-export")
+                    image_app.quit_application()
+            except Exception:
+                pass
 
 
 def emit_step5_pre_stage_records(

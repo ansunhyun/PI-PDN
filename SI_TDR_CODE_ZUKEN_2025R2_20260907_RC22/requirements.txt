@@ -1,0 +1,4 @@
+Pillow==10.2.0
+pyaedt==0.17.2
+ansys-pythonnet==3.1.0rc6
+pyedb==0.50.1

@@ -1,2 +1,2 @@
-﻿"Designator","Spec_Pin","EDB_Pin"
-"IC100","V31","V31"
+﻿"Designator","Spec_Pin","EDB_Pin","Expected_Net"
+"IC100","V31","AJ16","+D1V8"

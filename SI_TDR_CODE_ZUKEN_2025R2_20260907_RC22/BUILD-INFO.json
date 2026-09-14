@@ -1,0 +1,10 @@
+{
+  "packageName": "si-tdr-customer-package",
+  "version": "1.0.0-rc.22",
+  "releaseDate": "2026-09-07",
+  "releaseStatus": "candidate",
+  "gitCommit": "35ed8fc7b1d7",
+  "sourceTreeState": "dirty",
+  "administratorConfigSha256": "53f86daa32b69bdaf14ffe545d0e9419745d9382fd6e6877ebf42f81f288efc1",
+  "buildDate": "2026-09-07T18:43:46+09:00"
+}

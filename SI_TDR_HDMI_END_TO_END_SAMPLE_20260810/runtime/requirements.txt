@@ -1,3 +1,0 @@
-matplotlib==3.10.5
-pyaedt==0.17.2
-pyedb==0.50.1

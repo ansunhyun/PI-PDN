@@ -45,6 +45,43 @@ def detect_s2p_port_count(s2p_file: Path | str):
     return 2
 
 
+def _touchstone_freq_multiplier_from_header(line: str):
+    tok = [t.strip().upper() for t in str(line or "").split() if t.strip()]
+    for unit, mul in (("GHZ", 1e9), ("MHZ", 1e6), ("KHZ", 1e3), ("HZ", 1.0)):
+        if unit in tok:
+            return mul
+    return 1.0
+
+
+def detect_touchstone_freq_max_hz(s2p_file: Path | str):
+    try:
+        path = Path(s2p_file)
+        if not path.exists():
+            return None
+        freq_mul = 1.0
+        fmax = None
+        with open(path, "r", encoding="utf-8", errors="ignore") as f:
+            for raw in f:
+                line = str(raw).strip()
+                if not line or line.startswith("!"):
+                    continue
+                if line.startswith("#"):
+                    freq_mul = _touchstone_freq_multiplier_from_header(line)
+                    continue
+                vals = [v for v in re.split(r"\s+", line) if v]
+                if not vals:
+                    continue
+                try:
+                    freq_hz = float(vals[0]) * freq_mul
+                except Exception:
+                    continue
+                if fmax is None or freq_hz > fmax:
+                    fmax = freq_hz
+        return fmax
+    except Exception:
+        return None
+
+
 def _norm_part_token(text: str):
     return re.sub(r"[^A-Za-z0-9]", "", str(text or "").upper())
 
@@ -175,6 +212,7 @@ def assign_sparameter_models(
 
     records = []
     reason_counter = {}
+    min_required_hz = 1e9  # Cutout solve policy: require coverage up to 1GHz.
 
     def append_record(comp_name, category, maker_pn, s2p_path, status, reason="", assign_ok=False, port_count=None, pos_pin="", neg_pin=""):
         if reason:
@@ -229,12 +267,31 @@ def assign_sparameter_models(
         port_count = detect_s2p_port_count(s2p_path)
         pins = list(comp_inst.pins.keys())
         pin_count = len(pins)
-        
-        if pin_count < 2:
-            append_record(comp_name_str, category, maker_pn, s2p_path, "Skipped", "Pin count < 2")
+
+        # 품질 게이트 #1: 2-pin capacitor만 S-parameter 할당 허용 (핀/포트 불일치 방지)
+        if pin_count != 2:
+            append_record(comp_name_str, category, maker_pn, s2p_path, "Skipped", f"Unsupported pin count: {pin_count} (only 2-pin caps)")
             continue
-        if category == "InnerCap" and pin_count > 2:
-            append_record(comp_name_str, category, maker_pn, s2p_path, "Skipped", f"Unsupported pin count: {pin_count}")
+        if port_count != 2:
+            append_record(comp_name_str, category, maker_pn, s2p_path, "Skipped", f"Port/pin mismatch: pin_count=2, sNp_ports={port_count}")
+            continue
+
+        # 품질 게이트 #2: 주파수 상한 1GHz 커버리지 확인
+        fmax_hz = detect_touchstone_freq_max_hz(s2p_path)
+        if fmax_hz is None:
+            append_record(comp_name_str, category, maker_pn, s2p_path, "Skipped", "Failed to read touchstone frequency range", False, port_count)
+            continue
+        if fmax_hz + 1.0 < min_required_hz:
+            append_record(
+                comp_name_str,
+                category,
+                maker_pn,
+                s2p_path,
+                "Skipped",
+                f"Frequency coverage insufficient: fmax={fmax_hz:.3e}Hz < 1.000e+09Hz",
+                False,
+                port_count,
+            )
             continue
 
         pos_pin = next((p for p, pin in comp_inst.pins.items() if pin.net_name != gnd_net), pins[0] if pins else "")
