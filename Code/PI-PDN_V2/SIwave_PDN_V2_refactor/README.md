@@ -152,6 +152,22 @@ Full completed: 14/14 cases
 - `outputs/*_ZoomView.jpg`
 - `outputs/title.json`, `request.json`, `result.json`, `setting.json`, `result_detail.json`
 
+`result_detail.json`의 공통 구조는 DCIR H11과 동일하게 `stackup`, `tools`,
+`Image`, `simSchedule`, `result`, `postInfo`를 사용합니다. `tools`는 도구명,
+실행 단계, 요청 버전, 실제 버전, 코드 버전을 기록하며 실제 설치 버전을
+확인하지 못한 경우 `actualVersionDisplay`는 `-`입니다. `simSchedule`의
+`endData` 철자는 기존 시스템 계약을 유지합니다.
+
+PDN의 임피던스, 최대값 주파수, Touchstone, 검증 근거는 `result`에 유지합니다.
+이미지·CSV·Touchstone 항목은 출력 폴더 기준 파일명으로 제공하고, 진단용
+프로젝트·결과 폴더 경로는 유지합니다. `EDB_Target_Net`에는 실제 EDB Net을
+보존하며 SIGN Net에 `Display_Net`이 있는 경우 표시용 `Net`에 사용합니다.
+
+각 케이스의 `PDN_Result`에는 PDN 상세 결과를 추가로 제공합니다.
+`Files`에 CSV, 임피던스 그래프, Touchstone, FitView, ZoomView의 절대 경로를
+기록하며, 최대 임피던스와 해당 주파수, 결과 파일 검증 근거도 함께 저장합니다.
+생성되지 않은 파일 경로는 빈 문자열, 확보되지 않은 최대값은 `null`입니다.
+
 ## 운영 주의사항
 
 - `core/config.json`의 AEDT 버전과 설치된 AEDT/SIwave 버전이 일치해야 합니다.

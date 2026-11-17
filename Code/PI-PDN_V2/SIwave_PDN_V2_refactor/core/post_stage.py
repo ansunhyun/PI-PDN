@@ -10,6 +10,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import Any
+from core.result_detail import normalize_result_detail
 
 
 class PostStageError(RuntimeError):
@@ -475,6 +476,11 @@ def append_post_detail(output_dir: Path, state: PostStageState) -> None:
         },
         "viewerArtifacts": state.viewer_artifacts,
     }
+    metadata = {}
+    for name in ("setting", "request", "result"):
+        path = Path(output_dir) / f"{name}.json"
+        metadata[name] = _load_json(path) if path.is_file() else {}
+    normalize_result_detail(result_detail, output_dir=output_dir, **metadata)
     temporary_path = result_detail_path.with_suffix(".json.tmp")
     with temporary_path.open("w", encoding="utf-8") as stream:
         json.dump(result_detail, stream, indent=2, ensure_ascii=False, default=str)

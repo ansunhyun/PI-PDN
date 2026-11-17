@@ -37,6 +37,7 @@ from core.post_stage import (
 from core.pin_parsing import parse_cmp_pin_id, parse_cmp_xy_tokens
 from core import pdn_setup_utils
 from core.model_generation import resolve_generation_options
+from core.result_detail import build_pdn_tools, normalize_result_detail
 from core import vrm_setup
 from core.case_isolation import build_case_isolation_plans
 from core.case_session import (
@@ -4144,6 +4145,14 @@ def export_aedt_cutout_post_reports(output_dir: Path, logger: Logger):
         "setting": summary,
         "backend": "aedt_cutout",
     }
+    normalize_result_detail(
+        result_detail_payload, setting=setting_payload, request=request_payload,
+        result=result_payload, output_dir=output_dir,
+        tools=build_pdn_tools(
+            {"PDN": {"version": tool_version}},
+            code_version=VERSION, backend="aedt_cutout",
+        ),
+    )
     for name, payload in (
         ("title.json", title_payload),
         ("request.json", request_payload),
@@ -4167,6 +4176,11 @@ def run_standalone_post(conf_manager, input_json, output_dir, analysis_start=Non
         state.summary,
         state.gnd_net,
         logger,
+        tools=build_pdn_tools(
+            conf_manager.data,
+            stage="full batch" if analysis_start is not None else "POST",
+            code_version=VERSION,
+        ),
     )
     post_processor.set_PDN_results(
         analysis_start or state.analysis_start,

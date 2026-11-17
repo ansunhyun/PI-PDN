@@ -22,6 +22,7 @@ from ansys.aedt.core.generic.settings import Settings
 from EBU_lib.SIwave import SIwave
 from core.logger import LogLevel
 from core.aedt_version import aedt_display_version, normalize_aedt_version
+from core.result_detail import build_pdn_tools, normalize_result_detail
 from pathlib import Path
 from tqdm import tqdm
 
@@ -242,7 +243,7 @@ def _is_touchstone_file(path):
 class PostProcessing:
     """Class to extract AC PDN (Impedance) results and Net Path images from SIwave/AEDT simulation."""
 
-    def __init__(self, conf, setting, outputFolder, summary, GND_NET, logger, siwave=None):
+    def __init__(self, conf, setting, outputFolder, summary, GND_NET, logger, siwave=None, tools=None):
         self._siwave = siwave
         self._conf = conf
         self._setting = setting
@@ -300,6 +301,10 @@ class PostProcessing:
                     "setting": []
                 },
                 "result_detail": {
+                    "stackup": None,
+                    "tools": copy.deepcopy(tools if tools is not None else build_pdn_tools(conf)),
+                    "Image": {"pcbTopImage": None, "pcbBtmImage": None},
+                    "simSchedule": {"startDate": None, "endData": None},
                     "result": []
                 }
             }
@@ -549,6 +554,11 @@ class PostProcessing:
         self._logger.log(f"Simulation Result - Detail", level=LogLevel.DETAIL2)
         self._exportData["result_detail"]["result"] = copy.deepcopy(public_summary)
         update_case_keys(self._exportData["result_detail"]["result"])
+        detail = self._exportData["result_detail"]
+        detail["stackup"] = self._exportData["setting"]["stackup"]
+        detail["Image"] = copy.deepcopy(self._exportData["request"]["Image"])
+        detail["simSchedule"] = copy.deepcopy(self._exportData["result"]["simSchedule"])
+        normalize_result_detail(detail, output_dir=self._outputFolder)
 
     def _sync_post_artifact_metadata(self):
         """Rewrite JSON metadata from verified, final Post artifact paths."""
@@ -574,7 +584,13 @@ class PostProcessing:
                 for field in artifacts:
                     value = source.get(field, '')
                     row[field] = Path(value).name if value else ""
+                for field in ('Peak_Impedance_Ohm', 'Peak_Frequency_Hz', 'Plot_Evidence'):
+                    if field in source:
+                        row[field] = copy.deepcopy(source[field])
 
+        normalize_result_detail(
+            self._exportData.get('result_detail', {}), output_dir=self._outputFolder,
+        )
         for key, value in self._exportData.items():
             output_file = Path(self._outputFolder) / f"{key}.json"
             temporary = output_file.with_suffix(output_file.suffix + ".tmp")
