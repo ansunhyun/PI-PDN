@@ -1,0 +1,257 @@
+{
+  "sourceApp": "C:\\Users\\HP\\Documents\\Pmap_Gerneration\\PmapGenerator_VendorDownload",
+  "createdUtc": "2026-11-16T07:48:58.895640+00:00",
+  "purpose": "PDN 자동화용 모델 확보·대체·검증·매핑 코어",
+  "files": [
+    {
+      "source": "pmap_core/analysis_spec.py",
+      "exported": "pdn_s2p_core/pmap_core/analysis_spec.py",
+      "sourceSha256": "87cbfe09e7b511a46fecb85fbfeb4400fadcf933d80976306f92b3493de9ac4c",
+      "exportedSha256": "b8b316b172aba6237b891dd23aff34cec586fc9d78e8ea383e71a589bebfe91e",
+      "adaptations": []
+    },
+    {
+      "source": "pmap_core/candidate_library.py",
+      "exported": "pdn_s2p_core/pmap_core/candidate_library.py",
+      "sourceSha256": "f70d7ad36a38d1e9efda0fd0ae8d683c77f7f9993a92098410828e69177b5179",
+      "exportedSha256": "0eb067e93a9ee6d5e100c51f5b2a41d4dbe20429688ba37c3b8d53e89c88e283",
+      "adaptations": []
+    },
+    {
+      "source": "pmap_core/component_spec.py",
+      "exported": "pdn_s2p_core/pmap_core/component_spec.py",
+      "sourceSha256": "87e638f8109a37b9f83418419b1c90948e6b31eef16f2afd9062457fbdb84672",
+      "exportedSha256": "61f60b610efa42705e2bc9e6fdcb2e09560a2c72bd0b25f6afc5939353128b32",
+      "adaptations": []
+    },
+    {
+      "source": "pmap_core/models.py",
+      "exported": "pdn_s2p_core/pmap_core/models.py",
+      "sourceSha256": "578326e506d4c602f9b9d4caaf8880ad1670bbcbaf57f20b265b8b1e098da300",
+      "exportedSha256": "578326e506d4c602f9b9d4caaf8880ad1670bbcbaf57f20b265b8b1e098da300",
+      "adaptations": []
+    },
+    {
+      "source": "pmap_core/model_mapping.py",
+      "exported": "pdn_s2p_core/pmap_core/model_mapping.py",
+      "sourceSha256": "bf1b0cb48fe9426d21800a6d01617062c4558e6df6976d613f55505f64bbeb34",
+      "exportedSha256": "09fb49ae1a34f917342352ee1ce06cd99665255a9bb8e135bfdcf72dfc6b2bf4",
+      "adaptations": []
+    },
+    {
+      "source": "pmap_core/model_service.py",
+      "exported": "pdn_s2p_core/pmap_core/model_service.py",
+      "sourceSha256": "0d0fb61eee1c392836fa7f4a3baa1ec3792ce24069e7fae4e602326483a17989",
+      "exportedSha256": "579345c9d3eb049d3ffd4f83e4b7743ffd806ff554adf111a44251df85008baf",
+      "adaptations": [
+        "독립 패키지 네임스페이스로 import 변경",
+        "실행별 registry 경로를 인스턴스 인자로 분리"
+      ]
+    },
+    {
+      "source": "pmap_core/operating_conditions.py",
+      "exported": "pdn_s2p_core/pmap_core/operating_conditions.py",
+      "sourceSha256": "2edf92d3202ffe9771c0da29214af49662ea1ce852435d474e135855b1f022a6",
+      "exportedSha256": "c3b57ce58af6833063771bf0e3c1d6bf994ec8b669f5cd54deede0eb42d9efa5",
+      "adaptations": []
+    },
+    {
+      "source": "pmap_core/part_rules.py",
+      "exported": "pdn_s2p_core/pmap_core/part_rules.py",
+      "sourceSha256": "de33ccef534342d4fd452eabf8a4c9a34a6c348dae395634564b0ee589d70208",
+      "exportedSha256": "7e1999e7fc4fc0c4f0c9ae6439c8165ed3defbd9761dd0339d7967b097bef765",
+      "adaptations": [
+        "독립 패키지 네임스페이스로 import 변경"
+      ]
+    },
+    {
+      "source": "pmap_core/sparameter_qc.py",
+      "exported": "pdn_s2p_core/pmap_core/sparameter_qc.py",
+      "sourceSha256": "5347663beced3902293b797708bc497b6ad656f7a247e9cf18a535982bc58cfb",
+      "exportedSha256": "c217eca3ed7ef1e328bc70fa64d1bcd4e8bc7c6f5ce49b819d0e10c6cfc5dd34",
+      "adaptations": [
+        "독립 패키지 네임스페이스로 import 변경"
+      ]
+    },
+    {
+      "source": "pmap_core/specification_evidence.py",
+      "exported": "pdn_s2p_core/pmap_core/specification_evidence.py",
+      "sourceSha256": "a26d636e5da024392660b8a27a65ef9fcd388c87ff844e0921ef3647c04e711c",
+      "exportedSha256": "d3a7bce118c699ac7e995935ae5ccd9cc9a02bc1697de71d54ebff8efba26abb",
+      "adaptations": []
+    },
+    {
+      "source": "pmap_core/vendor_download.py",
+      "exported": "pdn_s2p_core/pmap_core/vendor_download.py",
+      "sourceSha256": "69778accc6b50aa92b4e11db358deefddc81484f13d169b245c5b37680d20f36",
+      "exportedSha256": "5b1ecb738f8db0503473cbbc9fe0e8c6183a2f675cdcf278425e7ee9f1866df0",
+      "adaptations": [
+        "독립 패키지 네임스페이스로 import 변경"
+      ]
+    },
+    {
+      "source": "pmap_core/__init__.py",
+      "exported": "pdn_s2p_core/pmap_core/__init__.py",
+      "sourceSha256": "b54669bc6c4bce9b6d06e56c0d507b6094a030afd6496cfb44d8d4d9615f1fd3",
+      "exportedSha256": "b54669bc6c4bce9b6d06e56c0d507b6094a030afd6496cfb44d8d4d9615f1fd3",
+      "adaptations": []
+    },
+    {
+      "source": "pmap_core/vendors/base.py",
+      "exported": "pdn_s2p_core/pmap_core/vendors/base.py",
+      "sourceSha256": "4d1668e10ef458c7a0cd74ec904650a6a92c3cb6676b7bb2b2fe31292054cf45",
+      "exportedSha256": "5654ea434e671afb17d5653b9aa6cfe41d2c7f559db0ff69e321b649b701d9e1",
+      "adaptations": []
+    },
+    {
+      "source": "pmap_core/vendors/darfon.py",
+      "exported": "pdn_s2p_core/pmap_core/vendors/darfon.py",
+      "sourceSha256": "5b4f1af879cb1e4d58d8d107f1969c8c88d74a6a6e55345a13e9b281b23711c2",
+      "exportedSha256": "148ccab0951aa90b036478befc075980a1d7435f35ff909baef3bbb8bd480575",
+      "adaptations": [
+        "독립 패키지 네임스페이스로 import 변경"
+      ]
+    },
+    {
+      "source": "pmap_core/vendors/manufacturer_aliases.json",
+      "exported": "pdn_s2p_core/pmap_core/vendors/manufacturer_aliases.json",
+      "sourceSha256": "9dc1df6bc1bb983dc0940de03d31951c6dbb659e0eb691a8419507687ad06772",
+      "exportedSha256": "9dc1df6bc1bb983dc0940de03d31951c6dbb659e0eb691a8419507687ad06772",
+      "adaptations": []
+    },
+    {
+      "source": "pmap_core/vendors/murata.py",
+      "exported": "pdn_s2p_core/pmap_core/vendors/murata.py",
+      "sourceSha256": "357e0f5cf490fb2c44303d50cc9f0a3050340927faddd42b737ad326d4c0c959",
+      "exportedSha256": "f20f47ddfc3727719d74117019bcd08375ea75842e5276403c47e35b82841bc3",
+      "adaptations": [
+        "독립 패키지 네임스페이스로 import 변경"
+      ]
+    },
+    {
+      "source": "pmap_core/vendors/registry.py",
+      "exported": "pdn_s2p_core/pmap_core/vendors/registry.py",
+      "sourceSha256": "e9c96df10e10831dd314baa7132698bfb7f5cc2c996d0397630b0565341a8ae3",
+      "exportedSha256": "31e51599886a80ccfa81baa3c46e586edf8412bafa13ddba7eb53695ad06e4d0",
+      "adaptations": []
+    },
+    {
+      "source": "pmap_core/vendors/samsung.py",
+      "exported": "pdn_s2p_core/pmap_core/vendors/samsung.py",
+      "sourceSha256": "ed562e87665ba88fff543f00c0cabd74db6ee1a2fa432f4d113e46c851b78f92",
+      "exportedSha256": "3e215a04aa9dc355b042f455fc5d384451325e8c6828aebf10ca6f4618669b7b",
+      "adaptations": [
+        "독립 패키지 네임스페이스로 import 변경"
+      ]
+    },
+    {
+      "source": "pmap_core/vendors/samwha.py",
+      "exported": "pdn_s2p_core/pmap_core/vendors/samwha.py",
+      "sourceSha256": "2cd787b2131741a7570f81bffa0f1bab7218e38ee44f1070ce2cfc1eca02c541",
+      "exportedSha256": "d0fa90b50d92256591129f5d1b4310511a2ed0d1aab0441222388d794aa3c6b1",
+      "adaptations": []
+    },
+    {
+      "source": "pmap_core/vendors/samyoung.py",
+      "exported": "pdn_s2p_core/pmap_core/vendors/samyoung.py",
+      "sourceSha256": "750c22d0a4fbdd9e9497a3f5d25ab9b91e51656f22199f62cee12ee6f199c0b9",
+      "exportedSha256": "750c22d0a4fbdd9e9497a3f5d25ab9b91e51656f22199f62cee12ee6f199c0b9",
+      "adaptations": []
+    },
+    {
+      "source": "pmap_core/vendors/taiyo_yuden.py",
+      "exported": "pdn_s2p_core/pmap_core/vendors/taiyo_yuden.py",
+      "sourceSha256": "1577aeb0e75fa3ea18f53d1535f391de66b72b6868d764dfc4ec539c0dc38016",
+      "exportedSha256": "8ae57f50d5c9e13dd130525ea59da5c8e641dbc7ae64e0ede54b5dd48a957a82",
+      "adaptations": [
+        "독립 패키지 네임스페이스로 import 변경"
+      ]
+    },
+    {
+      "source": "pmap_core/vendors/tdk.py",
+      "exported": "pdn_s2p_core/pmap_core/vendors/tdk.py",
+      "sourceSha256": "7445b2c6f10393d552d28a26ca1a0e860dab7388ce2c0af4b60a547ca754f305",
+      "exportedSha256": "647392afdba66cc7f07534e23f5b3b48c6a002ead8c47210b0daf3bc56b36d48",
+      "adaptations": [
+        "독립 패키지 네임스페이스로 import 변경"
+      ]
+    },
+    {
+      "source": "pmap_core/vendors/unresolved.py",
+      "exported": "pdn_s2p_core/pmap_core/vendors/unresolved.py",
+      "sourceSha256": "76203320460b395d357dcd4444110bc3f856b534c8f12bd754ada420a4150013",
+      "exportedSha256": "739d8330e7fb17847a19089cd376962f14a843560579454714521752d35f432d",
+      "adaptations": []
+    },
+    {
+      "source": "pmap_core/vendors/__init__.py",
+      "exported": "pdn_s2p_core/pmap_core/vendors/__init__.py",
+      "sourceSha256": "2261899aeb947be62a9d951ed4fc92cdb7b54d5d75a05ce2669ae2f685d2c071",
+      "exportedSha256": "8dae9afc862d9c93819bfc899f5616c9327d386a94fe748b11a0e5a7ff04120a",
+      "adaptations": []
+    },
+    {
+      "source": "pdn_pre_s2p/approximate_rlc.py",
+      "exported": "pdn_s2p_core/pdn_pre_s2p/approximate_rlc.py",
+      "sourceSha256": "b989ca3afab2f659e2fc0ea9f223fca68eb7df95899ae5eca182417125a6611a",
+      "exportedSha256": "22afd76b633e135f46758eec7fc8070862f48e4a8052d04347e5eec22c2668b0",
+      "adaptations": []
+    },
+    {
+      "source": "pdn_pre_s2p/characteristic.py",
+      "exported": "pdn_s2p_core/pdn_pre_s2p/characteristic.py",
+      "sourceSha256": "1acadaf77301eed4fb18bb8f1114e55bebe086a224bd9c66d6be15bf73b8886d",
+      "exportedSha256": "64e81d2f0d013fc7230af3d730e92eecb07514fbfbc570a5c640faff53cae684",
+      "adaptations": []
+    },
+    {
+      "source": "pdn_pre_s2p/generator.py",
+      "exported": "pdn_s2p_core/pdn_pre_s2p/generator.py",
+      "sourceSha256": "909912a0df715b42b3ba192e307dc6226d9cea6256045afcbe4b0ca67d49daaf",
+      "exportedSha256": "e7c0f12a59100f78c9d3d18a657225a5d06cfe9db479e4e68787848f26edd856",
+      "adaptations": []
+    },
+    {
+      "source": "pdn_pre_s2p/netlist.py",
+      "exported": "pdn_s2p_core/pdn_pre_s2p/netlist.py",
+      "sourceSha256": "4ac0baa52fe51f9e88964159fbd490f4f29e3fb0f5ebf560923fec01c1164bd7",
+      "exportedSha256": "1054c004e2341b4e57ca8880d2e98d4991b361e671cdf1a07df8dabaca09609d",
+      "adaptations": []
+    },
+    {
+      "source": "pdn_pre_s2p/substitution.py",
+      "exported": "pdn_s2p_core/pdn_pre_s2p/substitution.py",
+      "sourceSha256": "1a91575b5792826e557668bd55fb3bb1744235973edd53f3c9c0fa1d94a29499",
+      "exportedSha256": "4561253218617cc198fdc60c796f3098ef824b34f6c457f98bbd9ca98c138d20",
+      "adaptations": []
+    },
+    {
+      "source": "pdn_pre_s2p/__init__.py",
+      "exported": "pdn_s2p_core/pdn_pre_s2p/__init__.py",
+      "sourceSha256": "04c37b90b935aa945062274c335bbe34d7e3edc19fa188e972cccff4cbf0d624",
+      "exportedSha256": "865a478e8740574cff26acf681bef4e796fc39b3b20e771b535bed19b7e15159",
+      "adaptations": []
+    },
+    {
+      "source": "config.py",
+      "exported": "pdn_s2p_core/config.py",
+      "sourceSha256": "4e406f45139ac41d5e89151c9e8b2a82a2446758812d2d01f56a4100680a0643",
+      "exportedSha256": "3d1d7a18f21a7979bbe08e20c392dc80bf54e0de039e1d10a6620d7f7a665ef5",
+      "adaptations": [
+        "의존 상수만 추출",
+        "환경별 경로 제거 및 기본 ANSYS 동기화 비활성화"
+      ]
+    }
+  ],
+  "excluded": [
+    "GUI",
+    "EXE",
+    "빌드 파일",
+    "조사 스크립트·HTTP 캡처",
+    "전체 모델 라이브러리",
+    "보드별 전원 설정"
+  ],
+  "includedEvidence": "원부품 보완 사양 설정·공식 근거 파일",
+  "includedFixture": "공식 모델 한 쌍: 오프라인 통합 검증용, 자동 대체 PN 지정에 사용하지 않음",
+  "sourceExeSha256": "9eae01044d4e114ae953f4a192e8e08de7d7f6adfe7095db2a71ef84279ed57f"
+}

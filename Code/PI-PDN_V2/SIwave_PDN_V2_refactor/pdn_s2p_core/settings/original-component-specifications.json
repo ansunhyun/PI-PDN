@@ -1,0 +1,55 @@
+{
+  "schemaVersion": "1.0",
+  "parts": {
+    "AMK063C6104MH-R": {
+      "partNumber": "AMK063C6104MH-R",
+      "manufacturer": "TaiyoYuden",
+      "specificationStatus": "inferred_from_official_series_and_code_documents",
+      "specification": {
+        "capacitanceF": 1e-07,
+        "ratedVoltageV": 4.0,
+        "dielectric": "X6S",
+        "tolerancePercent": 20.0,
+        "sizeCodeMm": "0603",
+        "lengthMm": 0.6,
+        "widthMm": 0.3,
+        "temperatureRangeC": [
+          -55.0,
+          105.0
+        ],
+        "thicknessMm": null
+      },
+      "evidence": [
+        {
+          "file": "evidence/taiyo-yuden-amk063/official-series-search.html",
+          "sourceUrl": "https://ds.yuden.co.jp/TYCOMPAS/jp/search?pn=AMK063&u=M&cid=C",
+          "sha256": "b451e99194238beec3002fa42f937792825a7ad75735d1613879dc75a0f175d7",
+          "description": "공식 AMK063 목록의 기존 PN·4V·0603·X6S·±20%·온도범위에서 계열 사양 도출"
+        },
+        {
+          "file": "evidence/taiyo-yuden-amk063/official-mlcc-part-number-rules.pdf",
+          "sourceUrl": "https://ds.yuden.co.jp/TYCOMPAS/jp/download?pn=MSASA063EB5475MFNA01&fileType=CS",
+          "sha256": "f6d15ff5216382f2ed8e6c3ab306eccae379d66983bf4f6828f0795bbc36c072",
+          "description": "품번 문서의 104=100nF, C6=X6S, M=±20% 참조. 옛 PN의 H 두께에는 적용하지 않음"
+        }
+      ],
+      "limitations": [
+        "원 PN exact 사양서 미확보: 계열 및 코드 자료에서 사양 도출",
+        "옛 PN H 두께 의미 미확인",
+        "포장 제외 PN과 원 주문 PN의 공식 동일 모델 관계 미확인",
+        "원 부품과 대체 모델의 성능 동등성 및 보드 PDN 미검증"
+      ],
+      "fieldDerivation": {
+        "capacitanceF": "원 PN 104 코드와 품번 문서",
+        "ratedVoltageV": "공식 AMK063 계열의 기존 PN 및 4V 목록",
+        "dielectric": "원 PN C6 코드와 품번 문서·계열 목록",
+        "tolerancePercent": "원 PN M 코드와 품번 문서·계열 목록",
+        "sizeCodeMm": "공식 AMK063 계열 크기",
+        "lengthMm": "공식 AMK063 계열 크기",
+        "widthMm": "공식 AMK063 계열 크기",
+        "temperatureRangeC": "공식 AMK063 계열 X6S 온도범위",
+        "thicknessMm": "미확인"
+      }
+    }
+  }
+}

@@ -1,0 +1,6 @@
+ValidationMode None
+CheckForShortedNets
+FixDisjointNets
+FixOverlappingVias
+StrictDisjointNetCheck
+SetNumCpus 4
